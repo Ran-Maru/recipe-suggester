@@ -28,12 +28,16 @@ function App() {
   }
 
   function copyUrl() {
-    // TODO: recipeの型絞り込み
-    navigator.clipboard.writeText(recipe.url);
+    if (typeof recipe !== 'undefined'){
+      navigator.clipboard.writeText(recipe.url);
+    }
+
   }
 
   function openUrl() {
-    window.open(recipe.url, '_blank', 'noopener,noreferrer');
+    if (typeof recipe !== 'undefined'){
+      window.open(recipe.url, '_blank', 'noopener,noreferrer');
+    }
   }
 
   return (
