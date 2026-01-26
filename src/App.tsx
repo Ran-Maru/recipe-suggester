@@ -1,33 +1,63 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import data from './mapping.json' with { type: 'json' };
 import './App.css'
 
+type Recipe = {
+  title: string;
+  url: string;
+};
+
 function App() {
-  const [count, setCount] = useState(0)
+  // recipeの型付けをする。
+  const [recipe, setRecipe] = useState<Recipe>()
+  // const [recipe, setRecipe] = useState({})
+
+  function getUrl() {
+    const count = data.length;
+
+    // 使い方（例：1から10までのランダムな数）
+    const nth = getRandomInt(count-1);
+
+    setRecipe(data[nth]);
+  }
+
+  function getRandomInt(max: number) {
+    // Math.random() は 0以上1未満の小数を返す
+    // それに max を掛けて切り捨てることで 0 〜 max-1 にし、最後に +1 する
+    return Math.floor(Math.random() * max) + 1;
+  }
+
+  function copyUrl() {
+    // TODO: recipeの型絞り込み
+    navigator.clipboard.writeText(recipe.url);
+  }
+
+  function openUrl() {
+    window.open(recipe.url, '_blank', 'noopener,noreferrer');
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+      <h1>クリックしてレシピをGET!</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+        <button onClick={() => getUrl()}>
+          レシピGETボタン
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <br />
+        <span>
+          {recipe != undefined && recipe.title}
+        </span>
+        <button onClick={() => openUrl()}>
+          開く
+        </button>
+        <button onClick={() => copyUrl()}>
+          コピーする
+        </button>
+        <br/>
+        <button onClick={() => setRecipe(undefined)}>
+          クリア
+        </button>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
