@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import data from './mapping.json' with { type: 'json' };
-import './App.css'
+import { useState } from "react";
+import data from "./mapping.json" with { type: "json" };
+import "./App.css";
 
 type Recipe = {
   title: string;
@@ -9,14 +9,14 @@ type Recipe = {
 
 function App() {
   // recipeの型付けをする。
-  const [recipe, setRecipe] = useState<Recipe>()
+  const [recipe, setRecipe] = useState<Recipe>();
   // const [recipe, setRecipe] = useState({})
 
   function getUrl() {
     const count = data.length;
 
     // 使い方（例：1から10までのランダムな数）
-    const nth = getRandomInt(count-1);
+    const nth = getRandomInt(count - 1);
 
     setRecipe(data[nth]);
   }
@@ -28,15 +28,14 @@ function App() {
   }
 
   function copyUrl() {
-    if (typeof recipe !== 'undefined'){
+    if (typeof recipe !== "undefined") {
       navigator.clipboard.writeText(recipe.url);
     }
-
   }
 
   function openUrl() {
-    if (typeof recipe !== 'undefined'){
-      window.open(recipe.url, '_blank', 'noopener,noreferrer');
+    if (typeof recipe !== "undefined") {
+      window.open(recipe.url, "_blank", "noopener,noreferrer");
     }
   }
 
@@ -44,26 +43,16 @@ function App() {
     <>
       <h1>クリックしてレシピをGET!</h1>
       <div className="card">
-        <button onClick={() => getUrl()}>
-          レシピGETボタン
-        </button>
+        <button onClick={() => getUrl()}>レシピGETボタン</button>
         <br />
-        <span>
-          {recipe != undefined && recipe.title}
-        </span>
-        <button onClick={() => openUrl()}>
-          開く
-        </button>
-        <button onClick={() => copyUrl()}>
-          コピーする
-        </button>
-        <br/>
-        <button onClick={() => setRecipe(undefined)}>
-          クリア
-        </button>
+        <span>{recipe != undefined && recipe.title}</span>
+        <button onClick={() => openUrl()}>開く</button>
+        <button onClick={() => copyUrl()}>コピーする</button>
+        <br />
+        <button onClick={() => setRecipe(undefined)}>クリア</button>
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
