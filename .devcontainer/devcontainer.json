@@ -7,7 +7,7 @@
   "mounts": [
     "source=${localWorkspaceFolderBasename}-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
   ],
-  "postCreateCommand": "sudo chown node node_modules && npm install",
+  "postCreateCommand": "sudo chown node node_modules && npm install && npx playwright install --with-deps chromium webkit ffmpeg",
 
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
@@ -17,8 +17,8 @@
     },
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-  // Viteのデフォルトポート開放
-  "forwardPorts": [5173],
+  // Vite, Playwright reporterのデフォルトポート開放
+  "forwardPorts": [5173, 9323],
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
@@ -26,6 +26,7 @@
       "extensions": [
         "esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint",
+        "ms-playwright.playwright",
         "github.vscode-github-actions",
         "streetsidesoftware.code-spell-checker",
         // 以下ドキュメント作成補助用
