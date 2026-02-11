@@ -3,6 +3,12 @@
 {
   "name": "Node.js",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  // パフォーマンス高速化のためnode_modulesをDocker Volumeに格納する。
+  "mounts": [
+    "source=${localWorkspaceFolderBasename}-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+  ],
+  "postCreateCommand": "sudo chown node node_modules && npm install",
+
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
     // 最新版のGitを使用するため。/ バージョン固定したくなったら設定を記載予定
@@ -13,7 +19,6 @@
   },
   // Viteのデフォルトポート開放
   "forwardPorts": [5173],
-  "postCreateCommand": "npm install",
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
