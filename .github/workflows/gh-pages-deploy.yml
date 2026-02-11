@@ -20,6 +20,7 @@ concurrency:
 
 jobs:
   build:
+    # ビルドが遅くなってきたらランナーをubuntu-slimに戻すことを検討する。
     runs-on: ubuntu-slim
     steps:
       - name: Checkout
