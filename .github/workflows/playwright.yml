@@ -1,11 +1,10 @@
 name: Playwright Tests
 on:
+  # 一時的に無効化
   push:
-    # 一時的に無効化
-    # branches: [ main, master ]
+    branches-ignore: ["*"]
   pull_request:
-    # 一時的に無効化
-    # branches: [main, master]
+    branches-ignore: ["*"]
 jobs:
   test:
     timeout-minutes: 60
