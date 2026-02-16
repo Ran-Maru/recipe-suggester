@@ -1,0 +1,18 @@
+ARG PLAYWRIGHT_VERSION=1.58.2
+# Playwright関連のOSライブラリ、ブラウザ本体が必要なのでPlaywright公式イメージをベースにする。
+# Notice: GitHub Actions内ではDockerは使用しない。
+FROM mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-jammy
+
+# 日本語フォントのインストール（E2Eのスクリーンショットの文字化け防止）
+RUN apt-get update && apt-get install -y \
+    fonts-noto-cjk \
+    sudo \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# ブラウザのダウンロードをスキップ（ベースイメージに含まれるため）
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+
+RUN echo "pwuser ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/pwuser && \
+    chmod 0440 /etc/sudoers.d/pwuser
+
+WORKDIR /workspaces/recipe_suggester
