@@ -2,7 +2,16 @@
   "version": "0.2",
   "language": "en",
   // words - list of words to be always considered correct
-  "words": ["bierner", "dbaeumer", "esbenp", "gyoza"]
+  "words": [
+    "bierner",
+    "codegen",
+    "dbaeumer",
+    "esbenp",
+    "gyoza",
+    "NOPASSWD",
+    "noto",
+    "pwuser"
+  ]
   // flagWords - list of words to be always considered incorrect
   // This is useful for offensive words and common spelling errors.
   // For example "hte" should be "the"

@@ -1,13 +1,17 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/javascript-node
 {
-  "name": "Node.js",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "name": "recipe-suggester開発環境(Node.js + Playwright)",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  // Playwright公式イメージが用意したユーザーを使用する。
+  "remoteUser": "pwuser",
+  "postCreateCommand": "sudo chown -R pwuser:pwuser node_modules && npm install",
   // パフォーマンス高速化のためnode_modulesをDocker Volumeに格納する。
   "mounts": [
     "source=${localWorkspaceFolderBasename}-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
   ],
-  "postCreateCommand": "sudo chown node node_modules && npm install && npx playwright install --with-deps chromium webkit ffmpeg",
 
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
@@ -39,6 +43,6 @@
       }
     }
   }
-  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.e
   // "remoteUser": "root"
 }
