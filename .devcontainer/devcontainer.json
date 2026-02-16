@@ -35,6 +35,8 @@
         "streetsidesoftware.code-spell-checker",
         "ms-azuretools.vscode-docker",
         "docker.docker",
+        "eamodio.gitlens",
+        "usernamehw.errorlens",
         // 以下ドキュメント作成補助用
         "bierner.markdown-preview-github-styles"
       ],
