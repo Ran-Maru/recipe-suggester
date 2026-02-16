@@ -33,6 +33,8 @@
         "ms-playwright.playwright",
         "github.vscode-github-actions",
         "streetsidesoftware.code-spell-checker",
+        "ms-azuretools.vscode-docker",
+        "docker.docker",
         // 以下ドキュメント作成補助用
         "bierner.markdown-preview-github-styles"
       ],
