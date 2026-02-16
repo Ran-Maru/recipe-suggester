@@ -15,4 +15,4 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 RUN echo "pwuser ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/pwuser && \
     chmod 0440 /etc/sudoers.d/pwuser
 
-WORKDIR /workspaces/recipe_suggester
+WORKDIR /workspaces/recipe-suggester
