@@ -45,7 +45,9 @@ function App() {
       <div className="card">
         <button onClick={() => getUrl()}>レシピGETボタン</button>
         <br />
-        <span>{recipe != undefined && recipe.title}</span>
+        <span data-testid="recipe-name">
+          {recipe != undefined && recipe.title}
+        </span>
         <button onClick={() => openUrl()}>開く</button>
         <button onClick={() => copyUrl()}>コピーする</button>
         <br />
