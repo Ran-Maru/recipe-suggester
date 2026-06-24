@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 const URL = "http://localhost:5173/";
 
 test("has title", async ({ page }) => {
-  await page.goto(URL);
+  await page.goto("");
 
   await expect(page).toHaveTitle(/レシピ/);
 });
@@ -11,7 +11,7 @@ test("has title", async ({ page }) => {
 test.describe("レシピGETページのテスト軍", () => {
   // テスト前の共通処理共通処理
   test.beforeEach(async ({ page }) => {
-    await page.goto(URL);
+    await page.goto("");
   });
 
   test("レシピサイトを開く", async ({ page, context }) => {
