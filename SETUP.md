@@ -21,3 +21,14 @@
 1. コンテナ内で`npm run dev`を実行する。
 2. ステップ実行が必要であれば[実行とデバッグ]のサイドバーから[デバッグの開始]をクリックする。
    1. ブレークポイントを貼ることもできる。
+
+## Zed Editorについて
+
+- 基本的にVSCodeの前提で記載しているが、Zed Editorで動かす場合は以下を前提として試す。
+- 拡張機能
+  - Dockerfile
+  - Oxc
+- devcontainerを使う場合の制約
+  - デバッガー（.vscode/launch.json）を使うとタイムアウトする。
+    - https://github.com/zed-industries/zed/issues/57021
+  - ローカルだと問題なくうまくいく。
