@@ -28,8 +28,7 @@
     "vscode": {
       // エディタの見た目以外はここで拡張機能を導入する。
       "extensions": [
-        "esbenp.prettier-vscode",
-        "dbaeumer.vscode-eslint",
+        "VoidZero.vite-plus-extension-pack",
         "ms-playwright.playwright",
         "github.vscode-github-actions",
         "streetsidesoftware.code-spell-checker",
@@ -39,12 +38,7 @@
         "usernamehw.errorlens",
         // 以下ドキュメント作成補助用
         "bierner.markdown-preview-github-styles"
-      ],
-      "settings": {
-        "editor.formatOnSave": true,
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "prettier.requireConfig": true
-      }
+      ]
     }
   }
   // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.e
