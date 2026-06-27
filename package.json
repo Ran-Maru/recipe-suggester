@@ -4,15 +4,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
-    "build": "tsc -b && vite build",
-    "format": "prettier --write .",
-    "lint": "eslint .",
-    "preview": "vite preview",
+    "dev": "vp dev --host",
+    "build": "tsc -b && vp build",
+    "format": "vp fmt .",
+    "lint": "vp lint .",
+    "preview": "vp preview",
     "test:e2e": "playwright test",
     "test:e2e:trace": "playwright test --trace on",
     "test:e2e:ui": "playwright test --trace on --ui --ui-host 0.0.0.0",
-    "test:e2e:report": "playwright show-report --host 0.0.0.0 --port 9323"
+    "test:e2e:report": "playwright show-report --host 0.0.0.0 --port 9323",
+    "prepare": "vp config"
   },
   "dependencies": {
     "react": "^19.2.4",
@@ -20,7 +21,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
-    "@eslint/js": "^9.39.1",
     "@playwright/test": "1.58.2",
     "@rolldown/plugin-babel": "^0.2.3",
     "@types/babel__core": "^7.20.5",
@@ -29,14 +29,20 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
     "babel-plugin-react-compiler": "^1.0.0",
-    "eslint": "^9.39.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
-    "prettier": "3.8.1",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.46.4",
-    "vite": "8.0.16"
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vite-plus": "latest"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "npm",
+      "version": "11.6.2",
+      "onFail": "download"
+    }
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vitest": "4.1.9"
   }
 }

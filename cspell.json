@@ -10,11 +10,19 @@
     "errorlens",
     "esbenp",
     "gyoza",
+    "nonconstructor",
+    "nonoctal",
     "NOPASSWD",
     "noto",
+    "Oxfmt",
+    "oxlint",
     "pwuser",
+    "tsdown",
     "usernamehw",
-    "viewports"
+    "viewports",
+    "vite",
+    "Vitest",
+    "voidzero"
   ]
   // flagWords - list of words to be always considered incorrect
   // This is useful for offensive words and common spelling errors.
