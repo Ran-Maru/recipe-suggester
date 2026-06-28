@@ -27,9 +27,9 @@ function App() {
     return Math.floor(Math.random() * max) + 1;
   }
 
-  function copyUrl() {
+  async function copyUrl() {
     if (typeof recipe !== "undefined") {
-      navigator.clipboard.writeText(recipe.url);
+      await navigator.clipboard.writeText(recipe.url);
     }
   }
 

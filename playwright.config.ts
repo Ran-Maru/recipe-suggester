@@ -1,3 +1,5 @@
+// processの型定義を参照させるために必要
+/// <reference types="node" />
 import { defineConfig, devices } from "@playwright/test";
 
 /**
