@@ -26,7 +26,7 @@ test.describe("レシピGETページのテスト軍", () => {
 
     await page.getByText("開く").click();
     const newPage = await pagePromise;
-    await expect(newPage).toBeDefined();
+    expect(newPage).toBeDefined();
   });
 
   test("レシピサイトのURLをコピーする", async ({
