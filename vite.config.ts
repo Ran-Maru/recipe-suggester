@@ -14,6 +14,8 @@ export default defineConfig({
     },
     env: {
       builtin: true,
+      // playwright.config.tsでNodeJS.processを使用するため設定
+      node: true,
     },
     ignorePatterns: ["dist"],
     overrides: [
@@ -149,7 +151,7 @@ export default defineConfig({
   },
   base: "./",
   // TODO: React CompilerがBabelなしで動作するようになり、Vite Plusが安定したら修正する。
-  // @ts-expect-error
+  // @ts-expect-error: types error
   plugins: lazyPlugins(() => [
     react(),
     babel({ presets: [reactCompilerPreset()] }),
