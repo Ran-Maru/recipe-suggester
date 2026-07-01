@@ -32,3 +32,11 @@
   - デバッガー（.vscode/launch.json）を使うとタイムアウトする。
     - https://github.com/zed-industries/zed/issues/57021
   - ローカルだと問題なくうまくいく。
+
+## devcontainerとローカルの違い
+
+- ローカルだとtsファイルに対して謎のフォーマットが実行される。
+  - Oxcの拡張機能をON/OFFにして確認したら、Oxc拡張機能が原因の模様
+- devcontainerだとOxc拡張機能が起動できない。
+  - devcontainerの権限 or Oxc拡張機能のdevcontainer対応が進んでいないかのどちらか
+    - devcontainer使わなくても良い気がしてきた。。。。
