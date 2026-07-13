@@ -20,6 +20,7 @@ concurrency:
 
 jobs:
   build:
+    timeout-minutes: 5
     # ビルドが遅くなってきたらランナーをubuntu-slimに戻すことを検討する。
     runs-on: ubuntu-slim
     steps:
