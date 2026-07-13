@@ -150,8 +150,6 @@ export default defineConfig({
     ignorePatterns: [],
   },
   base: "./",
-  // TODO: React CompilerがBabelなしで動作するようになり、Vite Plusが安定したら修正する。
-  // @ts-expect-error: types error
   plugins: lazyPlugins(() => [
     react(),
     babel({ presets: [reactCompilerPreset()] }),
