@@ -12,6 +12,11 @@ updates:
       timezone: "Asia/Tokyo"
       day: "friday"
       time: "20:00"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    cooldown:
+      default-days: 3
 
   - package-ecosystem: "github-actions"
     # Workflow files stored in the default location of `.github/workflows`
