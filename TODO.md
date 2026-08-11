@@ -10,5 +10,3 @@
 ```
 
 ### その他のTODO
-
-- pluginの// @ts-expect-error

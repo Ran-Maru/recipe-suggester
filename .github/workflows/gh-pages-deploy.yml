@@ -21,15 +21,15 @@ concurrency:
 jobs:
   build:
     timeout-minutes: 5
-    # ビルドが遅くなってきたらランナーをubuntu-slimに戻すことを検討する。
+    # ビルドが遅くなってきたらランナーをubuntu-latestに戻すことを検討する。
     runs-on: ubuntu-slim
     steps:
       - name: Checkout
         uses: actions/checkout@v7
       - name: Setup Node
-        uses: voidzero-dev/setup-vp@v1
+        uses: voidzero-dev/setup-vp@v1.17.0
         with:
-          node-version: 24.18.0
+          node-version-file: ".node-version"
           cache: true
       - name: Install dependencies and build assets
         run: |
