@@ -12,9 +12,29 @@ updates:
       timezone: "Asia/Tokyo"
       day: "friday"
       time: "20:00"
+
+    groups:
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+          - "@vitejs/plugin-react"
+      other:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+          - "@vitejs/plugin-react"
     ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+      # @types/nodeのメジャーバージョンはnode.jsのバージョンに依存するため、メジャーバージョンアップデートは無視する。
+      - dependency-name: "@types/node"
+        update-types:
+          - "version-update:semver-major"
     cooldown:
       default-days: 3
 
@@ -27,3 +47,5 @@ updates:
       timezone: "Asia/Tokyo"
       day: "friday"
       time: "20:00"
+    cooldown:
+      default-days: 3

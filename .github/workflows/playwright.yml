@@ -1,4 +1,4 @@
-name: Playwright Tests
+name: Playwright Tests & Dependabot Auto Merge
 on:
   push:
     branches: [main]
@@ -10,14 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: voidzero-dev/setup-vp@v1
+      - uses: voidzero-dev/setup-vp@v1.17.0
         with:
-          node-version: "24.18.0"
+          node-version-file: ".node-version"
           cache: true
-      - name: Install dependencies
-        run: vp install
-      - name: Check Lint Rules And TypeScript Errors
+          run-install: true
+      - name: Check Build And Lint Rules And TypeScript Errors
         run: vp check
+      - name: Check Build
+        run: vp build
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium webkit
       - name: Run Playwright tests
@@ -28,3 +29,31 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+
+  # ブランチの保護ルール（特定CI Checkを必須化） + `gh pr merge --auto --merge "$PR_URL"` で対応する方法もあった。
+  # しかしブランチ保護ルールはPrivate Repositoryでは有料プランでしか使えないため、この方式を採用した。
+  dependabot-auto-merge:
+    needs: test
+    if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Dependabot metadata取得
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: マージ実行(minor/patchのみの場合、マージする。)
+        if: |
+          steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
+          steps.metadata.outputs.update-type == 'version-update:semver-minor'
+        run: gh pr merge --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
