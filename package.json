@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vp dev --host",
     "build": "tsc -b && vp build",
+    "check": "vp check && node scripts/check-mapping.json.js",
     "format": "vp fmt .",
     "lint": "vp lint .",
     "preview": "vp preview",
