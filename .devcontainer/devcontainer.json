@@ -21,7 +21,7 @@
     },
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-  // Vite, Playwright reporterのデフォルトポート開放
+  // プライマリ clone の既定ポート。worktree では scripts/dev-ports.js がずらす。
   "forwardPorts": [5173, 9323],
   // Configure tool-specific properties.
   "customizations": {
