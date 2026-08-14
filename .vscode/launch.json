@@ -4,7 +4,7 @@
     {
       "type": "chrome",
       "request": "launch",
-      "name": "Vite: Chromeデバッグ (先にnpm run devが必要)",
+      "name": "Vite: Chromeデバッグ (先にpnpm run devが必要)",
       "url": "http://localhost:5173",
       "webRoot": "${workspaceFolder}"
     }

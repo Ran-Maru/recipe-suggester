@@ -2,16 +2,16 @@
 
 ## 正常動作したもの
 
-- `npx playwright test`
-- テスト実行後の`npx playwright show-report --host 0.0.0.0 --port 9323`
-- `npx playwright test --ui`
+- `pnpm test:e2e` / `pnpm exec playwright test`
+- テスト実行後の`pnpm test:e2e:report` / `pnpm exec playwright show-report --host 0.0.0.0 --port 9323`
+- `pnpm test:e2e:ui` / `pnpm exec playwright test --ui`
 
 ## 動作しなかったもの
 
-- `npx playwright test --debug`
+- `pnpm exec playwright test --debug`
   - devcontainerで使うのは難しそう。
   - uiモードやtraceファイルが代わりになりそう。（ステップ実行などはできなさそう）
-- `npx playwright codegen`
+- `pnpm exec playwright codegen`
 
 ## 参考
 

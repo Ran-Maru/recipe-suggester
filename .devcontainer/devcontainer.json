@@ -7,7 +7,7 @@
   },
   // Playwright公式イメージが用意したユーザーを使用する。
   "remoteUser": "pwuser",
-  "postCreateCommand": "sudo chown -R pwuser:pwuser node_modules && npm install",
+  "postCreateCommand": "sudo chown -R pwuser:pwuser node_modules && pnpm install",
   // パフォーマンス高速化のためnode_modulesをDocker Volumeに格納する。
   "mounts": [
     "source=${localWorkspaceFolderBasename}-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
