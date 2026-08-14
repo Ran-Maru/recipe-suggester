@@ -1,6 +1,6 @@
 {
   "name": "recipe-suggester",
-  "install": "set -euo pipefail\nif [ -s \"$HOME/.nvm/nvm.sh\" ]; then\n  . \"$HOME/.nvm/nvm.sh\"\n  nvm use\n  hash -r\nfi\nnpm install\nnpx playwright install chromium webkit",
+  "install": "set -eo pipefail\nif [ -s \"$HOME/.nvm/nvm.sh\" ]; then\n  set +u\n  . \"$HOME/.nvm/nvm.sh\"\n  nvm install \"$(tr -d '[:space:]' < .node-version)\"\n  nvm use \"$(tr -d '[:space:]' < .node-version)\"\n  set -u\n  hash -r\nfi\nnpm install\nnpx playwright install chromium webkit",
   "ports": [
     {
       "name": "Vite",
