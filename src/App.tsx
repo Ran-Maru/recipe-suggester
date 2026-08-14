@@ -1,11 +1,13 @@
 import { useState } from "react";
 import data from "./mapping.json" with { type: "json" };
-import "./App.css";
 
 type Recipe = {
   title: string;
   url: string;
 };
+
+const buttonClassName =
+  "cursor-pointer rounded-lg border border-transparent bg-button px-[1.2em] py-[0.6em] text-[1em] font-medium transition-[border-color] duration-250 hover:border-brand focus:outline-4 focus-visible:outline-4 dark:bg-button-dark";
 
 function App() {
   // recipeの型付けをする。
@@ -41,17 +43,26 @@ function App() {
 
   return (
     <>
-      <h1>クリックしてレシピをGET!</h1>
-      <div className="card">
-        <button onClick={() => getUrl()}>レシピGETボタン</button>
-        <br />
+      <h1 className="text-[3.2em] leading-[1.1]">クリックしてレシピをGET!</h1>
+      <div className="flex flex-col items-center gap-4 p-[2em]">
+        <button className={buttonClassName} onClick={() => getUrl()}>
+          レシピGETボタン
+        </button>
         <span data-testid="recipe-name">
           {recipe != undefined && recipe.title}
         </span>
-        <button onClick={() => openUrl()}>開く</button>
-        <button onClick={() => copyUrl()}>コピーする</button>
-        <br />
-        <button onClick={() => setRecipe(undefined)}>クリア</button>
+        <button className={buttonClassName} onClick={() => openUrl()}>
+          開く
+        </button>
+        <button className={buttonClassName} onClick={() => copyUrl()}>
+          コピーする
+        </button>
+        <button
+          className={buttonClassName}
+          onClick={() => setRecipe(undefined)}
+        >
+          クリア
+        </button>
       </div>
     </>
   );
