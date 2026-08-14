@@ -11,7 +11,7 @@ export const DEFAULT_PREVIEW_PORT = 4173;
 
 /**
  * Linked git worktrees store `.git` as a file, not a directory.
- * The primary clone (and CI / Dev Container checkouts) keep `.git` as a directory.
+ * The primary clone (and CI checkouts) keep `.git` as a directory.
  *
  * @param {string} [cwd]
  * @returns {boolean}
