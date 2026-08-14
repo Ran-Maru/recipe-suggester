@@ -2,9 +2,20 @@ import { defineConfig, lazyPlugins } from "vite-plus";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
+import { devPorts } from "./scripts/dev-ports.js";
+
+const { dev, preview } = devPorts();
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    port: dev,
+    strictPort: true,
+  },
+  preview: {
+    port: preview,
+    strictPort: true,
+  },
   staged: {
     "*": "vp check --fix",
   },

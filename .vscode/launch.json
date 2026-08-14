@@ -4,7 +4,7 @@
     {
       "type": "chrome",
       "request": "launch",
-      "name": "Vite: Chromeデバッグ (先にnpm run devが必要)",
+      "name": "Vite: Chromeデバッグ (先にnpm run devが必要。既定は5173。worktreeでは node scripts/dev-ports.js の dev を確認)",
       "url": "http://localhost:5173",
       "webRoot": "${workspaceFolder}"
     }

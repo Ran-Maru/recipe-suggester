@@ -1,14 +1,10 @@
 // processの型定義を参照させるために必要
 /// <reference types="node" />
 import { defineConfig, devices } from "@playwright/test";
+import { devOrigin, devPorts } from "./scripts/dev-ports.js";
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+const { report } = devPorts();
+const origin = devOrigin();
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -24,14 +20,13 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  // reporter: [["html", { host: "0.0.0.0", port: 9323 }], ["github"]],
   reporter: process.env.CI
     ? [["github"], ["html"]]
-    : [["html", { host: "0.0.0.0", port: 9323 }]],
+    : [["html", { host: "0.0.0.0", port: report }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
-    baseURL: "http://localhost:5173",
+    baseURL: origin,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
@@ -68,7 +63,8 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: "npm run dev",
-    url: "http://localhost:5173",
+    url: origin,
+    // Unique per-worktree ports make reuse safe: this URL will not match another worktree.
     reuseExistingServer: !process.env.CI,
     timeout: 20 * 1000,
   },
