@@ -25,15 +25,14 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 
 ### Toolchain / runtime
 
-- Node is managed by `nvm` with the default alias set to `24.19.0` (matches `.node-version`), and `npm` is pinned globally to `11.6.2` (matches the `devEngines` requirement). The update script only runs `npm install` + a Playwright browser install; the node/npm versions come from this persisted nvm setup.
+- Node is managed by `nvm` with the default alias set to `24.19.0` (matches `.node-version`), and `npm` is pinned globally to `11.6.2` (matches the `devEngines` requirement). `.cursor/environment.json` `install` runs `npm install` and a Playwright browser install; the node/npm versions come from this persisted nvm setup.
 - Gotcha: run commands in a login shell so `nvm` is sourced. A non-login shell may resolve `node` to `/exec-daemon/node` (v22) and mismatch the pinned `npm`, which triggers `npm error EBADDEVENGINES` on `npm install`. The Cursor terminal login shells already handle this.
 - `vp` is a project-local binary (`node_modules/.bin/vp`), not global here. Invoke it via the `package.json` scripts (`npm run dev`, `npm run check`, `npm run build`) or `npx vp`.
 
 ### Run / lint / build / test
 
-- Dev server: `npm run dev` (runs `vp dev --host`). The primary clone and CI use `http://localhost:5173`. Linked git worktrees get a stable offset from the worktree path so parallel checkouts do not collide. `strictPort` is on, so a busy port fails instead of Vite silently incrementing. Print the ports with `node scripts/dev-ports.js`. Override with `DEV_PORT=5180 npm run dev` (HTML report / Playwright UI / preview shift by the same offset).
-- Playwright: `npx playwright install` once (chromium + webkit). Then `npx playwright test` — Playwright auto-starts the matching-port dev server via `webServer`, so you do NOT need to start `npm run dev` first. The `webkit` clipboard test is intentionally skipped (WebKit lacks clipboard API support).
+- Dev server: `npm run dev` (runs `vp dev --host`) serves on `http://localhost:5173`.
 - Lint + typecheck + mapping validation: `npm run check` (`vp check` then `scripts/check-mapping.json.js`).
 - Build: `npm run build` (`tsc -b && vp build`).
+- E2E tests: `npx playwright test`. Playwright auto-starts the dev server via the `webServer` block in `playwright.config.ts`, so you do NOT need to start `npm run dev` first. Browsers `chromium` and `webkit` are required; the `webkit` clipboard test is intentionally skipped (WebKit lacks clipboard API support).
 - Git hooks: `vp config` (run by `npm` `prepare`) leaves `core.hooksPath` alone because Cursor already points it at its own agent hooks; this is expected, not an error.
-- Agent shell: `.cursor/hooks.json` denies `sudo`, `git push --force`, recursive `rm` of system paths, `chmod -R`, `mkfs`, `dd`, and `security dump-keychain`. `ask` is not used because Cursor currently only enforces `deny`.

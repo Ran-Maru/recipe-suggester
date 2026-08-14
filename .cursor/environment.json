@@ -1,0 +1,14 @@
+{
+  "name": "recipe-suggester",
+  "install": "set -euo pipefail\nif [ -s \"$HOME/.nvm/nvm.sh\" ]; then\n  . \"$HOME/.nvm/nvm.sh\"\n  nvm use\n  hash -r\nfi\nnpm install\nnpx playwright install chromium webkit",
+  "ports": [
+    {
+      "name": "Vite",
+      "port": 5173
+    },
+    {
+      "name": "Playwright report",
+      "port": 9323
+    }
+  ]
+}
