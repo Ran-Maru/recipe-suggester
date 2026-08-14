@@ -1,6 +1,29 @@
 # 環境構築方法
 
-## 事前準備
+ホストで開発するのが既定です。Dev Container は任意です。
+
+## ホストで開発する場合
+
+### 事前準備
+
+- Node.js 24.19.0（`.node-version`。nvm なら `nvm use`）
+- npm 11.6.2（`package.json` の `devEngines`）
+- Git
+
+### 構築手順
+
+1. リポジトリを clone する（または git worktree を切る）
+2. `npm install`
+3. 初回のみ `npx playwright install`（chromium と webkit）
+4. `npm run dev` で開発サーバを起動する。ポートは `node scripts/dev-ports.js` で確認できる
+
+並列 worktree では、リンクされた worktree だけ Vite / Playwright のポートが自動でずれる。明示する場合は `DEV_PORT=5180 npm run dev`。
+
+Cursor の Agent は `.cursor/hooks.json` で危険なシェルコマンドを deny する。
+
+## Dev Container を使う場合
+
+### 事前準備
 
 - VSCodeのインストール
 - Dockerのインストール
@@ -9,7 +32,7 @@
 - VSCodeに[Dev Container拡張機能](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)をインストール
 - 本リポジトリのgit clone
 
-## 構築手順
+### 構築手順
 
 1. Dockerが起動していることを確認する。
 2. VSCodeで本フォルダを開く
