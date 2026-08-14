@@ -1,6 +1,7 @@
 import { defineConfig, lazyPlugins } from "vite-plus";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import babel from "@rolldown/plugin-babel";
+import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -138,19 +139,36 @@ export default defineConfig({
         name: "vite-plus",
         specifier: "vite-plus/oxlint-plugin",
       },
+      "oxlint-tailwindcss",
     ],
+    settings: {
+      tailwindcss: {
+        entryPoint: "src/index.css",
+        variablePatterns: ["^buttonClassName$"],
+      },
+    },
     rules: {
       "vite-plus/prefer-vite-plus-imports": "error",
+      "tailwindcss/no-unknown-classes": "error",
+      "tailwindcss/no-conflicting-classes": "error",
+      "tailwindcss/no-deprecated-classes": "error",
+      "tailwindcss/no-duplicate-classes": "warn",
+      "tailwindcss/enforce-canonical": "warn",
+      "tailwindcss/no-unnecessary-arbitrary-value": "warn",
     },
   },
   fmt: {
     singleQuote: false,
     printWidth: 80,
     sortPackageJson: false,
+    sortTailwindcss: {
+      stylesheet: "./src/index.css",
+    },
     ignorePatterns: [],
   },
   base: "./",
   plugins: lazyPlugins(() => [
+    tailwindcss(),
     react(),
     babel({ presets: [reactCompilerPreset()] }),
   ]),
