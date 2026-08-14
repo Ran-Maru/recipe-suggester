@@ -31,8 +31,9 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 
 ### Run / lint / build / test
 
-- Dev server: `npm run dev` (runs `vp dev --host`) serves on `http://localhost:5173`.
+- Dev server: `npm run dev` (runs `vp dev --host`). The primary clone and CI use `http://localhost:5173`. Linked git worktrees get a stable offset from the worktree path so parallel checkouts do not collide. `strictPort` is on, so a busy port fails instead of Vite silently incrementing. Print the ports with `node scripts/dev-ports.js`. Override with `DEV_PORT=5180 npm run dev` (HTML report / Playwright UI / preview shift by the same offset).
+- Host Playwright (no Dev Container): `npx playwright install` once (chromium + webkit). Then `npx playwright test` — Playwright auto-starts the matching-port dev server via `webServer`, so you do NOT need to start `npm run dev` first. The `webkit` clipboard test is intentionally skipped (WebKit lacks clipboard API support).
 - Lint + typecheck + mapping validation: `npm run check` (`vp check` then `scripts/check-mapping.json.js`).
 - Build: `npm run build` (`tsc -b && vp build`).
-- E2E tests: `npx playwright test`. Playwright auto-starts the dev server via the `webServer` block in `playwright.config.ts`, so you do NOT need to start `npm run dev` first. Browsers `chromium` and `webkit` are required; the `webkit` clipboard test is intentionally skipped (WebKit lacks clipboard API support).
 - Git hooks: `vp config` (run by `npm` `prepare`) leaves `core.hooksPath` alone because Cursor already points it at its own agent hooks; this is expected, not an error.
+- Agent shell: `.cursor/hooks.json` denies `sudo`, `git push --force`, recursive `rm` of system paths, `chmod -R`, `mkfs`, `dd`, and `security dump-keychain`. `ask` is not used because Cursor currently only enforces `deny`.
