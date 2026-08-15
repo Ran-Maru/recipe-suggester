@@ -1,3 +1,9 @@
+# レシピGET!
+
+セットアップ手順は [SETUP.md](./SETUP.md) を参照。
+
+過去の Dev Container 定義（`.devcontainer/devcontainer.json` など）はホスト開発への移行に伴い削除した。当時のファイルはコミット [`75a04d848c840d7682f78856519f1ef1e8d2c669`](https://github.com/Ran-Maru/recipe-suggester/commit/75a04d848c840d7682f78856519f1ef1e8d2c669) に残っている。復元方法は SETUP.md の「過去の Dev Container 設定」を参照。
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

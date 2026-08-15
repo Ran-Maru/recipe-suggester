@@ -2,23 +2,25 @@
 
 ## 事前準備
 
-- VSCodeのインストール
-- Dockerのインストール
-  - Docker Desktop等
-- Gitのインストール
-- VSCodeに[Dev Container拡張機能](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)をインストール
-- 本リポジトリのgit clone
+- Vite+（`vp`）。未導入なら https://viteplus.dev/guide/ の手順でインストール
+- Node.js は Vite+ が `.node-version`（24.19.0）から解決する
+- npm は `package.json` の `devEngines.packageManager`（11.6.2）
+- Git
 
 ## 構築手順
 
-1. Dockerが起動していることを確認する。
-2. VSCodeで本フォルダを開く
-3. 画面左下のマークをクリックして「コンテナーで再度開く」をクリックする。
-4. コンテナがビルドされ開発環境が起動する。
+1. リポジトリを clone する（または git worktree を切る）
+2. `vp install`
+3. 初回のみ `npx playwright install`（chromium と webkit）
+4. `npm run dev` で開発サーバを起動する。ポートは `node scripts/dev-ports.js` で確認できる
+
+並列 worktree では、リンクされた worktree だけ Vite / Playwright のポートが自動でずれる。明示する場合は `DEV_PORT=5180 npm run dev`。
+
+Cursor の Agent は `.cursor/hooks.json` で危険なシェルコマンドを deny する。
 
 ## デバッグの手順
 
-1. コンテナ内で`npm run dev`を実行する。
+1. `npm run dev` を実行する。
 2. ステップ実行が必要であれば[実行とデバッグ]のサイドバーから[デバッグの開始]をクリックする。
    1. ブレークポイントを貼ることもできる。
 
@@ -26,17 +28,20 @@
 
 - 基本的にVSCodeの前提で記載しているが、Zed Editorで動かす場合は以下を前提として試す。
 - 拡張機能
-  - Dockerfile
   - Oxc
-- devcontainerを使う場合の制約
-  - デバッガー（.vscode/launch.json）を使うとタイムアウトする。
-    - https://github.com/zed-industries/zed/issues/57021
-  - ローカルだと問題なくうまくいく。
 
-## devcontainerとローカルの違い
+## 過去の Dev Container 設定
 
-- ローカルだとtsファイルに対して謎のフォーマットが実行される。
-  - Oxcの拡張機能をON/OFFにして確認したら、Oxc拡張機能が原因の模様
-- devcontainerだとOxc拡張機能が起動できない。
-  - devcontainerの権限 or Oxc拡張機能のdevcontainer対応が進んでいないかのどちらか
-    - devcontainer使わなくても良い気がしてきた。。。。
+ホスト開発へ移行したため `.devcontainer/` は削除した。再導入したくなった場合は、次のコミットに当時のファイルが残っている。
+
+- コミット: [`75a04d848c840d7682f78856519f1ef1e8d2c669`](https://github.com/Ran-Maru/recipe-suggester/commit/75a04d848c840d7682f78856519f1ef1e8d2c669)（当時の `main`。`feat: replace raw CSS with Tailwind CSS v4 (#60)`）
+- 含まれるファイル:
+  - `.devcontainer/devcontainer.json`
+  - `.devcontainer/DockerFile`
+  - `.devcontainer/devcontainer-lock.json`
+
+復元例:
+
+```bash
+git checkout 75a04d848c840d7682f78856519f1ef1e8d2c669 -- .devcontainer
+```

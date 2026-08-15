@@ -1,0 +1,14 @@
+{
+  "name": "recipe-suggester",
+  "install": "set -eo pipefail\ncommand -v vp >/dev/null 2>&1 || curl -fsSL https://vite.plus | bash\nexport PATH=\"${VP_HOME:-$HOME/.vite-plus}/bin:$PATH\"\nvp install\nnpx playwright install chromium webkit",
+  "ports": [
+    {
+      "name": "Vite",
+      "port": 5173
+    },
+    {
+      "name": "Playwright report",
+      "port": 9323
+    }
+  ]
+}

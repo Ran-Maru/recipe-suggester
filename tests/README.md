@@ -3,15 +3,8 @@
 ## 正常動作したもの
 
 - `npx playwright test`
-- テスト実行後の`npx playwright show-report --host 0.0.0.0 --port 9323`
+- テスト実行後の`npm run test:e2e:report`（ポートは worktree ごとに `scripts/dev-ports.js` が決める）
 - `npx playwright test --ui`
-
-## 動作しなかったもの
-
-- `npx playwright test --debug`
-  - devcontainerで使うのは難しそう。
-  - uiモードやtraceファイルが代わりになりそう。（ステップ実行などはできなさそう）
-- `npx playwright codegen`
 
 ## 参考
 

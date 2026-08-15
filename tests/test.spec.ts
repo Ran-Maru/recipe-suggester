@@ -1,7 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-const URL = "http://localhost:5173/";
-
 test("has title", async ({ page }) => {
   await page.goto("");
 
@@ -38,8 +36,11 @@ test.describe("レシピGETページのテスト軍", () => {
     test.skip(browserName === "webkit", "WebKit lacks clipboard API support");
 
     // クリップボードへのアクセス権限を付与
+    const origin = new URL(
+      test.info().project.use.baseURL ?? "http://localhost:5173",
+    ).origin;
     await context.grantPermissions(["clipboard-read", "clipboard-write"], {
-      origin: URL,
+      origin,
     });
 
     // ボタンを押すとレシピ名が表示される。
