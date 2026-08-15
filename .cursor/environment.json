@@ -1,6 +1,6 @@
 {
   "name": "recipe-suggester",
-  "install": "set -eo pipefail\nif [ -s \"$HOME/.nvm/nvm.sh\" ]; then\n  set +u\n  . \"$HOME/.nvm/nvm.sh\"\n  nvm install \"$(tr -d '[:space:]' < .node-version)\"\n  nvm use \"$(tr -d '[:space:]' < .node-version)\"\n  set -u\n  hash -r\nfi\nnpm install\nnpx playwright install chromium webkit",
+  "install": "set -eo pipefail\ncommand -v vp >/dev/null 2>&1 || curl -fsSL https://vite.plus | bash\nexport PATH=\"${VP_HOME:-$HOME/.vite-plus}/bin:$PATH\"\nvp install\nnpx playwright install chromium webkit",
   "ports": [
     {
       "name": "Vite",

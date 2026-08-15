@@ -2,14 +2,15 @@
 
 ## 事前準備
 
-- Node.js 24.19.0（`.node-version`。nvm なら `nvm use`）
-- npm 11.6.2（`package.json` の `devEngines`）
+- Vite+（`vp`）。未導入なら https://viteplus.dev/guide/ の手順でインストール
+- Node.js は Vite+ が `.node-version`（24.19.0）から解決する
+- npm は `package.json` の `devEngines.packageManager`（11.6.2）
 - Git
 
 ## 構築手順
 
 1. リポジトリを clone する（または git worktree を切る）
-2. `npm install`
+2. `vp install`
 3. 初回のみ `npx playwright install`（chromium と webkit）
 4. `npm run dev` で開発サーバを起動する。ポートは `node scripts/dev-ports.js` で確認できる
 

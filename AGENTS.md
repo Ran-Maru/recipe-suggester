@@ -25,9 +25,9 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 
 ### Toolchain / runtime
 
-- Node is managed by `nvm` with the default alias set to `24.19.0` (matches `.node-version`), and `npm` is pinned globally to `11.6.2` (matches the `devEngines` requirement). `.cursor/environment.json` `install` runs `npm install` and a Playwright browser install; the node/npm versions come from this persisted nvm setup.
-- Gotcha: run commands in a login shell so `nvm` is sourced. A non-login shell may resolve `node` to `/exec-daemon/node` (v22) and mismatch the pinned `npm`, which triggers `npm error EBADDEVENGINES` on `npm install`. The Cursor terminal login shells already handle this.
-- `vp` is a project-local binary (`node_modules/.bin/vp`), not global here. Invoke it via the `package.json` scripts (`npm run dev`, `npm run check`, `npm run build`) or `npx vp`.
+- Node.js and npm are managed by Vite+ (`vp env`). `.node-version` pins Node 24.19.0; `package.json` `devEngines.packageManager` pins npm 11.6.2. `.cursor/environment.json` `install` runs `vp install` and a Playwright browser install.
+- Prefer `vp install` and `vp run <script>` so the managed runtime is used. Bare `npm` from `/exec-daemon/node` (v22) can fail with `npm error EBADDEVENGINES`. If runtime or package-manager behavior looks wrong, run `vp env doctor`.
+- After install, `vp` is available as `node_modules/.bin/vp`. Invoke it via the `package.json` scripts (`npm run dev`, `npm run check`, `npm run build`) or `npx vp`.
 
 ### Run / lint / build / test
 
