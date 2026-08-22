@@ -25,13 +25,13 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 
 ### Toolchain / runtime
 
-- Node is managed by `nvm` with the default alias set to `24.19.0` (matches `.node-version`), and `npm` is pinned globally to `11.6.2` (matches the `devEngines` requirement and the devcontainer `Dockerfile`). The update script only runs `npm install` + a Playwright browser install; the node/npm versions come from this persisted nvm setup.
+- Node is managed by Vite Plus (matches `.node-version` `24.19.0`), and `npm` is pinned to `11.6.2` (matches the `devEngines` requirement). The update script only runs `npm install` + a Playwright browser install.
 - Gotcha: run commands in a login shell so `nvm` is sourced. A non-login shell may resolve `node` to `/exec-daemon/node` (v22) and mismatch the pinned `npm`, which triggers `npm error EBADDEVENGINES` on `npm install`. The Cursor terminal login shells already handle this.
 - `vp` is a project-local binary (`node_modules/.bin/vp`), not global here. Invoke it via the `package.json` scripts (`npm run dev`, `npm run check`, `npm run build`) or `npx vp`.
 
 ### Run / lint / build / test
 
-- Dev server: `npm run dev` (runs `vp dev --host`) serves on `http://localhost:5173`.
+- Dev server: `npm run dev` (runs `vp dev`) serves on `http://localhost:5173`.
 - Lint + typecheck + mapping validation: `npm run check` (`vp check` then `scripts/check-mapping.json.js`).
 - Build: `npm run build` (`tsc -b && vp build`).
 - E2E tests: `npx playwright test`. Playwright auto-starts the dev server via the `webServer` block in `playwright.config.ts`, so you do NOT need to start `npm run dev` first. Browsers `chromium` and `webkit` are required; the `webkit` clipboard test is intentionally skipped (WebKit lacks clipboard API support).
