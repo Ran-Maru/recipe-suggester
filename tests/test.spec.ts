@@ -47,12 +47,15 @@ test.describe("レシピGETページのテスト軍", () => {
     const name = page.getByTestId("recipe-name");
     await expect(name).not.toHaveText("");
 
-    // URLがコピーできること
+    // URLがコピーできること（外部httpsまたは同一オリジンの相対レシピ）
     await page.getByRole("button", { name: "コピーする" }).click();
     const clipboardText = await page.evaluate(() =>
       navigator.clipboard.readText(),
     );
-    expect(clipboardText).toContain("https://");
+    expect(clipboardText).not.toBe("");
+    expect(
+      clipboardText.startsWith("https://") || clipboardText.startsWith(URL),
+    ).toBe(true);
   });
 
   test("クリアボタンが動作すること", async ({ page }) => {
@@ -64,4 +67,58 @@ test.describe("レシピGETページのテスト軍", () => {
     await page.getByText("クリア").click();
     await expect(name).toHaveText("");
   });
+});
+
+test.describe("一覧ページのテスト", () => {
+  test("テーブルのヘッダーと行が表示される", async ({ page }) => {
+    await page.goto("/recipes");
+
+    await expect(page.getByRole("columnheader", { name: "No" })).toBeVisible();
+    await expect(
+      page.getByRole("columnheader", { name: "メニュー名" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("columnheader", { name: "リンク" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("columnheader", { name: "コピー" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "しょうが焼き" }),
+    ).toBeVisible();
+  });
+
+  test("リンクをコピーできる", async ({ page, context, browserName }) => {
+    test.skip(browserName === "webkit", "WebKit lacks clipboard API support");
+
+    await context.grantPermissions(["clipboard-read", "clipboard-write"], {
+      origin: URL,
+    });
+
+    await page.goto("/recipes");
+    await page.getByRole("button", { name: "コピー" }).first().click();
+    const clipboardText = await page.evaluate(() =>
+      navigator.clipboard.readText(),
+    );
+    expect(clipboardText).not.toBe("");
+    expect(
+      clipboardText.startsWith("https://") || clipboardText.startsWith(URL),
+    ).toBe(true);
+  });
+});
+
+test("餃子ページが表示される", async ({ page }) => {
+  await page.goto("/family-recipe/gyoza");
+
+  await expect(page.getByRole("heading", { name: "うちの餃子" })).toBeVisible();
+});
+
+test("ナビでレシピGETと一覧を行き来できる", async ({ page }) => {
+  await page.goto("");
+
+  await page.getByRole("link", { name: "一覧" }).click();
+  await expect(page).toHaveURL(/\/recipes$/);
+
+  await page.getByRole("link", { name: "レシピGET" }).click();
+  await expect(page).toHaveURL(new RegExp(`${URL.replaceAll("/", "\\/")}$`));
 });

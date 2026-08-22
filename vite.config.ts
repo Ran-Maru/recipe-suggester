@@ -1,6 +1,15 @@
 import { defineConfig, lazyPlugins } from "vite-plus";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
+
+function viteBase(): string {
+  const raw = process.env.VITE_BASE ?? "/";
+  if (raw === "/" || raw === "") {
+    return "/";
+  }
+  return raw.endsWith("/") ? raw : `${raw}/`;
+}
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -17,7 +26,7 @@ export default defineConfig({
       // playwright.config.tsでNodeJS.processを使用するため設定
       node: true,
     },
-    ignorePatterns: ["dist"],
+    ignorePatterns: ["dist", "src/routeTree.gen.ts"],
     overrides: [
       {
         files: ["**/*.{ts,tsx}"],
@@ -128,6 +137,13 @@ export default defineConfig({
           WorkletGlobalScope: "readonly",
         },
       },
+      {
+        files: ["src/routes/**/*.{ts,tsx}"],
+        rules: {
+          // TanStack Router の route ファイルは Route 定数とコンポーネントを同じファイルに置く
+          "react/only-export-components": "off",
+        },
+      },
     ],
     options: {
       typeAware: true,
@@ -163,8 +179,15 @@ export default defineConfig({
     sortTailwindcss: {
       stylesheet: "./src/index.css",
     },
-    ignorePatterns: [],
+    ignorePatterns: ["src/routeTree.gen.ts"],
   },
-  base: "./",
-  plugins: lazyPlugins(() => [tailwindcss(), react({ compiler: true })]),
+  base: viteBase(),
+  plugins: lazyPlugins(() => [
+    tanstackRouter({
+      target: "react",
+      autoCodeSplitting: true,
+    }),
+    tailwindcss(),
+    react({ compiler: true }),
+  ]),
 });
