@@ -86,6 +86,12 @@ test.describe("一覧ページのテスト", () => {
     await expect(
       page.getByRole("cell", { name: "しょうが焼き" }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "しょうが焼きのレシピサイトを開く" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "しょうが焼きのURLをコピー" }),
+    ).toBeVisible();
   });
 
   test("リンクをコピーできる", async ({ page, context, browserName }) => {
