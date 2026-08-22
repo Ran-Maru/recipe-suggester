@@ -32,8 +32,9 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 
 ### Toolchain / runtime
 
-- Node is managed by Vite Plus (matches `.node-version` `24.19.0`), and `pnpm` is pinned to `11.22.0` (matches the `devEngines` requirement). Use `vp install` / `vp add` / `vp remove` rather than calling pnpm directly; Vite+ downloads the pinned pnpm. The update script only runs `vp install` + a Playwright browser install.
-- Gotcha: run commands in a login shell so `nvm` is sourced. A non-login shell may resolve `node` to `/exec-daemon/node` (v22) instead of the pinned Node. The Cursor terminal login shells already handle this.
+- Node is managed by Vite Plus (matches `.node-version` `24.19.0`), and `pnpm` is pinned to `11.22.0` (matches the `devEngines` requirement). Use `vp install` / `vp add` / `vp remove` rather than calling pnpm directly; Vite+ downloads the pinned pnpm.
+- Cloud Agent bootstrap is defined in `.cursor/environment.json`. The `install` command runs `.cursor/install.sh` (`vp install` plus Playwright `chromium`/`webkit`).
+- Gotcha: run commands in a login shell so `nvm` is sourced. A non-login shell may resolve `node` to `/exec-daemon/node` (v22) instead of the pinned Node. The Cursor terminal login shells already handle this. The install script prepends nvm's Node onto `PATH` for the same reason.
 - `vp` is a project-local binary (`node_modules/.bin/vp`), not global here. Invoke it via `vp run <script>` (`vp run dev`, `vp run check`, `vp run build`) or `./node_modules/.bin/vp`. Do not use `npx` / `npm`; Vite+ does not translate mismatched package-manager commands.
 
 ### Run / lint / build / test
