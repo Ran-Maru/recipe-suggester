@@ -1,0 +1,21 @@
+{
+  "name": "recipe-suggester",
+  "install": "bash .cursor/install.sh",
+  "terminals": [
+    {
+      "name": "dev",
+      "command": "./node_modules/.bin/vp run dev",
+      "description": "Vite+ dev server for レシピGET! at http://localhost:5173"
+    }
+  ],
+  "ports": [
+    {
+      "name": "Vite+ dev server",
+      "port": 5173
+    },
+    {
+      "name": "Playwright HTML report",
+      "port": 9323
+    }
+  ]
+}
