@@ -6,23 +6,23 @@
 - Gitのインストール
 - 本リポジトリのgit clone
 
-Node.js のバージョンは Vite Plus が管理する（[`.node-version`](.node-version) の `24.19.0`、[`package.json`](package.json) の `devEngines` の npm `11.6.2`）。セットアップやランタイムがおかしいときは `npx vp env doctor` を実行する。
+Node.js のバージョンは Vite Plus が管理する（[`.node-version`](.node-version) の `24.19.0`、[`package.json`](package.json) の `devEngines` の pnpm `11.22.0`）。セットアップやランタイムがおかしいときは `vp env doctor` を実行する。
 
 ## 構築手順
 
-1. リポジトリを clone したフォルダで `npm install` を実行する（Vite Plus がランタイムを揃える）。
+1. リポジトリを clone したフォルダで `vp install` を実行する（Vite Plus がランタイムと pnpm を揃える）。
 2. Playwright のブラウザをインストールする。
 
    ```sh
-   npx playwright install chromium webkit
+   vp exec playwright install chromium webkit
    ```
 
 3. VSCodeで本フォルダを開く。
-4. `npm run dev` を実行し、`http://localhost:5173` で起動を確認する。
+4. `vp run dev` を実行し、`http://localhost:5173` で起動を確認する。
 
 ## デバッグの手順
 
-1. `npm run dev` を実行する。
+1. `vp run dev` を実行する。
 2. ステップ実行が必要であれば[実行とデバッグ]のサイドバーから[デバッグの開始]をクリックする。
    1. ブレークポイントを貼ることもできる。
 

@@ -10,6 +10,13 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 
 `vp <name>` runs a built-in command. `vp run <name>` runs a `package.json` script or a `vite.config.ts` task. Scripts cannot overwrite built-ins, so `vp dev` and `vp run dev` may do different things. Check `package.json` and `vite.config.ts` first, and run `vp run <name>` when the project defines a script or task with that name.
 
+## Tool Versions
+
+Run `vp toolchain` to show versions and relationships in the active Vite+
+release. Add a tool name to select part of the graph. For example, run
+`vp toolchain vite`. Use `--global` to ignore the local `vite-plus` package. Use
+`vp why <package>` to show the package-manager dependency graph.
+
 ## Review Checklist
 
 - [ ] Run `vp install` after pulling remote changes and before getting started.
@@ -25,14 +32,14 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 
 ### Toolchain / runtime
 
-- Node is managed by Vite Plus (matches `.node-version` `24.19.0`), and `npm` is pinned to `11.6.2` (matches the `devEngines` requirement). The update script only runs `npm install` + a Playwright browser install.
-- Gotcha: run commands in a login shell so `nvm` is sourced. A non-login shell may resolve `node` to `/exec-daemon/node` (v22) and mismatch the pinned `npm`, which triggers `npm error EBADDEVENGINES` on `npm install`. The Cursor terminal login shells already handle this.
-- `vp` is a project-local binary (`node_modules/.bin/vp`), not global here. Invoke it via the `package.json` scripts (`npm run dev`, `npm run check`, `npm run build`) or `npx vp`.
+- Node is managed by Vite Plus (matches `.node-version` `24.19.0`), and `pnpm` is pinned to `11.22.0` (matches the `devEngines` requirement). Use `vp install` / `vp add` / `vp remove` rather than calling pnpm directly; Vite+ downloads the pinned pnpm. The update script only runs `vp install` + a Playwright browser install.
+- Gotcha: run commands in a login shell so `nvm` is sourced. A non-login shell may resolve `node` to `/exec-daemon/node` (v22) instead of the pinned Node. The Cursor terminal login shells already handle this.
+- `vp` is a project-local binary (`node_modules/.bin/vp`), not global here. Invoke it via `vp run <script>` (`vp run dev`, `vp run check`, `vp run build`) or `./node_modules/.bin/vp`. Do not use `npx` / `npm`; Vite+ does not translate mismatched package-manager commands.
 
 ### Run / lint / build / test
 
-- Dev server: `npm run dev` (runs `vp dev`) serves on `http://localhost:5173`.
-- Lint + typecheck + mapping validation: `npm run check` (`vp check` then `scripts/check-mapping.json.js`).
-- Build: `npm run build` (`tsc -b && vp build`).
-- E2E tests: `npx playwright test`. Playwright auto-starts the dev server via the `webServer` block in `playwright.config.ts`, so you do NOT need to start `npm run dev` first. Browsers `chromium` and `webkit` are required; the `webkit` clipboard test is intentionally skipped (WebKit lacks clipboard API support).
-- Git hooks: `vp config` (run by `npm` `prepare`) leaves `core.hooksPath` alone because Cursor already points it at its own agent hooks; this is expected, not an error.
+- Dev server: `vp run dev` (runs `vp dev`) serves on `http://localhost:5173`.
+- Lint + typecheck + mapping validation: `vp run check` (`vp check` then `scripts/check-mapping.json.js`).
+- Build: `vp run build` (`tsc -b && vp build`).
+- E2E tests: `vp exec playwright test`. Playwright auto-starts the dev server via the `webServer` block in `playwright.config.ts`, so you do NOT need to start `vp run dev` first. Browsers `chromium` and `webkit` are required; the `webkit` clipboard test is intentionally skipped (WebKit lacks clipboard API support).
+- Git hooks: `vp config` (run by pnpm `prepare`) leaves `core.hooksPath` alone because Cursor already points it at its own agent hooks; this is expected, not an error.
