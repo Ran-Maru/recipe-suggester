@@ -20,9 +20,9 @@ jobs:
       - name: Check Build
         run: vp build
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium webkit
+        run: vp exec playwright install --with-deps chromium webkit
       - name: Run Playwright tests
-        run: npx playwright test
+        run: vp exec playwright test
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
