@@ -1,15 +1,19 @@
 import { useState } from "react";
-import data from "./mapping.json" with { type: "json" };
+import { createFileRoute } from "@tanstack/react-router";
+import { buttonClassName } from "../buttonClassName.ts";
+import { copyUrl } from "../copyUrl.ts";
+import data from "../mapping.json" with { type: "json" };
 
 type Recipe = {
   title: string;
   url: string;
 };
 
-const buttonClassName =
-  "cursor-pointer rounded-lg border border-transparent bg-button px-[1.2em] py-[0.6em] text-[1em] font-medium transition-[border-color] duration-250 hover:border-brand focus:outline-4 focus-visible:outline-4 dark:bg-button-dark";
+export const Route = createFileRoute("/")({
+  component: Home,
+});
 
-function App() {
+function Home() {
   // recipeの型付けをする。
   const [recipe, setRecipe] = useState<Recipe>();
   // const [recipe, setRecipe] = useState({})
@@ -29,12 +33,6 @@ function App() {
     return Math.floor(Math.random() * max) + 1;
   }
 
-  async function copyUrl() {
-    if (typeof recipe !== "undefined") {
-      await navigator.clipboard.writeText(recipe.url);
-    }
-  }
-
   function openUrl() {
     if (typeof recipe !== "undefined") {
       window.open(recipe.url, "_blank", "noopener,noreferrer");
@@ -42,7 +40,7 @@ function App() {
   }
 
   return (
-    <>
+    <div className="flex flex-col items-center text-center">
       <h1 className="text-[3.2em] leading-[1.1]">クリックしてレシピをGET!</h1>
       <div className="flex flex-col items-center gap-4 p-[2em]">
         <button className={buttonClassName} onClick={() => getUrl()}>
@@ -54,7 +52,14 @@ function App() {
         <button className={buttonClassName} onClick={() => openUrl()}>
           開く
         </button>
-        <button className={buttonClassName} onClick={() => copyUrl()}>
+        <button
+          className={buttonClassName}
+          onClick={() => {
+            if (typeof recipe !== "undefined") {
+              void copyUrl(recipe.url);
+            }
+          }}
+        >
           コピーする
         </button>
         <button
@@ -64,8 +69,6 @@ function App() {
           クリア
         </button>
       </div>
-    </>
+    </div>
   );
 }
-
-export default App;
