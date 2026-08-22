@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Copy, ExternalLink } from "lucide-react";
 import { buttonClassName } from "../buttonClassName.ts";
 import { copyUrl } from "../copyUrl.ts";
 import data from "../mapping.json" with { type: "json" };
@@ -28,22 +29,27 @@ function Recipes() {
                 <td className="p-2">{recipe.title}</td>
                 <td className="p-2">
                   <a
-                    className="break-all text-brand hover:text-brand-hover"
+                    className="inline-flex rounded p-2 text-brand hover:text-brand-hover focus:outline-4 focus-visible:outline-4"
                     href={recipe.url}
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label={`${recipe.title}のレシピサイトを開く`}
+                    title="レシピサイトを開く"
                   >
-                    {recipe.url}
+                    <ExternalLink size={18} aria-hidden="true" />
                   </a>
                 </td>
                 <td className="p-2 whitespace-nowrap">
                   <button
+                    type="button"
                     className={buttonClassName}
+                    aria-label={`${recipe.title}のURLをコピー`}
+                    title="URLをコピー"
                     onClick={() => {
                       void copyUrl(recipe.url);
                     }}
                   >
-                    コピー
+                    <Copy size={18} aria-hidden="true" />
                   </button>
                 </td>
               </tr>
