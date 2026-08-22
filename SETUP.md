@@ -2,11 +2,11 @@
 
 ## 事前準備
 
-- VSCodeのインストール
+- VSCode(Cursor)のインストール
 - Gitのインストール
 - 本リポジトリのgit clone
 
-Node.js のバージョンは Vite Plus が管理する（[`.node-version`](.node-version) の `24.19.0`、[`package.json`](package.json) の `devEngines` の pnpm `11.22.0`）。セットアップやランタイムがおかしいときは `vp env doctor` を実行する。
+Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-version`](.node-version)[`package.json`](package.json) の `devEngines` の pnpm）。セットアップやランタイムがおかしいときは `vp env doctor` を実行する。
 
 ## 構築手順
 
@@ -28,6 +28,6 @@ Node.js のバージョンは Vite Plus が管理する（[`.node-version`](.nod
 
 ## Zed Editorについて
 
-- 基本的にVSCodeの前提で記載しているが、Zed Editorで動かす場合は以下を前提として試す。
+- VSCodeの前提で記載しているが、Zed Editorで動かす場合は以下を前提とする。
 - 拡張機能
   - Oxc
