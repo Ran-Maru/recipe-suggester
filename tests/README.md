@@ -2,14 +2,14 @@
 
 ## 正常動作したもの
 
-- `npm run test:e2e`（`npx playwright test`）
-- テスト実行後の`npm run test:e2e:report`（`npx playwright show-report`）
-- `npm run test:e2e:ui`（`npx playwright test --ui`）
-- `npm run test:e2e:debug`（`npx playwright test --debug`）
+- `vp run test:e2e`（`vp exec playwright test`）
+- テスト実行後の`vp run test:e2e:report`（`vp exec playwright show-report`）
+- `vp run test:e2e:ui`（`vp exec playwright test --ui`）
+- `vp run test:e2e:debug`（`vp exec playwright test --debug`）
 
 ## 動作しなかったもの
 
-- `npx playwright codegen`
+- `vp exec playwright codegen`
 
 ## 参考
 
