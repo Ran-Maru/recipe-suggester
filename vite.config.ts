@@ -1,6 +1,5 @@
 import { defineConfig, lazyPlugins } from "vite-plus";
-import react, { reactCompilerPreset } from "@vitejs/plugin-react";
-import babel from "@rolldown/plugin-babel";
+import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 
@@ -189,7 +188,6 @@ export default defineConfig({
       autoCodeSplitting: true,
     }),
     tailwindcss(),
-    react(),
-    babel({ presets: [reactCompilerPreset()] }),
+    react({ compiler: true }),
   ]),
 });
