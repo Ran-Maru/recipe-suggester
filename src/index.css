@@ -1,3 +1,9 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 :root {
   --color-brand: #646cff;
   --color-brand-hover: #535bf2;
@@ -30,4 +36,10 @@ body {
   margin-inline: auto;
   max-width: 80rem;
   padding: 2rem;
+}
+
+@media (max-width: 40rem) {
+  #root {
+    padding: 1rem;
+  }
 }

@@ -6,11 +6,14 @@
 }
 
 .tableWrapper {
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
 }
 
 .table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   text-align: left;
   font-size: 0.875rem;
@@ -25,23 +28,50 @@
   padding: 0.5rem;
 }
 
+.colNo {
+  width: 2.75rem;
+}
+
+.colLink,
+.colCopy {
+  width: 3.5rem;
+}
+
+.titleCell {
+  overflow-wrap: anywhere;
+}
+
 .nowrap {
   white-space: nowrap;
 }
 
-.openLink {
+.iconAction {
   display: inline-flex;
+  cursor: pointer;
+  border: none;
   border-radius: 0.25rem;
+  background: transparent;
   padding: 0.5rem;
+  font: inherit;
   color: var(--color-brand);
 }
 
-.openLink:hover {
+.iconAction:hover {
   color: var(--color-brand-hover);
 }
 
-.openLink:focus,
-.openLink:focus-visible {
+.iconAction:focus,
+.iconAction:focus-visible {
   outline-width: 4px;
   outline-style: solid;
+}
+
+@media (max-width: 40rem) {
+  .cell {
+    padding: 0.375rem 0.25rem;
+  }
+
+  .iconAction {
+    padding: 0.375rem;
+  }
 }

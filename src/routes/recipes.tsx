@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Copy, ExternalLink } from "lucide-react";
-import { buttonClassName } from "../buttonClassName.ts";
 import { copyUrl } from "../copyUrl.ts";
 import data from "../mapping.json" with { type: "json" };
 import styles from "./recipes.module.css";
@@ -17,10 +16,16 @@ function Recipes() {
         <table className={styles.table}>
           <thead>
             <tr className={styles.headRow}>
-              <th className={`${styles.cell} ${styles.nowrap}`}>No</th>
+              <th className={`${styles.cell} ${styles.colNo} ${styles.nowrap}`}>
+                No
+              </th>
               <th className={styles.cell}>メニュー名</th>
-              <th className={styles.cell}>リンク</th>
-              <th className={`${styles.cell} ${styles.nowrap}`}>コピー</th>
+              <th className={`${styles.cell} ${styles.colLink}`}>リンク</th>
+              <th
+                className={`${styles.cell} ${styles.colCopy} ${styles.nowrap}`}
+              >
+                コピー
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -29,10 +34,12 @@ function Recipes() {
                 <td className={`${styles.cell} ${styles.nowrap}`}>
                   {index + 1}
                 </td>
-                <td className={styles.cell}>{recipe.title}</td>
+                <td className={`${styles.cell} ${styles.titleCell}`}>
+                  {recipe.title}
+                </td>
                 <td className={styles.cell}>
                   <a
-                    className={styles.openLink}
+                    className={styles.iconAction}
                     href={recipe.url}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -45,7 +52,7 @@ function Recipes() {
                 <td className={`${styles.cell} ${styles.nowrap}`}>
                   <button
                     type="button"
-                    className={buttonClassName}
+                    className={styles.iconAction}
                     aria-label={`${recipe.title}のURLをコピー`}
                     title="URLをコピー"
                     onClick={() => {
