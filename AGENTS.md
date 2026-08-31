@@ -35,6 +35,7 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 - UI components come from [Mantine](https://mantine.dev/) (`@mantine/core` / `@mantine/hooks`). `src/main.tsx` imports `@mantine/core/styles.css` and wraps the router in `MantineProvider` with the theme from `src/theme.ts` (brand palette generated from `#646cff`, `defaultColorScheme="auto"`).
 - `postcss.config.cjs` enables `postcss-preset-mantine` (mixins such as `@mixin dark`, and the `rem()` function) plus `postcss-simple-vars` for the `$mantine-breakpoint-*` variables. Prefer Mantine components and style props first, then CSS Modules for anything Mantine cannot express.
 - `src/index.css` only holds the few globals Mantine's reset does not cover.
+- Icons come from `@tabler/icons-react`, the icon set Mantine's own docs and demos use. Component names are prefixed with `Icon` (e.g. `IconCopy`, `IconExternalLink`).
 
 ### Toolchain / runtime
 
