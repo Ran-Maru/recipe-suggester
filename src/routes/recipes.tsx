@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ActionIcon, Table, Title } from "@mantine/core";
-import { Copy, ExternalLink } from "lucide-react";
+import { IconCopy, IconExternalLink } from "@tabler/icons-react";
 import { copyUrl } from "../copyUrl.ts";
 import data from "../mapping.json" with { type: "json" };
 
@@ -39,7 +39,7 @@ function Recipes() {
                     aria-label={`${recipe.title}のレシピサイトを開く`}
                     title="レシピサイトを開く"
                   >
-                    <ExternalLink size={18} aria-hidden="true" />
+                    <IconExternalLink size={18} aria-hidden="true" />
                   </ActionIcon>
                 </Table.Td>
                 <Table.Td>
@@ -51,7 +51,7 @@ function Recipes() {
                       void copyUrl(recipe.url);
                     }}
                   >
-                    <Copy size={18} aria-hidden="true" />
+                    <IconCopy size={18} aria-hidden="true" />
                   </ActionIcon>
                 </Table.Td>
               </Table.Tr>
