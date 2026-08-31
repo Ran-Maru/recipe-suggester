@@ -1,5 +1,6 @@
 import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { Anchor, Container, Group } from "@mantine/core";
 import styles from "./__root.module.css";
 
 export const Route = createRootRoute({
@@ -8,17 +9,22 @@ export const Route = createRootRoute({
 
 function RootLayout() {
   return (
-    <>
-      <nav className={styles.nav}>
-        <Link to="/" className={styles.link} activeOptions={{ exact: true }}>
+    <Container size="xl" p={{ base: "md", sm: "xl" }}>
+      <Group justify="center" gap="md" mb="lg">
+        <Anchor
+          component={Link}
+          to="/"
+          className={styles.link}
+          activeOptions={{ exact: true }}
+        >
           レシピGET
-        </Link>
-        <Link to="/recipes" className={styles.link}>
+        </Anchor>
+        <Anchor component={Link} to="/recipes" className={styles.link}>
           一覧
-        </Link>
-      </nav>
+        </Anchor>
+      </Group>
       <Outlet />
       {import.meta.env.DEV ? <TanStackRouterDevtools /> : undefined}
-    </>
+    </Container>
   );
 }
