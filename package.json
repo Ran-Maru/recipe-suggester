@@ -18,12 +18,10 @@
     "prepare": "vp config"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-router": "^1.170.32",
     "lucide-react": "^1.34.0",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "tailwindcss": "^4.3.3"
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",
@@ -34,7 +32,6 @@
     "@types/react-dom": "^19.2.5",
     "@vitejs/plugin-react": "^6.1.0",
     "oxc-transform-react": "^0.147.0",
-    "oxlint-tailwindcss": "^1.9.0",
     "typescript": "~7.0.2",
     "vite": "npm:@voidzero-dev/vite-plus-core@latest",
     "vite-plus": "latest"

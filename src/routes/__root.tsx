@@ -1,5 +1,6 @@
 import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import styles from "./__root.module.css";
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -8,18 +9,11 @@ export const Route = createRootRoute({
 function RootLayout() {
   return (
     <>
-      <nav className="mb-6 flex justify-center gap-4">
-        <Link
-          to="/"
-          className="text-brand hover:text-brand-hover [&.active]:font-bold"
-          activeOptions={{ exact: true }}
-        >
+      <nav className={styles.nav}>
+        <Link to="/" className={styles.link} activeOptions={{ exact: true }}>
           レシピGET
         </Link>
-        <Link
-          to="/recipes"
-          className="text-brand hover:text-brand-hover [&.active]:font-bold"
-        >
+        <Link to="/recipes" className={styles.link}>
           一覧
         </Link>
       </nav>
