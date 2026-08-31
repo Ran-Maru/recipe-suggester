@@ -17,5 +17,10 @@
   "editor.formatOnSaveMode": "file",
   "editor.codeActionsOnSave": {
     "source.fixAll.oxc": "explicit"
-  }
+  },
+  // Mantine の CSS 変数を補完させる（https://mantine.dev/getting-started/）
+  "cssVariables.lookupFiles": [
+    "**/*.css",
+    "node_modules/@mantine/core/styles.css"
+  ]
 }

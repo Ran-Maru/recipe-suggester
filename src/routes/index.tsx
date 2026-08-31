@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { buttonClassName } from "../buttonClassName.ts";
+import { Button, Stack, Text, Title } from "@mantine/core";
 import { copyUrl } from "../copyUrl.ts";
 import data from "../mapping.json" with { type: "json" };
-import styles from "./index.module.css";
 
 type Recipe = {
   title: string;
@@ -41,20 +40,22 @@ function Home() {
   }
 
   return (
-    <div className={styles.home}>
-      <h1 className={styles.title}>クリックしてレシピをGET!</h1>
-      <div className={styles.actions}>
-        <button className={buttonClassName} onClick={() => getUrl()}>
+    <Stack align="center" ta="center">
+      <Title order={1} fz="3.2rem" lh={1.1}>
+        クリックしてレシピをGET!
+      </Title>
+      <Stack align="center" gap="md" p="xl">
+        <Button size="lg" onClick={() => getUrl()}>
           レシピGETボタン
-        </button>
-        <span data-testid="recipe-name">
+        </Button>
+        <Text data-testid="recipe-name">
           {recipe != undefined && recipe.title}
-        </span>
-        <button className={buttonClassName} onClick={() => openUrl()}>
+        </Text>
+        <Button variant="light" onClick={() => openUrl()}>
           開く
-        </button>
-        <button
-          className={buttonClassName}
+        </Button>
+        <Button
+          variant="light"
           onClick={() => {
             if (typeof recipe !== "undefined") {
               void copyUrl(recipe.url);
@@ -62,14 +63,11 @@ function Home() {
           }}
         >
           コピーする
-        </button>
-        <button
-          className={buttonClassName}
-          onClick={() => setRecipe(undefined)}
-        >
+        </Button>
+        <Button variant="default" onClick={() => setRecipe(undefined)}>
           クリア
-        </button>
-      </div>
-    </div>
+        </Button>
+      </Stack>
+    </Stack>
   );
 }
