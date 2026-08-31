@@ -1,33 +1,5 @@
-:root {
-  --color-brand: #646cff;
-  --color-brand-hover: #535bf2;
-  --color-page: #ffffff;
-  --color-ink: #213547;
-  --color-button: #f9f9f9;
-
-  color-scheme: light dark;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-page: #242424;
-    --color-ink: rgb(255 255 255 / 87%);
-    --color-button: #1a1a1a;
-  }
-}
-
+/* 余白・フォント・配色のリセットは @mantine/core/styles.css が担当する。 */
 body {
-  margin: 0;
   min-width: 20rem;
   min-height: 100vh;
-  background-color: var(--color-page);
-  color: var(--color-ink);
-}
-
-#root {
-  margin-inline: auto;
-  max-width: 80rem;
-  padding: 2rem;
 }

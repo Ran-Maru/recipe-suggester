@@ -30,6 +30,12 @@ release. Add a tool name to select part of the graph. For example, run
 
 This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a React + TypeScript + Vite+ site that suggests a random recipe URL from `src/mapping.json`. There is no backend.
 
+### UI
+
+- UI components come from [Mantine](https://mantine.dev/) (`@mantine/core` / `@mantine/hooks`). `src/main.tsx` imports `@mantine/core/styles.css` and wraps the router in `MantineProvider` with the theme from `src/theme.ts` (brand palette generated from `#646cff`, `defaultColorScheme="auto"`).
+- `postcss.config.cjs` enables `postcss-preset-mantine` (mixins such as `@mixin dark`, and the `rem()` function) plus `postcss-simple-vars` for the `$mantine-breakpoint-*` variables. Prefer Mantine components and style props first, then CSS Modules for anything Mantine cannot express.
+- `src/index.css` only holds the few globals Mantine's reset does not cover.
+
 ### Toolchain / runtime
 
 - Node is managed by Vite Plus (matches `.node-version` `24.19.0`), and `pnpm` is pinned to `11.22.0` (matches the `devEngines` requirement). Use `vp install` / `vp add` / `vp remove` rather than calling pnpm directly; Vite+ downloads the pinned pnpm.
