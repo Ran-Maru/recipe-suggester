@@ -45,8 +45,9 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 ### Run / lint / build / test
 
 - Dev server: `vp run dev` (runs `vp dev`) serves on `http://localhost:5173`.
-- Lint + typecheck + mapping validation: `vp run check` (`vp check` then `scripts/check-mapping.json.js`).
-- Build: `vp run build` (`tsc -b && vp build`).
+- Lint + typecheck + mapping validation: `vp run check` (`cmk` then `vp check` then stylelint then `scripts/check-mapping.json.js`).
+- Build: `vp run build` (`cmk && tsc -b && vp build`). `tsc` is TypeScript 7 (`typescript-7`); `typescript` is aliased to TypeScript 6 for CSS Modules Kit.
+- CSS: stylelint (`vp run lint:css`) plus CSS Modules Kit (`cmk` / ts-plugin). Formatting stays on Oxfmt.
 
 ### Project skills
 
