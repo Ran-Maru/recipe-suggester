@@ -1,6 +1,5 @@
 import { defineConfig, lazyPlugins } from "vite-plus";
 import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 
 function viteBase(): string {
@@ -154,31 +153,15 @@ export default defineConfig({
         name: "vite-plus",
         specifier: "vite-plus/oxlint-plugin",
       },
-      "oxlint-tailwindcss",
     ],
-    settings: {
-      tailwindcss: {
-        entryPoint: "src/index.css",
-        variablePatterns: ["^buttonClassName$"],
-      },
-    },
     rules: {
       "vite-plus/prefer-vite-plus-imports": "error",
-      "tailwindcss/no-unknown-classes": "error",
-      "tailwindcss/no-conflicting-classes": "error",
-      "tailwindcss/no-deprecated-classes": "error",
-      "tailwindcss/no-duplicate-classes": "warn",
-      "tailwindcss/enforce-canonical": "warn",
-      "tailwindcss/no-unnecessary-arbitrary-value": "warn",
     },
   },
   fmt: {
     singleQuote: false,
     printWidth: 80,
     sortPackageJson: false,
-    sortTailwindcss: {
-      stylesheet: "./src/index.css",
-    },
     ignorePatterns: ["src/routeTree.gen.ts"],
   },
   base: viteBase(),
@@ -187,7 +170,6 @@ export default defineConfig({
       target: "react",
       autoCodeSplitting: true,
     }),
-    tailwindcss(),
     react({ compiler: true }),
   ]),
 });

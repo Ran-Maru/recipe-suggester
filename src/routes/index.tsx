@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { buttonClassName } from "../buttonClassName.ts";
 import { copyUrl } from "../copyUrl.ts";
 import data from "../mapping.json" with { type: "json" };
+import styles from "./index.module.css";
 
 type Recipe = {
   title: string;
@@ -40,9 +41,9 @@ function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center text-center">
-      <h1 className="text-[3.2em] leading-[1.1]">クリックしてレシピをGET!</h1>
-      <div className="flex flex-col items-center gap-4 p-[2em]">
+    <div className={styles.home}>
+      <h1 className={styles.title}>クリックしてレシピをGET!</h1>
+      <div className={styles.actions}>
         <button className={buttonClassName} onClick={() => getUrl()}>
           レシピGETボタン
         </button>
