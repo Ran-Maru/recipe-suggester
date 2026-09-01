@@ -40,8 +40,6 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 ### Toolchain / runtime
 
 - Node is managed by Vite Plus (matches `.node-version` `24.19.0`), and `pnpm` is pinned to `11.22.0` (matches the `devEngines` requirement). Use `vp install` / `vp add` / `vp remove` rather than calling pnpm directly; Vite+ downloads the pinned pnpm.
-- Cloud Agent bootstrap is defined in `.cursor/environment.json`. The `install` command runs `.cursor/install.sh` (`vp install` plus Playwright `chromium`/`webkit`).
-- Gotcha: run commands in a login shell so `nvm` is sourced. A non-login shell may resolve `node` to `/exec-daemon/node` (v22) instead of the pinned Node. The Cursor terminal login shells already handle this. The install script prepends nvm's Node onto `PATH` for the same reason.
 - `vp` is a project-local binary (`node_modules/.bin/vp`), not global here. Invoke it via `vp run <script>` (`vp run dev`, `vp run check`, `vp run build`) or `./node_modules/.bin/vp`. Do not use `npx` / `npm`; Vite+ does not translate mismatched package-manager commands.
 
 ### Run / lint / build / test
@@ -49,5 +47,13 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 - Dev server: `vp run dev` (runs `vp dev`) serves on `http://localhost:5173`.
 - Lint + typecheck + mapping validation: `vp run check` (`vp check` then `scripts/check-mapping.json.js`).
 - Build: `vp run build` (`tsc -b && vp build`).
-- E2E tests: `vp exec playwright test`. Playwright auto-starts the dev server via the `webServer` block in `playwright.config.ts`, so you do NOT need to start `vp run dev` first. Browsers `chromium` and `webkit` are required; the `webkit` clipboard test is intentionally skipped (WebKit lacks clipboard API support).
-- Git hooks: `vp config` (run by pnpm `prepare`) leaves `core.hooksPath` alone because Cursor already points it at its own agent hooks; this is expected, not an error.
+
+### Project skills
+
+Detailed workflows live in `.cursor/skills/` — read the matching skill when relevant:
+
+| Skill                | When to use                                                    |
+| -------------------- | -------------------------------------------------------------- |
+| `recipe-mapping`     | Adding or editing `src/mapping.json`                           |
+| `playwright-e2e`     | Writing or running E2E tests, debugging Playwright/CI failures |
+| `cursor-cloud-setup` | Cloud Agent bootstrap, Node/nvm issues, `.cursor/install.sh`   |
