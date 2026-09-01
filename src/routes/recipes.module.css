@@ -1,0 +1,24 @@
+.title {
+  margin-bottom: var(--mantine-spacing-lg);
+  text-align: center;
+  font-size: rem(32);
+  line-height: 1.1;
+}
+
+.table {
+  font-size: var(--mantine-font-size-sm);
+}
+
+.colNo {
+  width: rem(44);
+}
+
+.colLink,
+.colCopy {
+  width: rem(72);
+  white-space: nowrap;
+}
+
+.titleCell {
+  overflow-wrap: anywhere;
+}
