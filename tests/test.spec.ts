@@ -122,6 +122,75 @@ test.describe("一覧ページのテスト", () => {
       clipboardText.startsWith("https://") || clipboardText.startsWith(URL),
     ).toBe(true);
   });
+
+  test("タイトルで部分一致検索できる", async ({ page }) => {
+    await page.goto("/recipes");
+    await page.getByRole("textbox", { name: "レシピを検索" }).fill("しょうが");
+
+    await expect(
+      page.getByRole("cell", { name: "しょうが焼き", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "豚汁", exact: true }),
+    ).not.toBeVisible();
+  });
+
+  test("かなで部分一致検索できる", async ({ page }) => {
+    await page.goto("/recipes");
+    await page.getByRole("textbox", { name: "レシピを検索" }).fill("とんじる");
+
+    await expect(
+      page.getByRole("cell", { name: "豚汁", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "しょうが焼き", exact: true }),
+    ).not.toBeVisible();
+  });
+
+  test("検索をクリアすると全件に戻る", async ({ page }) => {
+    await page.goto("/recipes");
+    const searchInput = page.getByRole("textbox", { name: "レシピを検索" });
+    await searchInput.fill("とんじる");
+    await expect(
+      page.getByRole("cell", { name: "豚汁", exact: true }),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "検索をクリア" }).click();
+    await expect(searchInput).toHaveValue("");
+    await expect(
+      page.getByRole("cell", { name: "しょうが焼き", exact: true }),
+    ).toBeVisible();
+  });
+
+  test("該当なしのときメッセージを表示する", async ({ page }) => {
+    await page.goto("/recipes");
+    await page
+      .getByRole("textbox", { name: "レシピを検索" })
+      .fill("存在しないレシピ名");
+
+    await expect(page.getByText("該当するレシピがありません")).toBeVisible();
+    await expect(
+      page.getByRole("columnheader", { name: "No" }),
+    ).not.toBeVisible();
+  });
+
+  test("検索入力中もページがビューポート幅を超えない", async ({ page }) => {
+    await page.goto("/recipes");
+    await page
+      .getByRole("textbox", { name: "レシピを検索" })
+      .fill("しょうがやきとんじる");
+
+    await expect(
+      page.getByRole("button", { name: "検索をクリア" }),
+    ).toBeVisible();
+
+    const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }));
+
+    expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1);
+  });
 });
 
 test("餃子ページが表示される", async ({ page }) => {
