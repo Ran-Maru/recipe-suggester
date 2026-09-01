@@ -26,8 +26,12 @@ function Recipes() {
           <Table.Tr>
             <Table.Th w={44}>No</Table.Th>
             <Table.Th>メニュー名</Table.Th>
-            <Table.Th w={56}>リンク</Table.Th>
-            <Table.Th w={56}>コピー</Table.Th>
+            <Table.Th w={72} style={{ whiteSpace: "nowrap" }}>
+              リンク
+            </Table.Th>
+            <Table.Th w={72} style={{ whiteSpace: "nowrap" }}>
+              コピー
+            </Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
