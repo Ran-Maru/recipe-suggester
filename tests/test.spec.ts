@@ -94,6 +94,17 @@ test.describe("一覧ページのテスト", () => {
     ).toBeVisible();
   });
 
+  test("ページがビューポート幅を超えない", async ({ page }) => {
+    await page.goto("/recipes");
+
+    const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }));
+
+    expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1);
+  });
+
   test("リンクをコピーできる", async ({ page, context, browserName }) => {
     test.skip(browserName === "webkit", "WebKit lacks clipboard API support");
 
