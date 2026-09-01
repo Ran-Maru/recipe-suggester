@@ -3,6 +3,7 @@ import { ActionIcon, Table, Title } from "@mantine/core";
 import { IconCopy, IconExternalLink } from "@tabler/icons-react";
 import { copyUrl } from "../copyUrl.ts";
 import data from "../mapping.json" with { type: "json" };
+import styles from "./recipes.module.css";
 
 export const Route = createFileRoute("/recipes")({
   component: Recipes,
@@ -11,54 +12,59 @@ export const Route = createFileRoute("/recipes")({
 function Recipes() {
   return (
     <>
-      <Title order={1} ta="center" mb="lg" fz="2rem" lh={1.1}>
+      <Title order={1} className={styles.title}>
         レシピ一覧
       </Title>
-      <Table.ScrollContainer minWidth={480} type="native">
-        <Table striped highlightOnHover verticalSpacing="xs" fz="sm">
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th w={60}>No</Table.Th>
-              <Table.Th>メニュー名</Table.Th>
-              <Table.Th w={80}>リンク</Table.Th>
-              <Table.Th w={80}>コピー</Table.Th>
+      <Table
+        className={styles.table}
+        striped
+        highlightOnHover
+        layout="fixed"
+        verticalSpacing="xs"
+        horizontalSpacing="xs"
+      >
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th className={styles.colNo}>No</Table.Th>
+            <Table.Th>メニュー名</Table.Th>
+            <Table.Th className={styles.colLink}>リンク</Table.Th>
+            <Table.Th className={styles.colCopy}>コピー</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {data.map((recipe, index) => (
+            <Table.Tr key={`${recipe.title}-${recipe.url}-${String(index)}`}>
+              <Table.Td>{index + 1}</Table.Td>
+              <Table.Td className={styles.titleCell}>{recipe.title}</Table.Td>
+              <Table.Td>
+                <ActionIcon
+                  component="a"
+                  variant="subtle"
+                  href={recipe.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${recipe.title}のレシピサイトを開く`}
+                  title="レシピサイトを開く"
+                >
+                  <IconExternalLink size={18} aria-hidden="true" />
+                </ActionIcon>
+              </Table.Td>
+              <Table.Td>
+                <ActionIcon
+                  variant="default"
+                  aria-label={`${recipe.title}のURLをコピー`}
+                  title="URLをコピー"
+                  onClick={() => {
+                    void copyUrl(recipe.url);
+                  }}
+                >
+                  <IconCopy size={18} aria-hidden="true" />
+                </ActionIcon>
+              </Table.Td>
             </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {data.map((recipe, index) => (
-              <Table.Tr key={`${recipe.title}-${recipe.url}-${String(index)}`}>
-                <Table.Td>{index + 1}</Table.Td>
-                <Table.Td>{recipe.title}</Table.Td>
-                <Table.Td>
-                  <ActionIcon
-                    component="a"
-                    variant="subtle"
-                    href={recipe.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${recipe.title}のレシピサイトを開く`}
-                    title="レシピサイトを開く"
-                  >
-                    <IconExternalLink size={18} aria-hidden="true" />
-                  </ActionIcon>
-                </Table.Td>
-                <Table.Td>
-                  <ActionIcon
-                    variant="default"
-                    aria-label={`${recipe.title}のURLをコピー`}
-                    title="URLをコピー"
-                    onClick={() => {
-                      void copyUrl(recipe.url);
-                    }}
-                  >
-                    <IconCopy size={18} aria-hidden="true" />
-                  </ActionIcon>
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </Table.ScrollContainer>
+          ))}
+        </Table.Tbody>
+      </Table>
     </>
   );
 }
