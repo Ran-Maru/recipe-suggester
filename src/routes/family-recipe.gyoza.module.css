@@ -1,0 +1,10 @@
+.page {
+  gap: var(--mantine-spacing-xs);
+  text-align: left;
+}
+
+.title {
+  font-size: 3.2rem;
+  line-height: 1.1;
+  margin-bottom: var(--mantine-spacing-md);
+}

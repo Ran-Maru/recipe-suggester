@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Stack, Text, Title } from "@mantine/core";
+import styles from "./family-recipe.gyoza.module.css";
 
 export const Route = createFileRoute("/family-recipe/gyoza")({
   component: Gyoza,
@@ -7,8 +8,8 @@ export const Route = createFileRoute("/family-recipe/gyoza")({
 
 function Gyoza() {
   return (
-    <Stack gap="xs" ta="left">
-      <Title order={1} fz="3.2rem" lh={1.1} mb="md">
+    <Stack className={styles.page}>
+      <Title order={1} className={styles.title}>
         うちの餃子
       </Title>
       <Text>
