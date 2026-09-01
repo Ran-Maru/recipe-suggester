@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button, Stack, Text, Title } from "@mantine/core";
 import { copyUrl } from "../copyUrl.ts";
 import data from "../mapping.json" with { type: "json" };
+import styles from "./index.module.css";
 
 type Recipe = {
   title: string;
@@ -40,11 +41,11 @@ function Home() {
   }
 
   return (
-    <Stack align="center" ta="center">
-      <Title order={1} fz="3.2rem" lh={1.1}>
+    <Stack className={styles.page}>
+      <Title order={1} className={styles.title}>
         クリックしてレシピをGET!
       </Title>
-      <Stack align="center" gap="md" p="xl">
+      <Stack className={styles.actions}>
         <Button size="lg" onClick={() => getUrl()}>
           レシピGETボタン
         </Button>
