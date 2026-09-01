@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ActionIcon, Table, Title } from "@mantine/core";
-import { IconCopy, IconExternalLink } from "@tabler/icons-react";
+import { ArrowSquareOut, Copy } from "@phosphor-icons/react";
 import { copyUrl } from "../copyUrl.ts";
 import data from "../mapping.json" with { type: "json" };
 import styles from "./recipes.module.css";
@@ -46,7 +46,7 @@ function Recipes() {
                   aria-label={`${recipe.title}のレシピサイトを開く`}
                   title="レシピサイトを開く"
                 >
-                  <IconExternalLink size={18} aria-hidden="true" />
+                  <ArrowSquareOut size={18} aria-hidden="true" />
                 </ActionIcon>
               </Table.Td>
               <Table.Td>
@@ -58,7 +58,7 @@ function Recipes() {
                     void copyUrl(recipe.url);
                   }}
                 >
-                  <IconCopy size={18} aria-hidden="true" />
+                  <Copy size={18} aria-hidden="true" />
                 </ActionIcon>
               </Table.Td>
             </Table.Tr>
