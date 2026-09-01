@@ -1,0 +1,15 @@
+.page {
+  align-items: center;
+  text-align: center;
+}
+
+.title {
+  font-size: 3.2rem;
+  line-height: 1.1;
+}
+
+.actions {
+  align-items: center;
+  gap: var(--mantine-spacing-md);
+  padding: var(--mantine-spacing-xl);
+}

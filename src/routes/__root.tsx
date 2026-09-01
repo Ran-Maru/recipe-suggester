@@ -9,8 +9,8 @@ export const Route = createRootRoute({
 
 function RootLayout() {
   return (
-    <Container size="xl" p={{ base: "md", sm: "xl" }}>
-      <Group justify="center" gap="md" mb="lg">
+    <Container size="xl" className={styles.container}>
+      <Group className={styles.nav}>
         <Anchor
           component={Link}
           to="/"
