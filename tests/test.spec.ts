@@ -147,6 +147,32 @@ test.describe("一覧ページのテスト", () => {
     ).not.toBeVisible();
   });
 
+  test("濁点・半濁点を区別せず検索できる", async ({ page }) => {
+    await page.goto("/recipes");
+    await page
+      .getByRole("textbox", { name: "レシピを検索" })
+      .fill("しようかやき");
+
+    await expect(
+      page.getByRole("cell", { name: "しょうが焼き", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "豚汁", exact: true }),
+    ).not.toBeVisible();
+  });
+
+  test("小文字かなを区別せず検索できる", async ({ page }) => {
+    await page.goto("/recipes");
+    await page.getByRole("textbox", { name: "レシピを検索" }).fill("とんしる");
+
+    await expect(
+      page.getByRole("cell", { name: "豚汁", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("cell", { name: "しょうが焼き", exact: true }),
+    ).not.toBeVisible();
+  });
+
   test("検索をクリアすると全件に戻る", async ({ page }) => {
     await page.goto("/recipes");
     const searchInput = page.getByRole("textbox", { name: "レシピを検索" });
