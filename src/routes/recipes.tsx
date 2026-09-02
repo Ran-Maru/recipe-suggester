@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ActionIcon, Table, Text, TextInput, Title } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
@@ -17,10 +17,7 @@ function Recipes() {
   const [debouncedQuery] = useDebouncedValue(query, 300);
   const effectiveQuery = query.trim() === "" ? "" : debouncedQuery;
 
-  const filteredRecipes = useMemo(
-    () => searchRecipes(data, effectiveQuery),
-    [effectiveQuery],
-  );
+  const filteredRecipes = searchRecipes(data, effectiveQuery);
 
   const showClearButton = query.length > 0;
 
