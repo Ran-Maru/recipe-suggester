@@ -14,6 +14,7 @@ function viteBase(): string {
 export default defineConfig({
   staged: {
     "*": "vp check --fix",
+    "*.css": "stylelint --fix",
   },
   lint: {
     plugins: ["oxc", "typescript", "unicorn", "react"],
@@ -25,7 +26,7 @@ export default defineConfig({
       // playwright.config.tsでNodeJS.processを使用するため設定
       node: true,
     },
-    ignorePatterns: ["dist", "src/routeTree.gen.ts"],
+    ignorePatterns: ["dist", "generated", "src/routeTree.gen.ts"],
     overrides: [
       {
         files: ["**/*.{ts,tsx}"],
@@ -162,7 +163,7 @@ export default defineConfig({
     singleQuote: false,
     printWidth: 80,
     sortPackageJson: false,
-    ignorePatterns: ["src/routeTree.gen.ts"],
+    ignorePatterns: ["generated", "src/routeTree.gen.ts"],
   },
   base: viteBase(),
   plugins: lazyPlugins(() => [
