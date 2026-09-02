@@ -17,8 +17,8 @@ try {
       errors.push(`[${index}] オブジェクトではありません`);
       return;
     }
-    // titleとurlの存在チェック
-    ["title", "url"].forEach((key) => {
+    // title、url、kanaの存在チェック
+    ["title", "url", "kana"].forEach((key) => {
       if (typeof item[key] !== "string" || item[key].trim() === "") {
         errors.push(
           `[${index}] ${key} が不正です: ${JSON.stringify(item[key])}`,

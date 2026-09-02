@@ -14,16 +14,18 @@ description: >-
 
 `src/mapping.json` is a JSON array. Each entry must be an object with:
 
-| Field   | Type   | Rules                                            |
-| ------- | ------ | ------------------------------------------------ |
-| `title` | string | Non-empty after trim (menu name shown in the UI) |
-| `url`   | string | Non-empty after trim (recipe page URL)           |
+| Field   | Type   | Rules                                              |
+| ------- | ------ | -------------------------------------------------- |
+| `title` | string | Non-empty after trim (menu name shown in the UI)   |
+| `kana`  | string | Non-empty after trim (hiragana reading for search) |
+| `url`   | string | Non-empty after trim (recipe page URL)             |
 
 Example:
 
 ```json
 {
   "title": "しょうが焼き",
+  "kana": "しょうがやき",
   "url": "https://park.ajinomoto.co.jp/recipe/card/706344/"
 }
 ```
@@ -35,7 +37,7 @@ Example:
 1. Valid JSON syntax
 2. Root value is an array
 3. Every item is a non-null object
-4. Every item has non-empty string `title` and `url`
+4. Every item has non-empty string `title`, `url`, and `kana`
 
 On failure it prints index-specific errors and exits with code 1.
 
