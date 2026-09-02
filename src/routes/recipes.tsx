@@ -14,7 +14,7 @@ export const Route = createFileRoute("/recipes")({
 
 function Recipes() {
   const [query, setQuery] = useState("");
-  const [debouncedQuery] = useDebouncedValue(query, 300);
+  const [debouncedQuery] = useDebouncedValue(query, 150);
   const effectiveQuery = query.trim() === "" ? "" : debouncedQuery;
 
   const filteredRecipes = searchRecipes(data, effectiveQuery);
