@@ -5,6 +5,27 @@
   line-height: 1.1;
 }
 
+.search {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-bottom: var(--mantine-spacing-md);
+}
+
+.search :global(.mantine-Input-wrapper) {
+  min-width: 0;
+}
+
+.searchInput {
+  font-size: rem(16);
+  min-width: 0;
+}
+
+.emptyMessage {
+  text-align: center;
+  color: var(--mantine-color-dimmed);
+}
+
 .table {
   font-size: var(--mantine-font-size-sm);
 }
