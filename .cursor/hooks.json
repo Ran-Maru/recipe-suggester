@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/deny-commit-and-push.sh",
+        "matcher": "git commit"
+      }
+    ],
+    "afterShellExecution": [
+      {
+        "command": ".cursor/hooks/after-git-commit.sh",
+        "matcher": "git commit"
+      }
+    ]
+  }
+}

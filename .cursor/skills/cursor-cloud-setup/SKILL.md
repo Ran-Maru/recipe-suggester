@@ -63,6 +63,12 @@ Use `vp install` / `vp add` / `vp remove` instead of calling pnpm directly.
 
 `vp config` (pnpm `prepare`) leaves `core.hooksPath` alone when Cursor already points at agent hooks. This is expected, not an error.
 
+## Cloud Agent のコミットメール
+
+Cursor アカウントの個人メールが `Co-authored-by` に付くのを防ぐ公式設定は無い。
+`.cursor/hooks.json` の `afterShellExecution` が、ホスト型 Cloud Agent（`/run/cursor/api.sock` があるとき）の `git commit` 直後だけメッセージを直す。
+同じコマンドで `git commit` と `git push` をつなぐと、その前に `beforeShellExecution` が拒否する。ローカルではどちらも動かない。
+
 ## When setup looks wrong
 
 1. Re-run `bash .cursor/install.sh`
