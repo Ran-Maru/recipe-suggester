@@ -11,7 +11,7 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
 ## 構築手順
 
 1. リポジトリを clone したフォルダで `vp install` を実行する（Vite Plus がランタイムと pnpm を揃える）。
-2. Playwright のブラウザをインストールする。
+2. Playwright のブラウザをインストールする（Vitest Browser Mode と E2E の両方で使う）。
 
    ```sh
    vp exec playwright install chromium webkit
@@ -19,6 +19,11 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
 
 3. VSCodeで本フォルダを開く。
 4. `vp run dev` を実行し、`http://localhost:5173` で起動を確認する。
+
+テスト:
+
+- `vp test` — Vitest の unit と Browser Mode
+- `vp exec playwright test` — クリップボード / 別タブの E2E
 
 ## デバッグの手順
 

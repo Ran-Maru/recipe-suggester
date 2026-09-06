@@ -8,11 +8,19 @@ description: >-
 
 # Playwright E2E
 
-End-to-end tests live in `tests/` and use `@playwright/test`.
+End-to-end tests live in `tests/` and use `@playwright/test`. They cover only
+clipboard copy and opening a recipe in a new tab. Search logic and other UI
+behavior live in Vitest (`vp test`).
 
 ## Run tests
 
-Primary command (via Vite+):
+Unit + Browser Mode (Vitest, via Vite+):
+
+```bash
+vp test
+```
+
+Playwright E2E:
 
 ```bash
 vp exec playwright test
@@ -28,6 +36,7 @@ Do **not** start `vp run dev` first. `playwright.config.ts` starts the dev serve
 
 | Script                   | Purpose                                     |
 | ------------------------ | ------------------------------------------- |
+| `vp test`                | Vitest unit + browser mode                  |
 | `vp run test:e2e`        | Same as `playwright test`                   |
 | `vp run test:e2e:trace`  | Run with trace always on                    |
 | `vp run test:e2e:ui`     | Interactive UI mode with trace              |
@@ -58,11 +67,11 @@ Do not treat these skips as failures.
 
 `tests/test.spec.ts` covers:
 
-- Page title contains レシピ
-- **レシピGET page**: GET button shows recipe name, 開く opens new tab, コピー copies URL, クリア resets
-- **一覧 (`/recipes`)**: table headers/rows, no horizontal overflow, copy button
-- **餃子 page** (`/family-recipe/gyoza`)
-- **Navigation** between レシピGET and 一覧
+- **レシピGET page**: 開く opens a new tab, コピーする copies the recipe URL
+- **一覧 (`/recipes`)**: copy button writes the URL to the clipboard
+
+Other UI and search coverage is in `src/**/*.test.ts` (Node) and
+`src/**/*.browser.test.tsx` (Vitest Browser Mode).
 
 Selectors favor accessible roles (`getByRole`, `getByTestId`).
 
