@@ -1,6 +1,8 @@
 {
   "recommendations": [
     "VoidZero.vite-plus-extension-pack",
+    "stylelint.vscode-stylelint",
+    "mizdra.css-modules-kit-vscode",
     "streetsidesoftware.code-spell-checker",
     "ms-playwright.playwright",
     "github.vscode-github-actions",
