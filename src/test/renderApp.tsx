@@ -5,6 +5,8 @@ import {
   createRouter,
 } from "@tanstack/react-router";
 import { render } from "vitest-browser-react";
+import { expect } from "vite-plus/test";
+import { page } from "vite-plus/test/browser/context";
 import "@mantine/core/styles.css";
 import "../index.css";
 import { routeTree } from "../routeTree.gen.ts";
@@ -15,10 +17,17 @@ export async function renderApp(path: string) {
     routeTree,
     history: createMemoryHistory({ initialEntries: [path] }),
   });
+  await router.load();
 
-  return render(
+  const view = await render(
     <MantineProvider theme={theme} defaultColorScheme="auto">
       <RouterProvider router={router} />
     </MantineProvider>,
   );
+
+  await expect
+    .element(page.getByRole("link", { name: "レシピGET" }))
+    .toBeVisible();
+
+  return view;
 }

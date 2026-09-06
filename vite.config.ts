@@ -202,6 +202,7 @@ export default defineConfig({
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,
+      routeFileIgnorePattern: "\\.(?:browser\\.)?test\\.[jt]sx?$",
     }),
     react({ compiler: true }),
   ]),

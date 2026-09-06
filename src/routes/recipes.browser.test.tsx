@@ -46,9 +46,9 @@ describe("一覧ページ", () => {
     await expect
       .element(page.getByRole("cell", { name: "しょうが焼き", exact: true }))
       .toBeVisible();
-    await expect
-      .element(page.getByRole("cell", { name: "豚汁", exact: true }))
-      .not.toBeVisible();
+    expect(
+      page.getByRole("cell", { name: "豚汁", exact: true }).query(),
+    ).toBeNull();
   });
 
   it("検索をクリアすると全件に戻る", async () => {
@@ -77,9 +77,7 @@ describe("一覧ページ", () => {
     await expect
       .element(page.getByText("該当するレシピがありません"))
       .toBeVisible();
-    await expect
-      .element(page.getByRole("columnheader", { name: "No" }))
-      .not.toBeVisible();
+    expect(page.getByRole("columnheader", { name: "No" }).query()).toBeNull();
   });
 
   it("ページがビューポート幅を超えない", async () => {
