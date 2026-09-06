@@ -14,16 +14,16 @@ describe("一覧ページ", () => {
     await renderApp("/recipes");
 
     await expect
-      .element(page.getByRole("columnheader", { name: "No" }))
+      .element(page.getByRole("heading", { name: "レシピ一覧" }))
       .toBeVisible();
     await expect
-      .element(page.getByRole("columnheader", { name: "メニュー名" }))
+      .element(page.getByText("メニュー名", { exact: true }))
       .toBeVisible();
     await expect
-      .element(page.getByRole("columnheader", { name: "リンク" }))
+      .element(page.getByText("リンク", { exact: true }))
       .toBeVisible();
     await expect
-      .element(page.getByRole("columnheader", { name: "コピー" }))
+      .element(page.getByText("コピー", { exact: true }))
       .toBeVisible();
     await expect
       .element(page.getByRole("cell", { name: "しょうが焼き", exact: true }))
@@ -46,9 +46,9 @@ describe("一覧ページ", () => {
     await expect
       .element(page.getByRole("cell", { name: "しょうが焼き", exact: true }))
       .toBeVisible();
-    expect(
-      page.getByRole("cell", { name: "豚汁", exact: true }).query(),
-    ).toBeNull();
+    await expect
+      .poll(() => page.getByRole("cell", { name: "豚汁", exact: true }).query())
+      .toBeNull();
   });
 
   it("検索をクリアすると全件に戻る", async () => {
@@ -59,6 +59,11 @@ describe("一覧ページ", () => {
     await expect
       .element(page.getByRole("cell", { name: "豚汁", exact: true }))
       .toBeVisible();
+    await expect
+      .poll(() =>
+        page.getByRole("cell", { name: "しょうが焼き", exact: true }).query(),
+      )
+      .toBeNull();
 
     await page.getByRole("button", { name: "検索をクリア" }).click();
     await expect.element(searchInput).toHaveValue("");
@@ -77,7 +82,7 @@ describe("一覧ページ", () => {
     await expect
       .element(page.getByText("該当するレシピがありません"))
       .toBeVisible();
-    expect(page.getByRole("columnheader", { name: "No" }).query()).toBeNull();
+    expect(page.getByText("メニュー名", { exact: true }).query()).toBeNull();
   });
 
   it("ページがビューポート幅を超えない", async () => {
