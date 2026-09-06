@@ -45,7 +45,7 @@ On failure it prints index-specific errors and exits with code 1.
 
 1. Edit `src/mapping.json` — append or update entries; keep valid JSON (trailing commas are invalid).
 2. Run `vp run check` to lint, typecheck, and validate the mapping.
-3. If UI behavior changed, run E2E tests (see the `playwright-e2e` skill).
+3. If UI behavior changed, run `vp test` and Playwright E2E (see the `playwright-e2e` skill).
 
 ## Notes
 

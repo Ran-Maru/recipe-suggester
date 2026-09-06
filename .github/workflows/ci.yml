@@ -1,4 +1,4 @@
-name: Playwright Tests & Dependabot Auto Merge
+name: Tests & Dependabot Auto Merge
 on:
   push:
     branches: [main]
@@ -6,7 +6,7 @@ on:
     branches: [main]
 jobs:
   test:
-    timeout-minutes: 5
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -21,6 +21,8 @@ jobs:
         run: vp run build
       - name: Install Playwright Browsers
         run: vp exec playwright install --with-deps chromium webkit
+      - name: Run Vitest
+        run: vp test
       - name: Run Playwright tests
         run: vp exec playwright test
       - uses: actions/upload-artifact@v7

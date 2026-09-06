@@ -1,6 +1,7 @@
 import { defineConfig, lazyPlugins } from "vite-plus";
 import react from "@vitejs/plugin-react";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
+import { playwright } from "vite-plus/test/browser-playwright";
 
 function viteBase(): string {
   const raw = process.env.VITE_BASE ?? "/";
@@ -144,6 +145,12 @@ export default defineConfig({
           "react/only-export-components": "off",
         },
       },
+      {
+        files: ["src/**/*.test.ts", "src/**/*.browser.test.tsx", "src/test/**"],
+        rules: {
+          "react/only-export-components": "off",
+        },
+      },
     ],
     options: {
       typeAware: true,
@@ -165,11 +172,37 @@ export default defineConfig({
     sortPackageJson: false,
     ignorePatterns: ["generated", "src/routeTree.gen.ts"],
   },
+  test: {
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: "unit",
+          include: ["src/**/*.test.ts"],
+          environment: "node",
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: "browser",
+          include: ["src/**/*.browser.test.tsx"],
+          browser: {
+            enabled: true,
+            provider: playwright(),
+            instances: [{ browser: "chromium" }],
+            viewport: { width: 390, height: 844 },
+          },
+        },
+      },
+    ],
+  },
   base: viteBase(),
   plugins: lazyPlugins(() => [
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,
+      routeFileIgnorePattern: "\\.(?:browser\\.)?test\\.[jt]sx?$",
     }),
     react({ compiler: true }),
   ]),
