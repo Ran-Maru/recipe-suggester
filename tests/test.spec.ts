@@ -1,6 +1,12 @@
 import { test, expect } from "@playwright/test";
 
-const URL = "http://localhost:5173/";
+function appOrigin(): string {
+  const baseURL = test.info().project.use.baseURL;
+  if (!baseURL) {
+    throw new Error("Playwright baseURL is not configured");
+  }
+  return new URL(baseURL).origin;
+}
 
 test.describe("レシピGETページ", () => {
   test.beforeEach(async ({ page }) => {
@@ -26,7 +32,7 @@ test.describe("レシピGETページ", () => {
     test.skip(browserName === "webkit", "WebKit lacks clipboard API support");
 
     await context.grantPermissions(["clipboard-read", "clipboard-write"], {
-      origin: URL,
+      origin: appOrigin(),
     });
 
     await page.getByRole("button", { name: "レシピGETボタン" }).click();
@@ -39,7 +45,8 @@ test.describe("レシピGETページ", () => {
     );
     expect(clipboardText).not.toBe("");
     expect(
-      clipboardText.startsWith("https://") || clipboardText.startsWith(URL),
+      clipboardText.startsWith("https://") ||
+        clipboardText.startsWith(appOrigin()),
     ).toBe(true);
   });
 });
@@ -49,7 +56,7 @@ test.describe("一覧ページ", () => {
     test.skip(browserName === "webkit", "WebKit lacks clipboard API support");
 
     await context.grantPermissions(["clipboard-read", "clipboard-write"], {
-      origin: URL,
+      origin: appOrigin(),
     });
 
     await page.goto("/recipes");
@@ -59,7 +66,8 @@ test.describe("一覧ページ", () => {
     );
     expect(clipboardText).not.toBe("");
     expect(
-      clipboardText.startsWith("https://") || clipboardText.startsWith(URL),
+      clipboardText.startsWith("https://") ||
+        clipboardText.startsWith(appOrigin()),
     ).toBe(true);
   });
 });

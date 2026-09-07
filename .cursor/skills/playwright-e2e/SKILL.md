@@ -29,8 +29,15 @@ vp exec playwright test
 Do **not** start `vp run dev` first. `playwright.config.ts` starts the dev server automatically via `webServer`:
 
 - Command: `vp dev`
-- URL: `http://localhost:5173`
-- `reuseExistingServer: !process.env.CI` — reuses a running local server outside CI
+- URL: this worktree's port from `scripts/worktree-ports.ts` (CI/Cloud は `http://localhost:5173`)
+- `reuseExistingServer: !process.env.CI` — 同じ worktree で既に立っている dev server だけ再利用する。別 worktree の 5173 には繋がない。
+- HTML report ポートも同じ offset（ベース 9323）
+
+Playwright UI を並行起動するときは `--ui-port` を worktree ごとにずらす:
+
+```bash
+vp exec playwright test --ui --ui-port 8080
+```
 
 ## package.json scripts
 
@@ -85,5 +92,5 @@ Selectors favor accessible roles (`getByRole`, `getByTestId`).
 ## Troubleshooting
 
 - **Browser missing**: run `vp exec playwright install --with-deps chromium webkit`
-- **Port 5173 busy**: stop other dev servers or let `reuseExistingServer` pick up the existing one locally
+- **Port busy**: この worktree のポートは `scripts/worktree-ports.ts` で決まる。`strictPort` のため勝手に次ポートへは行かない。`VITE_DEV_PORT` / `PORT` で上書きするか、そのポートのプロセスを止める。
 - **CI trace**: download artifact and open with Playwright trace viewer

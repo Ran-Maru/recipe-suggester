@@ -2,6 +2,11 @@ import { defineConfig, lazyPlugins } from "vite-plus";
 import react from "@vitejs/plugin-react";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import { playwright } from "vite-plus/test/browser-playwright";
+import {
+  worktreeDevPort,
+  worktreePreviewPort,
+  worktreeVitestBrowserApiPort,
+} from "./scripts/worktree-ports.ts";
 
 function viteBase(): string {
   const raw = process.env.VITE_BASE ?? "/";
@@ -178,7 +183,7 @@ export default defineConfig({
         extends: true,
         test: {
           name: "unit",
-          include: ["src/**/*.test.ts"],
+          include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
           environment: "node",
         },
       },
@@ -192,12 +197,21 @@ export default defineConfig({
             provider: playwright(),
             instances: [{ browser: "chromium" }],
             viewport: { width: 390, height: 844 },
+            api: { port: worktreeVitestBrowserApiPort() },
           },
         },
       },
     ],
   },
   base: viteBase(),
+  server: {
+    port: worktreeDevPort(),
+    strictPort: true,
+  },
+  preview: {
+    port: worktreePreviewPort(),
+    strictPort: true,
+  },
   plugins: lazyPlugins(() => [
     tanstackRouter({
       target: "react",
