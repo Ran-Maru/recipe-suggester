@@ -29,8 +29,8 @@ vp exec playwright test
 Do **not** start `vp run dev` first. `playwright.config.ts` starts the dev server automatically via `webServer`:
 
 - Command: `vp dev`
-- URL: this worktree's port from `scripts/worktree-ports.ts` (CI/Cloud は `http://localhost:5173`)
-- `reuseExistingServer: !process.env.CI` — 同じ worktree で既に立っている dev server だけ再利用する。別 worktree の 5173 には繋がない。
+- URL: this worktree's port from `scripts/worktree-ports.ts`（`vp run print:dev-port` で確認。CI / Cloud は offset 0）
+- `reuseExistingServer: !process.env.CI` — 同じ worktree で既に立っている dev server だけ再利用する。別 worktree の dev server には繋がない。
 - HTML report ポートも同じ offset（ベース 9323）
 
 Playwright UI を並行起動するときは `--ui-port` を worktree ごとにずらす:

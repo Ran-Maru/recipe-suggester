@@ -92,7 +92,7 @@ describe("worktreeDevPort", () => {
     expect(bashDevPort(options.cwd, options.env)).toBe(7000);
   });
 
-  it("adds the worktree offset to 5173 when not isolated", () => {
+  it("adds the worktree offset to the dev base port when not isolated", () => {
     const cwd = "/tmp/worktree-a";
     const offset = worktreePortOffset(cwd, {}, missingSocket);
     expect(

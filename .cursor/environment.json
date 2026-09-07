@@ -5,7 +5,7 @@
     {
       "name": "dev",
       "command": "./node_modules/.bin/vp run dev",
-      "description": "Vite+ dev server for レシピGET! at http://localhost:5173"
+      "description": "Vite+ dev server for レシピGET! (Cloud uses base port 5173; local worktrees use scripts/worktree-ports.ts)"
     }
   ],
   "ports": [

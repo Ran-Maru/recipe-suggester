@@ -18,7 +18,7 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
    ```
 
 3. VSCodeで本フォルダを開く。
-4. `vp run dev` を実行し、`http://localhost:5173` で起動を確認する。
+4. `vp run dev` を実行し、ターミナルに表示された Local URL で起動を確認する（ポートは `vp run print:dev-port` でも確認できる）。
 
 テスト:
 
@@ -27,9 +27,9 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
 
 ## デバッグの手順
 
-1. `vp run dev` を実行する。
-2. ステップ実行が必要であれば[実行とデバッグ]のサイドバーから[デバッグの開始]をクリックする。
-   1. ブレークポイントを貼ることもできる。
+1. [実行とデバッグ] から **Vite: dev + Chrome** を選ぶ（`vp run dev` 起動後、表示された Local URL で Chrome が開く）。
+2. すでに `vp run dev` を起動している場合は **Vite: Chrome（dev 起動済み）** を使い、`vp run print:dev-port` で確認したポートを含む URL を入力する。
+3. ステップ実行が必要ならブレークポイントを貼ってから上記を実行する。
 
 ## Zed Editorについて
 

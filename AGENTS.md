@@ -44,7 +44,7 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 
 ### Run / lint / build / test
 
-- Dev server: `vp run dev` (runs `vp dev`). CI とホスト型 Cloud Agent は `http://localhost:5173`。ローカルの Git/Cursor worktree は cwd のハッシュで 5173–5672 を割り当てる（`scripts/worktree-ports.ts`）。上書きは `VITE_DEV_PORT` または `PORT`。ターミナルに出た Local URL を使うこと。
+- Dev server: `vp run dev` (runs `vp dev`). ポートは worktree ごとに `scripts/worktree-ports.ts` で決まる（ベース 5173 + cwd 由来の offset）。`vp run print:dev-port` またはターミナルの Local URL を使う。CI / Cloud は offset 0。上書きは `VITE_DEV_PORT` または `PORT`。
 - Lint + typecheck + mapping validation: `vp run check` (`cmk` then `vp check` then stylelint then `scripts/check-mapping.json.js`).
 - Unit + Browser Mode tests: `vp test`.
 - E2E (clipboard copy and open-in-new-tab): `vp exec playwright test`. Playwright は同じ worktree ポートを `baseURL` にする。別 worktree の dev server は使わない。
@@ -62,7 +62,7 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 | Playwright HTML report | 9323   | `PLAYWRIGHT_HTML_PORT`    |
 | Vitest Browser API     | 63315  | `VITEST_BROWSER_API_PORT` |
 
-`CI` または `/run/cursor/api.sock` があるときは offset 0（5173 のまま）。Vite は `strictPort: true`。衝突したら次の空きポートへ逃げず失敗するので、`PORT=` で上書きする。
+`CI` または `/run/cursor/api.sock` があるときは offset 0（ベースポートのまま）。Vite は `strictPort: true`。衝突したら次の空きポートへ逃げず失敗するので、`PORT=` で上書きする。
 
 Playwright UI は config にポートが無い。`vp exec playwright test --ui --ui-port <8080+offset>` のようにずらす。
 
