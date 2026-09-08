@@ -68,13 +68,13 @@ Playwright UI は config にポートが無い。`vp exec playwright test --ui -
 
 ### Safety hooks
 
-`.cursor/hooks.json` の bash hook（`failClosed`）が危険な操作を拒否する。実装は `scripts/dangerous-command-policy.sh`。
+`.cursor/hooks.json` の bash hook（`failClosed`、危険そうなコマンドだけ matcher）が戻らない破壊を拒否する。実装は `scripts/dangerous-command-policy.sh`。
 
-- `beforeShellExecution`: `git push --force` / `-f` / `--force-with-lease`、`git reset --hard`、`git clean -f`、worktree 全体を捨てる `checkout`/`restore`、`rm -rf /` や worktree 外、`chmod 777`、worktree 外への `mv`/`cp`
+- `beforeShellExecution`: 素の `git push --force` / `-f` / `+refspec`、`git reset --hard`、`git clean -x`/`-X`、worktree 全体を捨てる `checkout`/`restore`、`rm -rf` の `/` / `$HOME` / `.git` / `src/` / worktree ルート、`chmod 777`、worktree 外への `mv`、`/tmp` 以外の worktree 外への `cp`
 - `preToolUse` (`Write` / `StrReplace` / `Delete` / `EditNotebook`): 現在の worktree の外と `.git/` 配下の編集
 - Cloud 専用: commit と push の同一コマンド禁止、commit 後の Co-authored-by 修正
 
-許可する例: `rm -rf node_modules` / `dist` / Playwright 成果物、`git reset`（`--hard` なし）、単一ファイルの `git restore`。
+許可する例: `git push --force-with-lease`、`git clean -fd`、`rm -rf tmp` / `node_modules` / `/tmp/...`、`cp file /tmp/file`、`git reset`（`--hard` なし）、単一ファイルの `git restore`。
 
 ### Project skills
 

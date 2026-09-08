@@ -87,24 +87,62 @@ is_git_metadata() {
   [[ "$path" == "$root/.git" || "$rel" == .git || "$rel" == .git/* ]]
 }
 
-is_allowed_rm_target() {
+is_tmp_path() {
+  local path="$1"
+  [[ "$path" == /tmp || "$path" == /tmp/* || "$path" == /private/tmp || "$path" == /private/tmp/* ]]
+}
+
+is_src_path() {
   local path="$1"
   local root="$2"
-  if is_git_metadata "$path" "$root" || ! is_inside_worktree "$path" "$root"; then
-    return 1
-  fi
   local rel="${path#"$root"/}"
-  case "$rel" in
-    node_modules | dist | dist-ssr | generated | test-results | playwright-report | blob-report | coverage | playwright/.cache | playwright/.auth)
-      return 0
-      ;;
-  esac
-  case "$(basename -- "$path")" in
-    node_modules | dist | dist-ssr | generated | test-results | playwright-report | blob-report | coverage)
-      return 0
-      ;;
-  esac
+  [[ "$path" == "$root/src" || "$rel" == src || "$rel" == src/* ]]
+}
+
+# Deny only irreversible targets: /, $HOME, .git, src/, worktree root, or an ancestor of the worktree.
+is_denied_rm_target() {
+  local path="$1"
+  local root="$2"
+  if [[ "$path" == / || "$path" == "$HOME" ]]; then
+    return 0
+  fi
+  if is_git_metadata "$path" "$root"; then
+    return 0
+  fi
+  if is_src_path "$path" "$root"; then
+    return 0
+  fi
+  if [[ "$path" == "$root" || "$root" == "$path"/* ]]; then
+    return 0
+  fi
   return 1
+}
+
+unquote_token() {
+  local token="$1"
+  if [[ ${#token} -ge 2 ]]; then
+    local first="${token:0:1}"
+    local last="${token: -1}"
+    if [[ "$first" == "$last" && ( "$first" == '"' || "$first" == "'" ) ]]; then
+      token="${token:1:${#token}-2}"
+    fi
+  fi
+  printf '%s\n' "$token"
+}
+
+skip_env_assignments() {
+  local i=0
+  while [[ $i -lt ${#_POLICY_TOKENS[@]} ]]; do
+    local token="${_POLICY_TOKENS[$i]}"
+    if [[ "$token" == [A-Za-z_]*=* ]]; then
+      i=$((i + 1))
+      continue
+    fi
+    break
+  done
+  if [[ $i -gt 0 ]]; then
+    _POLICY_TOKENS=("${_POLICY_TOKENS[@]:$i}")
+  fi
 }
 
 split_shell_commands() {
@@ -112,7 +150,13 @@ split_shell_commands() {
 }
 
 command_tokens() {
-  read -ra _POLICY_TOKENS <<< "$1"
+  local raw token
+  _POLICY_TOKENS=()
+  read -ra raw <<< "$1"
+  for token in "${raw[@]}"; do
+    _POLICY_TOKENS+=("$(unquote_token "$token")")
+  done
+  skip_env_assignments
 }
 
 has_recursive_rm_flag() {
@@ -197,8 +241,8 @@ decide_rm() {
       deny_json "危険な rm 対象です: $raw"
       return 0
     fi
-    if ! is_allowed_rm_target "$target" "$root"; then
-      deny_json "rm -r は node_modules / dist / Playwright 成果物など許可されたディレクトリ以外では禁止です。"
+    if is_denied_rm_target "$target" "$root"; then
+      deny_json "危険な rm 対象です: $raw"
       return 0
     fi
   done
@@ -240,10 +284,69 @@ decide_copy_or_move() {
     deny_json "$name で .git 配下へ書き込むことは禁止です。"
     return 0
   fi
-  if ! is_inside_worktree "$dest" "$root"; then
-    deny_json "$name のコピー先/移動先がこの worktree の外です: ${_POLICY_PATHS[${#_POLICY_PATHS[@]} - 1]}"
+  if is_inside_worktree "$dest" "$root"; then
+    return 1
+  fi
+  if [[ "$name" == cp ]] && is_tmp_path "$dest"; then
+    return 1
+  fi
+  if [[ "$name" == mv ]]; then
+    deny_json "mv の移動先がこの worktree の外です: ${_POLICY_PATHS[${#_POLICY_PATHS[@]} - 1]}"
     return 0
   fi
+  deny_json "cp のコピー先がこの worktree と /tmp の外です: ${_POLICY_PATHS[${#_POLICY_PATHS[@]} - 1]}"
+  return 0
+}
+
+git_subcommand_index() {
+  local i=1
+  local token
+  while [[ $i -lt ${#_POLICY_TOKENS[@]} ]]; do
+    token="${_POLICY_TOKENS[$i]}"
+    case "$token" in
+      -C | -c | --git-dir | --work-tree | --namespace | --config-env)
+        i=$((i + 2))
+        continue
+        ;;
+      --git-dir=* | --work-tree=* | --namespace=* | --config-env=* | -c*)
+        i=$((i + 1))
+        continue
+        ;;
+      --)
+        i=$((i + 1))
+        printf '%s\n' "$i"
+        return 0
+        ;;
+      -*)
+        i=$((i + 1))
+        continue
+        ;;
+      *)
+        printf '%s\n' "$i"
+        return 0
+        ;;
+    esac
+  done
+  return 1
+}
+
+is_whole_worktree_path() {
+  local path="$1"
+  path="${path%%/}"
+  [[ "$path" == "." || "$path" == ":/" || "$path" == "*" ]]
+}
+
+has_git_short_flag() {
+  local needle="$1"
+  local token
+  for token in "${_POLICY_TOKENS[@]:1}"; do
+    if [[ "$token" == --* || "$token" == "-" ]]; then
+      continue
+    fi
+    if [[ "$token" == -* && "$token" == *"$needle"* ]]; then
+      return 0
+    fi
+  done
   return 1
 }
 
@@ -251,39 +354,68 @@ decide_git() {
   local name
   name=$(basename_of "${_POLICY_TOKENS[0]}")
   [[ "$name" == git ]] || return 1
-  local joined=" ${_POLICY_TOKENS[*]} "
-  if printf '%s' "$joined" | grep -Eq '[[:space:]]push[[:space:]]'; then
-    if printf '%s' "$joined" | grep -Eq -- '--force|--force-with-lease'; then
-      deny_json "git push --force / -f / --force-with-lease は禁止です。"
+  local sub_index subcommand
+  sub_index=$(git_subcommand_index) || return 1
+  subcommand="${_POLICY_TOKENS[$sub_index]}"
+  local token
+  case "$subcommand" in
+    push)
+      local has_bare_force=0
+      for token in "${_POLICY_TOKENS[@]:sub_index+1}"; do
+        if [[ "$token" == --force-with-lease || "$token" == --force-with-lease=* ]]; then
+          continue
+        fi
+        if [[ "$token" == --force || "$token" == --force=* ]]; then
+          has_bare_force=1
+          break
+        fi
+        if [[ "$token" == -* && "$token" != --* && "$token" != "-" && "$token" == *f* ]]; then
+          has_bare_force=1
+          break
+        fi
+        if [[ "$token" == +* ]]; then
+          has_bare_force=1
+          break
+        fi
+      done
+      if [[ $has_bare_force -eq 1 ]]; then
+        deny_json "git push --force / -f / +refspec は禁止です。"
+        return 0
+      fi
+      ;;
+    reset)
+      for token in "${_POLICY_TOKENS[@]:sub_index+1}"; do
+        if [[ "$token" == --hard ]]; then
+          deny_json "git reset --hard は禁止です。"
+          return 0
+        fi
+      done
+      ;;
+    clean)
+      if has_git_short_flag x || has_git_short_flag X; then
+        deny_json "git clean の -x / -X は禁止です。"
+        return 0
+      fi
+      ;;
+    checkout | restore)
+      for token in "${_POLICY_TOKENS[@]:sub_index+1}"; do
+        if [[ "$token" == "--" ]]; then
+          continue
+        fi
+        if [[ "$token" == -* && "$token" != "-" ]]; then
+          continue
+        fi
+        if is_whole_worktree_path "$token"; then
+          deny_json "git checkout/restore で worktree 全体の変更を捨てる操作は禁止です。"
+          return 0
+        fi
+      done
+      ;;
+    filter-branch | filter-repo)
+      deny_json "git filter-branch / filter-repo は禁止です。"
       return 0
-    fi
-    if printf '%s' "$joined" | grep -Eq '[[:space:]]-[a-zA-Z]*f[a-zA-Z]*[[:space:]]'; then
-      deny_json "git push --force / -f / --force-with-lease は禁止です。"
-      return 0
-    fi
-    if printf '%s' "$joined" | grep -Eq '[[:space:]]\+'; then
-      deny_json "git push --force / -f / --force-with-lease は禁止です。"
-      return 0
-    fi
-  fi
-  if printf '%s' "$joined" | grep -Eq '[[:space:]]reset[[:space:]].*--hard'; then
-    deny_json "git reset --hard は禁止です。"
-    return 0
-  fi
-  if printf '%s' "$joined" | grep -Eq '[[:space:]]clean[[:space:]]'; then
-    if printf '%s' "$joined" | grep -Eq -- '--force|[[:space:]]-[a-zA-Z]*f'; then
-      deny_json "git clean -f は禁止です。"
-      return 0
-    fi
-  fi
-  if printf '%s' "$joined" | grep -Eq '[[:space:]](checkout|restore)[[:space:]]+(--[[:space:]]+)?(\.|:/|\*)[[:space:]]*$'; then
-    deny_json "git checkout/restore で worktree 全体の変更を捨てる操作は禁止です。"
-    return 0
-  fi
-  if printf '%s' "$joined" | grep -Eq '[[:space:]](filter-branch|filter-repo)[[:space:]]'; then
-    deny_json "git filter-branch / filter-repo は禁止です。"
-    return 0
-  fi
+      ;;
+  esac
   return 1
 }
 
