@@ -11,7 +11,7 @@
         "command": "bash .cursor/hooks/deny-dangerous-commands.sh",
         "failClosed": true,
         "timeout": 8,
-        "matcher": "rm|chmod|\\bmv |\\bcp |git "
+        "matcher": "rm|chmod|mv |cp |git "
       },
       {
         "command": ".cursor/hooks/deny-commit-and-push.sh",
