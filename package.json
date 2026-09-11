@@ -12,6 +12,7 @@
     "lint": "vp lint .",
     "lint:css": "stylelint \"src/**/*.css\"",
     "preview": "vp preview",
+    "print:dev-port": "bash scripts/print-worktree-dev-port.sh",
     "test:e2e": "playwright test",
     "test:e2e:trace": "playwright test --trace on",
     "test:e2e:ui": "playwright test --trace on --ui",

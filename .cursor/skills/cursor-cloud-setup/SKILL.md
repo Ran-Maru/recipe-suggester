@@ -17,8 +17,10 @@ Cloud Agent bootstrap for this repo is defined under `.cursor/`.
 | Key            | Value                                           |
 | -------------- | ----------------------------------------------- |
 | `install`      | `bash .cursor/install.sh`                       |
-| `terminals[0]` | `vp run dev` on port 5173                       |
+| `terminals[0]` | `vp run dev`（Cloud はベースポート 5173）       |
 | `ports`        | 5173 (Vite+ dev), 9323 (Playwright HTML report) |
+
+ローカルで複数 worktree を並列起動する場合、dev / preview / Playwright HTML のポートは `scripts/worktree-ports.ts` が cwd からずらす。Cloud VM と CI は隔離済みなので 5173 / 4173 / 9323 のまま。この `environment.json` のポート宣言は Cloud 用なので変更しない。
 
 ## install.sh
 
@@ -67,7 +69,9 @@ Use `vp install` / `vp add` / `vp remove` instead of calling pnpm directly.
 
 Cursor アカウントの個人メールが `Co-authored-by` に付くのを防ぐ公式設定は無い。
 `.cursor/hooks.json` の `afterShellExecution` が、ホスト型 Cloud Agent（`/run/cursor/api.sock` があるとき）の `git commit` 直後だけメッセージを直す。
-同じコマンドで `git commit` と `git push` をつなぐと、その前に `beforeShellExecution` が拒否する。ローカルではどちらも動かない。
+同じコマンドで `git commit` と `git push` をつなぐと、その前に `beforeShellExecution` が拒否する。ローカルではその commit+push 分割 hook は動かない。
+
+ローカルでも `bash .cursor/hooks/deny-dangerous-commands.sh` と `deny-outside-worktree.sh` が、素の force push / `reset --hard` / 危険な `rm -rf`（`/`・ホーム・`.git`・`src/`・worktree ルート）/ worktree 外への編集を拒否する。`git push --force-with-lease` と `git clean -fd` は許可する。
 
 ## When setup looks wrong
 

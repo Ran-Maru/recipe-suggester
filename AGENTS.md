@@ -44,12 +44,37 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 
 ### Run / lint / build / test
 
-- Dev server: `vp run dev` (runs `vp dev`) serves on `http://localhost:5173`.
+- Dev server: `vp run dev` (runs `vp dev`). ポートは worktree ごとに `scripts/worktree-ports.ts` で決まる（ベース 5173 + cwd 由来の offset）。`vp run print:dev-port` またはターミナルの Local URL を使う。CI / Cloud は offset 0。上書きは `VITE_DEV_PORT` または `PORT`。
 - Lint + typecheck + mapping validation: `vp run check` (`cmk` then `vp check` then stylelint then `scripts/check-mapping.json.js`).
 - Unit + Browser Mode tests: `vp test`.
-- E2E (clipboard copy and open-in-new-tab): `vp exec playwright test`.
+- E2E (clipboard copy and open-in-new-tab): `vp exec playwright test`. Playwright は同じ worktree ポートを `baseURL` にする。別 worktree の dev server は使わない。
 - Build: `vp run build` (`cmk && tsc -b && vp build`). `tsc` is TypeScript 7 (`typescript-7`); `typescript` is aliased to TypeScript 6 for CSS Modules Kit.
 - CSS: stylelint (`vp run lint:css`) plus CSS Modules Kit (`cmk` / ts-plugin). Formatting stays on Oxfmt.
+
+### Worktree ports
+
+複数 worktree を同時に起動してもポートがぶつからないようにする。
+
+| 用途                   | ベース | 上書き                    |
+| ---------------------- | ------ | ------------------------- |
+| Vite+ dev              | 5173   | `VITE_DEV_PORT` / `PORT`  |
+| Vite+ preview          | 4173   | `PREVIEW_PORT`            |
+| Playwright HTML report | 9323   | `PLAYWRIGHT_HTML_PORT`    |
+| Vitest Browser API     | 63315  | `VITEST_BROWSER_API_PORT` |
+
+`CI` または `/run/cursor/api.sock` があるときは offset 0（ベースポートのまま）。Vite は `strictPort: true`。衝突したら次の空きポートへ逃げず失敗するので、`PORT=` で上書きする。
+
+Playwright UI は config にポートが無い。`vp exec playwright test --ui --ui-port <8080+offset>` のようにずらす。
+
+### Safety hooks
+
+`.cursor/hooks.json` の bash hook（`failClosed`、危険そうなコマンドだけ matcher）が戻らない破壊を拒否する。実装は `scripts/dangerous-command-policy.sh`。
+
+- `beforeShellExecution`: 素の `git push --force` / `-f` / `+refspec`、`git reset --hard`、`git clean -x`/`-X`、worktree 全体を捨てる `checkout`/`restore`、`rm -rf` の `/` / `$HOME` / `.git` / `src/` / worktree ルート、`chmod 777`、worktree 外への `mv`、`/tmp` 以外の worktree 外への `cp`
+- `preToolUse` (`Write` / `StrReplace` / `Delete` / `EditNotebook`): 現在の worktree の外と `.git/` 配下の編集
+- Cloud 専用: commit と push の同一コマンド禁止、commit 後の Co-authored-by 修正
+
+許可する例: `git push --force-with-lease`、`git clean -fd`、`rm -rf tmp` / `node_modules` / `/tmp/...`、`cp file /tmp/file`、`git reset`（`--hard` なし）、単一ファイルの `git restore`。
 
 ### Project skills
 

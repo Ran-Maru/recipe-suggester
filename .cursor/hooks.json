@@ -1,10 +1,28 @@
 {
   "version": 1,
   "hooks": {
+    "sessionStart": [
+      {
+        "command": "bash .cursor/hooks/inject-worktree-ports.sh"
+      }
+    ],
     "beforeShellExecution": [
+      {
+        "command": "bash .cursor/hooks/deny-dangerous-commands.sh",
+        "failClosed": true,
+        "timeout": 8,
+        "matcher": "rm|chmod|mv |cp |git "
+      },
       {
         "command": ".cursor/hooks/deny-commit-and-push.sh",
         "matcher": "git commit"
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": "bash .cursor/hooks/deny-outside-worktree.sh",
+        "failClosed": true,
+        "matcher": "Write|StrReplace|Delete|EditNotebook"
       }
     ],
     "afterShellExecution": [

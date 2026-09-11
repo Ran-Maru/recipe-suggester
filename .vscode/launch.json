@@ -2,11 +2,32 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Vite: dev + Chrome",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "${workspaceFolder}/node_modules/.bin/vp run dev",
+      "cwd": "${workspaceFolder}",
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "killOnServerStop": true,
+        "pattern": "Local:\\s+https?://[^/]*:(\\d+)/",
+        "uriFormat": "http://localhost:%s",
+        "webRoot": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "Vite: Chrome（dev 起動済み）",
       "type": "chrome",
       "request": "launch",
-      "name": "Vite: Chromeデバッグ (先にnpm run devが必要)",
-      "url": "http://localhost:5173",
+      "url": "${input:devServerUrl}",
       "webRoot": "${workspaceFolder}"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "devServerUrl",
+      "type": "promptString",
+      "description": "vp run dev の Local URL（例: http://localhost:5315/）。ポートは vp run print:dev-port"
     }
   ]
 }
