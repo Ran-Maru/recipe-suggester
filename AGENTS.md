@@ -36,6 +36,7 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 - `postcss.config.cjs` enables `postcss-preset-mantine` (mixins such as `@mixin dark`, and the `rem()` function) plus `postcss-simple-vars` for the `$mantine-breakpoint-*` variables. Mantine の `style` prop（`w`, `mt`, `bg` など）は使わない。コンポーネント固有の props（`variant`, `layout`, `striped` など）は積極的に使う。見た目は `className` / `classNames` と CSS Modules で実装し、動的スタイルが必要な場合のみ `style` で CSS Modules 内の CSS 変数を参照する。Mantine の `styles` prop は使わない。
 - `src/index.css` only holds the few globals Mantine's reset does not cover.
 - Icons come from `@phosphor-icons/react`. Import icons by their PascalCase name (e.g. `Copy`, `ArrowSquareOut`).
+- スマホのタップ領域とアイコンサイズは `.cursor/skills/mobile-touch-targets/SKILL.md` と `src/touchTarget.ts` に従う。単独の `ActionIcon` は `xl`（44px）、Phosphor アイコンは 24px。検索欄は `TextInput` `lg`。16px / 18px のアイコンは使わない。
 
 ### Toolchain / runtime
 
@@ -80,8 +81,9 @@ Playwright UI は config にポートが無い。`vp exec playwright test --ui -
 
 Detailed workflows live in `.cursor/skills/` — read the matching skill when relevant:
 
-| Skill                | When to use                                                    |
-| -------------------- | -------------------------------------------------------------- |
-| `recipe-mapping`     | Adding or editing `src/mapping.json`                           |
-| `playwright-e2e`     | Writing or running E2E tests, debugging Playwright/CI failures |
-| `cursor-cloud-setup` | Cloud Agent bootstrap, Node/nvm issues, `.cursor/install.sh`   |
+| Skill                  | When to use                                                             |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `recipe-mapping`       | Adding or editing `src/mapping.json`                                    |
+| `playwright-e2e`       | Writing or running E2E tests, debugging Playwright/CI failures          |
+| `cursor-cloud-setup`   | Cloud Agent bootstrap, Node/nvm issues, `.cursor/install.sh`            |
+| `mobile-touch-targets` | Changing buttons, icons, search/address-bar size, or mobile tap targets |

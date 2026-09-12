@@ -6,6 +6,12 @@ import { ArrowSquareOut, Copy, X } from "@phosphor-icons/react";
 import { copyUrl } from "../copyUrl.ts";
 import data from "../mapping.json" with { type: "json" };
 import { searchRecipes } from "../searchRecipes.ts";
+import {
+  TOUCH_ACTION_ICON_SIZE,
+  TOUCH_ICON_PX,
+  TOUCH_INPUT_ACTION_ICON_SIZE,
+  TOUCH_INPUT_SIZE,
+} from "../touchTarget.ts";
 import styles from "./recipes.module.css";
 
 export const Route = createFileRoute("/recipes")({
@@ -33,6 +39,7 @@ function Recipes() {
       <TextInput
         className={styles.search}
         classNames={{ input: styles.searchInput }}
+        size={TOUCH_INPUT_SIZE}
         label="レシピを検索"
         placeholder="メニュー名やかな"
         value={query}
@@ -44,11 +51,12 @@ function Recipes() {
             <ActionIcon
               variant="subtle"
               color="gray"
+              size={TOUCH_INPUT_ACTION_ICON_SIZE}
               aria-label="検索をクリア"
               title="検索をクリア"
               onClick={clearSearch}
             >
-              <X size={16} aria-hidden="true" />
+              <X size={TOUCH_ICON_PX} aria-hidden="true" />
             </ActionIcon>
           ) : undefined
         }
@@ -81,25 +89,27 @@ function Recipes() {
                   <ActionIcon
                     component="a"
                     variant="subtle"
+                    size={TOUCH_ACTION_ICON_SIZE}
                     href={recipe.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`${recipe.title}のレシピサイトを開く`}
                     title="レシピサイトを開く"
                   >
-                    <ArrowSquareOut size={18} aria-hidden="true" />
+                    <ArrowSquareOut size={TOUCH_ICON_PX} aria-hidden="true" />
                   </ActionIcon>
                 </Table.Td>
                 <Table.Td>
                   <ActionIcon
                     variant="default"
+                    size={TOUCH_ACTION_ICON_SIZE}
                     aria-label={`${recipe.title}のURLをコピー`}
                     title="URLをコピー"
                     onClick={() => {
                       void copyUrl(recipe.url);
                     }}
                   >
-                    <Copy size={18} aria-hidden="true" />
+                    <Copy size={TOUCH_ICON_PX} aria-hidden="true" />
                   </ActionIcon>
                 </Table.Td>
               </Table.Tr>
