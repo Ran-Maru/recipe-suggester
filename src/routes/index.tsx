@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button, Stack, Text, Title } from "@mantine/core";
 import { copyUrl } from "../copyUrl.ts";
 import data from "../mapping.json" with { type: "json" };
+import { TOUCH_BUTTON_SIZE } from "../touchTarget.ts";
 import styles from "./index.module.css";
 
 type Recipe = {
@@ -46,16 +47,21 @@ function Home() {
         クリックしてレシピをGET!
       </Title>
       <Stack className={styles.actions}>
-        <Button size="lg" onClick={() => getUrl()}>
+        <Button size={TOUCH_BUTTON_SIZE} onClick={() => getUrl()}>
           レシピGETボタン
         </Button>
         <Text data-testid="recipe-name">
           {recipe != undefined && recipe.title}
         </Text>
-        <Button variant="light" onClick={() => openUrl()}>
+        <Button
+          size={TOUCH_BUTTON_SIZE}
+          variant="light"
+          onClick={() => openUrl()}
+        >
           開く
         </Button>
         <Button
+          size={TOUCH_BUTTON_SIZE}
           variant="light"
           onClick={() => {
             if (typeof recipe !== "undefined") {
@@ -65,7 +71,11 @@ function Home() {
         >
           コピーする
         </Button>
-        <Button variant="default" onClick={() => setRecipe(undefined)}>
+        <Button
+          size={TOUCH_BUTTON_SIZE}
+          variant="default"
+          onClick={() => setRecipe(undefined)}
+        >
           クリア
         </Button>
       </Stack>
