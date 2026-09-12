@@ -1,6 +1,6 @@
 # 概要
 
-美味しかったレシピのURLをまとめたサイト
+美味しかったレシピの URL をまとめたサイト（レシピGET!）。
 https://ran-maru.github.io/recipe-suggester/
 
 ## 機能
