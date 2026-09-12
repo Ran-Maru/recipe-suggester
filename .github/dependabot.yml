@@ -13,6 +13,8 @@ updates:
       day: "friday"
       time: "20:00"
 
+    # 失敗しやすい系統は other から外し、関連パッケージだけまとめる。
+    # other に混ぜると 1 件の破壊的更新で週次バッチ全体が落ちる（#100）。
     groups:
       react:
         patterns:
@@ -21,6 +23,31 @@ updates:
           - "@types/react"
           - "@types/react-dom"
           - "@vitejs/plugin-react"
+      # Vite+ が vitest をピン留めしている。provider だけ major が上がると設定解決が壊れる。
+      vitest:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+          - "vitest-browser-react"
+      # ツールチェーン本体。パッチでも型・設定 API が壊れやすい（#63）。
+      vite-plus:
+        patterns:
+          - "vite-plus"
+          - "vite"
+      # ブラウザバイナリと @playwright/test は同じバージョンに揃える。
+      playwright:
+        patterns:
+          - "playwright"
+          - "@playwright/test"
+      # typescript は TS6 alias、typescript-7 は TS7。片方だけ major が上がると構成が崩れる。
+      typescript:
+        patterns:
+          - "typescript"
+          - "typescript-7"
+      # 0.x のため minor でも破壊的になり得る。React compiler 用。
+      oxc:
+        patterns:
+          - "oxc-transform-react"
       other:
         patterns:
           - "*"
@@ -30,6 +57,16 @@ updates:
           - "@types/react"
           - "@types/react-dom"
           - "@vitejs/plugin-react"
+          - "vitest"
+          - "@vitest/*"
+          - "vitest-browser-react"
+          - "vite-plus"
+          - "vite"
+          - "playwright"
+          - "@playwright/test"
+          - "typescript"
+          - "typescript-7"
+          - "oxc-transform-react"
     ignore:
       # @types/nodeのメジャーバージョンはnode.jsのバージョンに依存するため、メジャーバージョンアップデートは無視する。
       - dependency-name: "@types/node"
