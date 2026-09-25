@@ -23,17 +23,15 @@ updates:
           - "@types/react"
           - "@types/react-dom"
           - "@vitejs/plugin-react"
-      # Vite+ が vitest をピン留めしている。provider だけ major が上がると設定解決が壊れる。
-      vitest:
-        patterns:
-          - "vitest"
-          - "@vitest/*"
-          - "vitest-browser-react"
       # ツールチェーン本体。パッチでも型・設定 API が壊れやすい（#63）。
+      # Vite+ が vitest をピン留めしているため、provider だけ major が上がると設定解決が壊れる。同一グループで更新する。
       vite-plus:
         patterns:
           - "vite-plus"
           - "vite"
+          - "vitest"
+          - "@vitest/*"
+          - "vitest-browser-react"
       # ブラウザバイナリと @playwright/test は同じバージョンに揃える。
       playwright:
         patterns:
