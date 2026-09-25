@@ -25,6 +25,7 @@ updates:
           - "@vitejs/plugin-react"
       # ツールチェーン本体。パッチでも型・設定 API が壊れやすい（#63）。
       # Vite+ が vitest をピン留めしているため、provider だけ major が上がると設定解決が壊れる。同一グループで更新する。
+      # このグループの PR は ci.yml の dependabot-auto-merge 対象外。
       vite-plus:
         patterns:
           - "vite-plus"

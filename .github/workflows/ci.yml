@@ -51,10 +51,15 @@ jobs:
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: マージ実行(minor/patchのみの場合、マージする。)
+      # vite-plus グループはパッチでも型・設定 API が壊れやすい（dependabot.yml / #63）。
+      # && は || より優先されるため、update-type の判定は括弧でまとめる。
+      - name: マージ実行(minor/patchのみ。vite-plus グループは除く)
         if: |
-          steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
-          steps.metadata.outputs.update-type == 'version-update:semver-minor'
+          steps.metadata.outputs.dependency-group != 'vite-plus' &&
+          (
+            steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
+            steps.metadata.outputs.update-type == 'version-update:semver-minor'
+          )
         run: gh pr merge --squash "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
