@@ -40,7 +40,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/browser-playwright": "4.1.11",
-    "oxc-transform-react": "^0.150.0",
+    "oxc-transform-react": "^0.151.0",
     "playwright": "1.63.0",
     "postcss": "^8.5.28",
     "postcss-preset-mantine": "^1.18.0",
@@ -50,8 +50,8 @@
     "stylelint-config-standard": "^40.0.0",
     "typescript": "npm:@typescript/typescript6@~6.0.2",
     "typescript-7": "npm:typescript@~7.0.2",
-    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
-    "vite-plus": "latest",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.3.2",
+    "vite-plus": "0.3.2",
     "vitest-browser-react": "2.3.0"
   },
   "devEngines": {

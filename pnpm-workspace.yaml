@@ -1,3 +1,6 @@
+# dist-tag `latest` は Dependabot の cooldown 付き `pnpm update` で再解決される。
+# latest が prerelease だと公開日フィルタが安定版を飛ばし、古い prerelease へ落とす。
+# その結果 Vite+ 同梱の oxfmt が package.json をフォーマット違反にして CI が落ちる（#113）。
 overrides:
-  vite: npm:@voidzero-dev/vite-plus-core@latest
+  vite: npm:@voidzero-dev/vite-plus-core@0.3.2
   vitest: 4.1.11
