@@ -79,7 +79,7 @@ Playwright UI は config にポートが無い。`vp exec playwright test --ui -
 
 ### Project skills
 
-Detailed workflows live in `.cursor/skills/` — read the matching skill when relevant:
+Detailed workflows live in `.cursor/skills/` and `.agents/skills/` — read the matching skill when relevant:
 
 | Skill                  | When to use                                                             |
 | ---------------------- | ----------------------------------------------------------------------- |
@@ -87,3 +87,4 @@ Detailed workflows live in `.cursor/skills/` — read the matching skill when re
 | `playwright-e2e`       | Writing or running E2E tests, debugging Playwright/CI failures          |
 | `cursor-cloud-setup`   | Cloud Agent bootstrap, Node/nvm issues, `.cursor/install.sh`            |
 | `mobile-touch-targets` | Changing buttons, icons, search/address-bar size, or mobile tap targets |
+| `natural-japanese`     | Writing or revising Japanese so it reads naturally                      |
