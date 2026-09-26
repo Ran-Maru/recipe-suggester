@@ -21,10 +21,10 @@
     "prepare": "vp config"
   },
   "dependencies": {
-    "@mantine/core": "^9.6.1",
-    "@mantine/hooks": "^9.6.1",
+    "@mantine/core": "^9.6.2",
+    "@mantine/hooks": "^9.6.2",
     "@phosphor-icons/react": "^2.1.10",
-    "@tanstack/react-router": "^1.170.36",
+    "@tanstack/react-router": "^1.170.39",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
@@ -34,8 +34,8 @@
     "@css-modules-kit/ts-plugin": "^1.4.0",
     "@playwright/test": "1.63.0",
     "@tanstack/react-router-devtools": "^1.167.2",
-    "@tanstack/router-plugin": "^1.168.38",
-    "@types/node": "^24.13.4",
+    "@tanstack/router-plugin": "^1.168.40",
+    "@types/node": "^24.13.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
@@ -50,7 +50,7 @@
     "stylelint-config-standard": "^40.0.0",
     "typescript": "npm:@typescript/typescript6@~6.0.2",
     "typescript-7": "npm:typescript@~7.0.2",
-    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.0.0-rc.0",
     "vite-plus": "latest",
     "vitest-browser-react": "2.3.0"
   },
