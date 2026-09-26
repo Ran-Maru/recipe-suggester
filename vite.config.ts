@@ -191,13 +191,13 @@ export default defineConfig({
         extends: true,
         test: {
           name: "browser",
+          api: { port: worktreeVitestBrowserApiPort() },
           include: ["src/**/*.browser.test.tsx"],
           browser: {
             enabled: true,
             provider: playwright(),
             instances: [{ browser: "chromium" }],
             viewport: { width: 390, height: 844 },
-            api: { port: worktreeVitestBrowserApiPort() },
           },
         },
       },
