@@ -175,7 +175,12 @@ export default defineConfig({
     singleQuote: false,
     printWidth: 80,
     sortPackageJson: false,
-    ignorePatterns: ["generated", "src/routeTree.gen.ts"],
+    ignorePatterns: [
+      "generated",
+      "src/routeTree.gen.ts",
+      // 取り込んだ Agent Skill の文書。上流の文言を Oxfmt で書き換えない
+      ".agents/**/*.md",
+    ],
   },
   test: {
     projects: [
