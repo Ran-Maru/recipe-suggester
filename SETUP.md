@@ -31,6 +31,27 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
 2. すでに `vp run dev` を起動している場合は **Vite: Chrome（dev 起動済み）** を使い、`vp run print:dev-port` で確認したポートを含む URL を入力する。
 3. ステップ実行が必要ならブレークポイントを貼ってから上記を実行する。
 
+## Vite Plusのアップデート手順
+
+- `vp upgrade`でグローバルコマンド vp のバージョンを上げる。
+- pnpm-workspace.yaml に指定するVitestのバージョンを最新にする。
+  - Vite Plusのリポジトリを見て、バージョンアップ先のVitestのバージョンを確認する。
+    - 少なくともv1.0.0-rc.0の時点ではVitestのバージョンは明記する必要がありそう。
+- `vp update`コマンドを実行する。
+
+## Node.jsのアップデート方法
+
+- `vp env list-remote`でインストール可能なnode.jsのバージョンを確認する。
+- .node-version に記載されている node.js のバージョンを変更してから`vp env install`を実行する。
+
+## pnpmのアップデート方法
+
+- package.json に記載されている pnpm のバージョンを変更してから`vp install`を実行する。
+
+## npm Packages, Action(GitHub Actions)のアップデート方法
+
+- 基本的にdependabotが作成するPRをマージすればOK
+
 ## Zed Editorについて
 
 - VSCodeの前提で記載しているが、Zed Editorで動かす場合は以下を前提とする。
