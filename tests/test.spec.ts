@@ -56,12 +56,10 @@ test.describe("一覧ページ", () => {
     page,
     context,
     browserName,
-  }, testInfo) => {
+    isMobile,
+  }) => {
     test.skip(browserName === "webkit", "WebKit lacks clipboard API support");
-    test.skip(
-      testInfo.project.name.startsWith("Mobile"),
-      "スマホ幅ではコピー列を出さない",
-    );
+    test.skip(isMobile, "スマホ幅ではコピー列を出さない");
 
     await context.grantPermissions(["clipboard-read", "clipboard-write"], {
       origin: appOrigin(),

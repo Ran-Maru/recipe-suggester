@@ -1,4 +1,4 @@
-import { useState, type PointerEvent } from "react";
+import { useRef, useState, type PointerEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ActionIcon,
@@ -8,7 +8,7 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedValue, useWindowEvent } from "@mantine/hooks";
 import { ArrowSquareOut, Copy, Note, X } from "@phosphor-icons/react";
 import { copyUrl } from "../copyUrl.ts";
 import data from "../mapping.json" with { type: "json" };
@@ -27,6 +27,25 @@ export const Route = createFileRoute("/recipes")({
 
 function RecipeMemoButton({ title, memo }: { title: string; memo: string }) {
   const [opened, setOpened] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  // iOS Safari はタップでボタンにフォーカスを渡さないため、開閉はクリックで切り替える
+  const lastPointerTypeRef = useRef<string | null>(null);
+
+  useWindowEvent("keydown", (event) => {
+    if (opened && event.key === "Escape") {
+      setOpened(false);
+    }
+  });
+
+  useWindowEvent("pointerdown", (event) => {
+    if (
+      opened &&
+      event.target instanceof Node &&
+      !buttonRef.current?.contains(event.target)
+    ) {
+      setOpened(false);
+    }
+  });
 
   function openFromPointer(event: PointerEvent<HTMLButtonElement>) {
     if (event.pointerType === "mouse") {
@@ -40,6 +59,16 @@ function RecipeMemoButton({ title, memo }: { title: string; memo: string }) {
     }
   }
 
+  function handleClick() {
+    const pointerType = lastPointerTypeRef.current;
+    lastPointerTypeRef.current = null;
+    if (pointerType === "mouse") {
+      setOpened(true);
+      return;
+    }
+    setOpened((current) => !current);
+  }
+
   return (
     <Tooltip
       label={memo}
@@ -49,14 +78,20 @@ function RecipeMemoButton({ title, memo }: { title: string; memo: string }) {
       classNames={{ tooltip: styles.memoTooltip }}
     >
       <ActionIcon
+        ref={buttonRef}
         variant="subtle"
         size={TOUCH_ACTION_ICON_SIZE}
         aria-label={`${title}のメモ`}
-        aria-expanded={opened}
+        onPointerDown={(event) => {
+          lastPointerTypeRef.current = event.pointerType;
+        }}
         onPointerEnter={openFromPointer}
         onPointerLeave={closeFromPointer}
-        onFocus={() => {
-          setOpened(true);
+        onClick={handleClick}
+        onFocus={(event) => {
+          if (event.currentTarget.matches(":focus-visible")) {
+            setOpened(true);
+          }
         }}
         onBlur={() => {
           setOpened(false);

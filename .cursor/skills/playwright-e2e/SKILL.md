@@ -73,7 +73,7 @@ test.skip(browserName === "webkit", "WebKit lacks clipboard API support");
 `tests/test.spec.ts` がカバーするもの:
 
 - **レシピGET ページ**: 「開く」が新しいタブを開く、「コピーする」がレシピ URL をコピーする
-- **一覧（`/recipes`）**: コピーボタンが URL をクリップボードへ書く。スマホ幅（Mobile Chrome / Mobile Safari）ではコピー列を出さないので、このテストはそれらのプロジェクトでは skip する
+- **一覧（`/recipes`）**: コピーボタンが URL をクリップボードへ書く。スマホ幅（Mobile Chrome / Mobile Safari）ではコピー列を出さないので、このテストは `isMobile` のとき skip する
 
 その他の UI と検索は `src/**/*.test.ts`（Node）と `src/**/*.browser.test.tsx`（Vitest Browser Mode）にある。
 
