@@ -1,8 +1,15 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ActionIcon, Table, Text, TextInput, Title } from "@mantine/core";
+import {
+  ActionIcon,
+  Table,
+  Text,
+  TextInput,
+  Title,
+  Tooltip,
+} from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import { ArrowSquareOut, Copy, X } from "@phosphor-icons/react";
+import { ArrowSquareOut, Copy, Note, X } from "@phosphor-icons/react";
 import { copyUrl } from "../copyUrl.ts";
 import data from "../mapping.json" with { type: "json" };
 import { searchRecipes } from "../searchRecipes.ts";
@@ -78,6 +85,7 @@ function Recipes() {
               <Table.Th>メニュー名</Table.Th>
               <Table.Th className={styles.colLink}>リンク</Table.Th>
               <Table.Th className={styles.colCopy}>コピー</Table.Th>
+              <Table.Th className={styles.colMemo}>メモ</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -99,7 +107,7 @@ function Recipes() {
                     <ArrowSquareOut size={TOUCH_ICON_PX} aria-hidden="true" />
                   </ActionIcon>
                 </Table.Td>
-                <Table.Td>
+                <Table.Td className={styles.colCopy}>
                   <ActionIcon
                     variant="default"
                     size={TOUCH_ACTION_ICON_SIZE}
@@ -111,6 +119,25 @@ function Recipes() {
                   >
                     <Copy size={TOUCH_ICON_PX} aria-hidden="true" />
                   </ActionIcon>
+                </Table.Td>
+                <Table.Td className={styles.colMemo}>
+                  {recipe.memo.trim() === "" ? null : (
+                    <Tooltip
+                      label={recipe.memo}
+                      multiline
+                      events={{ hover: true, focus: true, touch: true }}
+                      position="left"
+                      classNames={{ tooltip: styles.memoTooltip }}
+                    >
+                      <ActionIcon
+                        variant="subtle"
+                        size={TOUCH_ACTION_ICON_SIZE}
+                        aria-label={`${recipe.title}のメモ`}
+                      >
+                        <Note size={TOUCH_ICON_PX} aria-hidden="true" />
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
                 </Table.Td>
               </Table.Tr>
             ))}
