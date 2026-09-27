@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type PointerEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ActionIcon,
@@ -24,6 +24,49 @@ import styles from "./recipes.module.css";
 export const Route = createFileRoute("/recipes")({
   component: Recipes,
 });
+
+function RecipeMemoButton({ title, memo }: { title: string; memo: string }) {
+  const [opened, setOpened] = useState(false);
+
+  function openFromPointer(event: PointerEvent<HTMLButtonElement>) {
+    if (event.pointerType === "mouse") {
+      setOpened(true);
+    }
+  }
+
+  function closeFromPointer(event: PointerEvent<HTMLButtonElement>) {
+    if (event.pointerType === "mouse") {
+      setOpened(false);
+    }
+  }
+
+  return (
+    <Tooltip
+      label={memo}
+      multiline
+      opened={opened}
+      position="left"
+      classNames={{ tooltip: styles.memoTooltip }}
+    >
+      <ActionIcon
+        variant="subtle"
+        size={TOUCH_ACTION_ICON_SIZE}
+        aria-label={`${title}のメモ`}
+        aria-expanded={opened}
+        onPointerEnter={openFromPointer}
+        onPointerLeave={closeFromPointer}
+        onFocus={() => {
+          setOpened(true);
+        }}
+        onBlur={() => {
+          setOpened(false);
+        }}
+      >
+        <Note size={TOUCH_ICON_PX} aria-hidden="true" />
+      </ActionIcon>
+    </Tooltip>
+  );
+}
 
 function Recipes() {
   const [query, setQuery] = useState("");
@@ -122,21 +165,7 @@ function Recipes() {
                 </Table.Td>
                 <Table.Td className={styles.colMemo}>
                   {recipe.memo.trim() === "" ? null : (
-                    <Tooltip
-                      label={recipe.memo}
-                      multiline
-                      events={{ hover: true, focus: true, touch: true }}
-                      position="left"
-                      classNames={{ tooltip: styles.memoTooltip }}
-                    >
-                      <ActionIcon
-                        variant="subtle"
-                        size={TOUCH_ACTION_ICON_SIZE}
-                        aria-label={`${recipe.title}のメモ`}
-                      >
-                        <Note size={TOUCH_ICON_PX} aria-hidden="true" />
-                      </ActionIcon>
-                    </Tooltip>
+                    <RecipeMemoButton title={recipe.title} memo={recipe.memo} />
                   )}
                 </Table.Td>
               </Table.Tr>

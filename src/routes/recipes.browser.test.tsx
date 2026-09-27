@@ -24,8 +24,8 @@ describe("一覧ページ", () => {
       .element(page.getByText("リンク", { exact: true }))
       .toBeVisible();
     await expect
-      .poll(() => page.getByText("コピー", { exact: true }).query())
-      .toBeNull();
+      .element(page.getByText("コピー", { exact: true }))
+      .not.toBeVisible();
     await expect.element(page.getByText("メモ", { exact: true })).toBeVisible();
     await expect
       .element(page.getByRole("cell", { name: "しょうが焼き", exact: true }))
@@ -146,6 +146,21 @@ describe("一覧ページ", () => {
     const clearIcon = clearButton.element().querySelector("svg");
     expect(clearIcon).not.toBeNull();
     expect(Number(clearIcon?.getAttribute("width"))).toBe(TOUCH_ICON_PX);
+  });
+
+  it("メモがある行はクリックでも文面を出す", async () => {
+    await renderApp("/recipes");
+
+    const memoButton = page.getByRole("button", {
+      name: "ロールキャベツのメモ",
+    });
+    await memoButton.click();
+
+    await expect
+      .element(page.getByRole("tooltip"))
+      .toHaveTextContent(
+        "破れたり余ったキャベツを鍋に入れるとたくさん食べれて嬉しい",
+      );
   });
 
   it("メモがある行はホバーで文面を出す", async () => {
