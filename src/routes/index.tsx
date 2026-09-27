@@ -2,14 +2,10 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button, Stack, Text, Title } from "@mantine/core";
 import { copyUrl } from "../copyUrl.ts";
-import data from "../mapping.json" with { type: "json" };
+import { recipes } from "../loadRecipes.ts";
+import type { Recipe } from "../searchRecipes.ts";
 import { TOUCH_BUTTON_SIZE } from "../touchTarget.ts";
 import styles from "./index.module.css";
-
-type Recipe = {
-  title: string;
-  url: string;
-};
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -21,12 +17,12 @@ function Home() {
   // const [recipe, setRecipe] = useState({})
 
   function getUrl() {
-    const count = data.length;
+    const count = recipes.length;
 
     // 使い方（例：1から10までのランダムな数）
     const nth = getRandomInt(count - 1);
 
-    setRecipe(data[nth]);
+    setRecipe(recipes[nth]);
   }
 
   function getRandomInt(max: number) {

@@ -11,7 +11,7 @@ import {
 import { useDebouncedValue, useWindowEvent } from "@mantine/hooks";
 import { ArrowSquareOut, Copy, Note, X } from "@phosphor-icons/react";
 import { copyUrl } from "../copyUrl.ts";
-import data from "../mapping.json" with { type: "json" };
+import { recipes } from "../loadRecipes.ts";
 import { searchRecipes } from "../searchRecipes.ts";
 import {
   TOUCH_ACTION_ICON_SIZE,
@@ -108,7 +108,7 @@ function Recipes() {
   const [debouncedQuery] = useDebouncedValue(query, 150);
   const effectiveQuery = query.trim() === "" ? "" : debouncedQuery;
 
-  const filteredRecipes = searchRecipes(data, effectiveQuery);
+  const filteredRecipes = searchRecipes(recipes, effectiveQuery);
 
   const showClearButton = query.length > 0;
 
