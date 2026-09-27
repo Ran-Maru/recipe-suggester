@@ -33,11 +33,12 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
 
 ## Vite Plusのアップデート手順
 
-- `vp upgrade`でグローバルコマンド vp のバージョンを上げる。
-- pnpm-workspace.yaml に指定するVitestのバージョンを最新にする。
-  - Vite Plusのリポジトリを見て、バージョンアップ先のVitestのバージョンを確認する。
-    - 少なくともv1.0.0-rc.0の時点ではVitestのバージョンは明記する必要がありそう。
-- `vp update`コマンドを実行する。
+- `vp upgrade` でグローバル CLI を上げる。
+- ワークスペースルートで `vp migrate --no-interactive` を実行する。`--full` は付けない。
+- catalog の `vite-plus` と `vite`（`@voidzero-dev/vite-plus-core`）が同じバージョンか、`pnpm-workspace.yaml` の `vitest@*` が `vp toolchain vitest` のバージョンかを確認する。
+- 依存の入れ直しは `vp install`。`vp update` は依存全体が上がる。
+
+詳細は [`.cursor/skills/upgrade-toolchain/SKILL.md`](.cursor/skills/upgrade-toolchain/SKILL.md) を参照する。
 
 ## Node.jsのアップデート方法
 
@@ -46,7 +47,9 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
 
 ## pnpmのアップデート方法
 
-- package.json に記載されている pnpm のバージョンを変更してから`vp install`を実行する。
+- `package.json` の `devEngines.packageManager.version` を変更する。
+- 同じバージョンを [`.cursor/install.sh`](.cursor/install.sh) の `corepack prepare pnpm@...` にも書く（`node_modules/.bin/vp` がまだ無いときのフォールバック）。
+- `vp install` を実行する。
 
 ## npm Packages, Action(GitHub Actions)のアップデート方法
 

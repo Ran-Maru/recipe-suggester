@@ -88,3 +88,4 @@ Playwright UI は config にポートが無い。`vp exec playwright test --ui -
 | `cursor-cloud-setup`   | Cloud Agent の初期化、Node / nvm の不整合、`.cursor/install.sh`          |
 | `mobile-touch-targets` | ボタン、アイコン、検索欄（アドレスバー相当）のサイズ、スマホのタップ領域 |
 | `natural-japanese`     | 日本語を自然に書く・直す                                                 |
+| `upgrade-toolchain`    | Vite Plus、Node.js、pnpm、Vitest ピンのバージョンアップ                |
