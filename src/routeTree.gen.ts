@@ -11,7 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecipesRouteImport } from './routes/recipes'
-import { Route as FamilyRecipeGyozaRouteImport } from './routes/family-recipe.gyoza'
+import { Route as FamilyRecipeIdRouteImport } from './routes/family-recipe.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,40 +23,40 @@ const RecipesRoute = RecipesRouteImport.update({
   path: '/recipes',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FamilyRecipeGyozaRoute = FamilyRecipeGyozaRouteImport.update({
-  id: '/family-recipe/gyoza',
-  path: '/family-recipe/gyoza',
+const FamilyRecipeIdRoute = FamilyRecipeIdRouteImport.update({
+  id: '/family-recipe/$id',
+  path: '/family-recipe/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/recipes': typeof RecipesRoute
-  '/family-recipe/gyoza': typeof FamilyRecipeGyozaRoute
+  '/family-recipe/$id': typeof FamilyRecipeIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/recipes': typeof RecipesRoute
-  '/family-recipe/gyoza': typeof FamilyRecipeGyozaRoute
+  '/family-recipe/$id': typeof FamilyRecipeIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/recipes': typeof RecipesRoute
-  '/family-recipe/gyoza': typeof FamilyRecipeGyozaRoute
+  '/family-recipe/$id': typeof FamilyRecipeIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/recipes' | '/family-recipe/gyoza'
+  fullPaths: '/' | '/recipes' | '/family-recipe/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/recipes' | '/family-recipe/gyoza'
-  id: '__root__' | '/' | '/recipes' | '/family-recipe/gyoza'
+  to: '/' | '/recipes' | '/family-recipe/$id'
+  id: '__root__' | '/' | '/recipes' | '/family-recipe/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   RecipesRoute: typeof RecipesRoute
-  FamilyRecipeGyozaRoute: typeof FamilyRecipeGyozaRoute
+  FamilyRecipeIdRoute: typeof FamilyRecipeIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,11 +75,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecipesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/family-recipe/gyoza': {
-      id: '/family-recipe/gyoza'
-      path: '/family-recipe/gyoza'
-      fullPath: '/family-recipe/gyoza'
-      preLoaderRoute: typeof FamilyRecipeGyozaRouteImport
+    '/family-recipe/$id': {
+      id: '/family-recipe/$id'
+      path: '/family-recipe/$id'
+      fullPath: '/family-recipe/$id'
+      preLoaderRoute: typeof FamilyRecipeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -88,7 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   RecipesRoute: RecipesRoute,
-  FamilyRecipeGyozaRoute: FamilyRecipeGyozaRoute,
+  FamilyRecipeIdRoute: FamilyRecipeIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
