@@ -39,13 +39,13 @@ vp exec playwright test --ui --ui-port 8080
 
 ## package.json の script
 
-| Script                   | 用途                                        |
-| ------------------------ | ------------------------------------------- |
-| `vp test`                | Vitest の unit + browser mode               |
-| `vp run test:e2e`        | `playwright test` と同じ                    |
-| `vp run test:e2e:trace`  | trace を常時オンで実行                      |
-| `vp run test:e2e:ui`     | trace 付きの対話 UI モード                  |
-| `vp run test:e2e:debug`  | Playwright inspector                        |
+| Script                   | 用途                                            |
+| ------------------------ | ----------------------------------------------- |
+| `vp test`                | Vitest の unit + browser mode                   |
+| `vp run test:e2e`        | `playwright test` と同じ                        |
+| `vp run test:e2e:trace`  | trace を常時オンで実行                          |
+| `vp run test:e2e:ui`     | trace 付きの対話 UI モード                      |
+| `vp run test:e2e:debug`  | Playwright inspector                            |
 | `vp run test:e2e:report` | HTML レポートを開く（`playwright show-report`） |
 
 ## ブラウザプロジェクト

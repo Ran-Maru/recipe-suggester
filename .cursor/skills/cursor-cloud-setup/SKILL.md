@@ -14,11 +14,11 @@ description: >-
 
 `.cursor/environment.json` の設定:
 
-| キー           | 値                                              |
-| -------------- | ----------------------------------------------- |
-| `install`      | `bash .cursor/install.sh`                       |
-| `terminals[0]` | `vp run dev`（Cloud はベースポート 5173）       |
-| `ports`        | 5173（Vite+ dev）、9323（Playwright HTML report）|
+| キー           | 値                                                |
+| -------------- | ------------------------------------------------- |
+| `install`      | `bash .cursor/install.sh`                         |
+| `terminals[0]` | `vp run dev`（Cloud はベースポート 5173）         |
+| `ports`        | 5173（Vite+ dev）、9323（Playwright HTML report） |
 
 ローカルで複数 worktree を並列起動する場合、dev / preview / Playwright HTML のポートは `scripts/worktree-ports.ts` が cwd からずらす。Cloud VM と CI は隔離済みなので 5173 / 4173 / 9323 のまま。この `environment.json` のポート宣言は Cloud 用なので変更しない。
 

@@ -81,10 +81,10 @@ Playwright UI は config にポートが無い。`vp exec playwright test --ui -
 
 詳しい手順は `.cursor/skills/` と `.agents/skills/` にある。該当するスキルを読んでから作業する。
 
-| Skill                  | 使うとき                                                                    |
-| ---------------------- | --------------------------------------------------------------------------- |
-| `recipe-mapping`       | `src/mapping.json` の追加・編集                                             |
-| `playwright-e2e`       | E2E テストの作成・実行、Playwright / CI の失敗調査                          |
-| `cursor-cloud-setup`   | Cloud Agent の初期化、Node / nvm の不整合、`.cursor/install.sh`             |
-| `mobile-touch-targets` | ボタン、アイコン、検索欄（アドレスバー相当）のサイズ、スマホのタップ領域    |
-| `natural-japanese`     | 日本語を自然に書く・直す                                                    |
+| Skill                  | 使うとき                                                                 |
+| ---------------------- | ------------------------------------------------------------------------ |
+| `recipe-mapping`       | `src/mapping.json` の追加・編集                                          |
+| `playwright-e2e`       | E2E テストの作成・実行、Playwright / CI の失敗調査                       |
+| `cursor-cloud-setup`   | Cloud Agent の初期化、Node / nvm の不整合、`.cursor/install.sh`          |
+| `mobile-touch-targets` | ボタン、アイコン、検索欄（アドレスバー相当）のサイズ、スマホのタップ領域 |
+| `natural-japanese`     | 日本語を自然に書く・直す                                                 |
