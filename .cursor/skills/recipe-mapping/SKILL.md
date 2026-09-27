@@ -6,21 +6,21 @@ description: >-
   when the user mentions レシピ追加, mapping, or recipe URLs.
 ---
 
-# Recipe mapping
+# レシピの mapping
 
-`recipe-suggester` picks a random recipe from `src/mapping.json`. There is no backend; this file is the only recipe data source.
+`recipe-suggester` は `src/mapping.json` からレシピをランダムに選ぶ。バックエンドはなく、このファイルが唯一のレシピデータだ。
 
-## Schema
+## スキーマ
 
-`src/mapping.json` is a JSON array. Each entry must be an object with:
+`src/mapping.json` は JSON 配列。各要素は次のフィールドを持つオブジェクトにする。
 
-| Field   | Type   | Rules                                              |
-| ------- | ------ | -------------------------------------------------- |
-| `title` | string | Non-empty after trim (menu name shown in the UI)   |
-| `kana`  | string | Non-empty after trim (hiragana reading for search) |
-| `url`   | string | Non-empty after trim (recipe page URL)             |
+| フィールド | 型     | ルール                                         |
+| ---------- | ------ | ---------------------------------------------- |
+| `title`    | string | trim 後に空でない（UI に出す料理名）           |
+| `kana`     | string | trim 後に空でない（検索用のひらがな読み）      |
+| `url`      | string | trim 後に空でない（レシピページの URL）        |
 
-Example:
+例:
 
 ```json
 {
@@ -30,24 +30,24 @@ Example:
 }
 ```
 
-## Validation
+## 検証
 
-`scripts/check-mapping.json.js` runs as part of `vp run check` and verifies:
+`scripts/check-mapping.json.js` は `vp run check` の一部として走り、次を確認する。
 
-1. Valid JSON syntax
-2. Root value is an array
-3. Every item is a non-null object
-4. Every item has non-empty string `title`, `url`, and `kana`
+1. JSON として正しい
+2. ルートが配列である
+3. 各要素が null でないオブジェクトである
+4. 各要素の `title`、`url`、`kana` が空でない文字列である
 
-On failure it prints index-specific errors and exits with code 1.
+失敗すると、何件目かを示したエラーを出して、終了コード 1 で止まる。
 
-## Workflow
+## 手順
 
-1. Edit `src/mapping.json` — append or update entries; keep valid JSON (trailing commas are invalid).
-2. Run `vp run check` to lint, typecheck, and validate the mapping.
-3. If UI behavior changed, run `vp test` and Playwright E2E (see the `playwright-e2e` skill).
+1. `src/mapping.json` を編集する。エントリを足すか、既存を更新する。JSON として正しい形を保つ（末尾カンマは不正）。
+2. `vp run check` で lint、型チェック、mapping の検証をまとめて走らせる。
+3. UI の挙動を変えたときは `vp test` と Playwright E2E を実行する（`playwright-e2e` スキルを参照）。
 
-## Notes
+## 補足
 
-- URLs may be external `https://` links or same-origin paths used by in-app recipes.
-- The `/recipes` list page reads the same file; new entries appear there automatically after build.
+- URL は外部の `https://` リンクでも、アプリ内レシピが使う同一オリジンのパスでもよい。
+- `/recipes` の一覧も同じファイルを読む。新しいエントリはビルド後、自動でそこに出る。

@@ -26,33 +26,33 @@ release. Add a tool name to select part of the graph. For example, run
 
 <!--VITE PLUS END-->
 
-## Cursor Cloud specific instructions
+## Cursor Cloud 向けの手順
 
-This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a React + TypeScript + Vite+ site that suggests a random recipe URL from `src/mapping.json`. There is no backend.
+このリポジトリはフロントエンドだけのアプリ `recipe-suggester`（「レシピGET!」）だ。React + TypeScript + Vite+ で、`src/mapping.json` からレシピ URL をランダムに提案する。バックエンドはない。
 
 ### UI
 
-- UI components come from [Mantine](https://mantine.dev/) (`@mantine/core` / `@mantine/hooks`). `src/main.tsx` imports `@mantine/core/styles.css` and wraps the router in `MantineProvider` with the theme from `src/theme.ts` (brand palette generated from `#646cff`, `defaultColorScheme="auto"`).
-- `postcss.config.cjs` enables `postcss-preset-mantine` (mixins such as `@mixin dark`, and the `rem()` function) plus `postcss-simple-vars` for the `$mantine-breakpoint-*` variables. Mantine の `style` prop（`w`, `mt`, `bg` など）は使わない。コンポーネント固有の props（`variant`, `layout`, `striped` など）は積極的に使う。見た目は `className` / `classNames` と CSS Modules で実装し、動的スタイルが必要な場合のみ `style` で CSS Modules 内の CSS 変数を参照する。Mantine の `styles` prop は使わない。
-- `src/index.css` only holds the few globals Mantine's reset does not cover.
-- Icons come from `@phosphor-icons/react`. Import icons by their PascalCase name (e.g. `Copy`, `ArrowSquareOut`).
+- UI コンポーネントは [Mantine](https://mantine.dev/)（`@mantine/core` / `@mantine/hooks`）。`src/main.tsx` が `@mantine/core/styles.css` を import し、ルーターを `MantineProvider` で包む。テーマは `src/theme.ts`（ブランドパレットは `#646cff` から生成、`defaultColorScheme="auto"`）。
+- `postcss.config.cjs` は `postcss-preset-mantine`（`@mixin dark` や `rem()`）と、`$mantine-breakpoint-*` 用の `postcss-simple-vars` を有効にする。Mantine の `style` prop（`w`, `mt`, `bg` など）は使わない。コンポーネント固有の props（`variant`, `layout`, `striped` など）は積極的に使う。見た目は `className` / `classNames` と CSS Modules で実装し、動的スタイルが必要な場合のみ `style` で CSS Modules 内の CSS 変数を参照する。Mantine の `styles` prop は使わない。
+- `src/index.css` には、Mantine のリセットがカバーしない少数のグローバルだけを置く。
+- アイコンは `@phosphor-icons/react`。PascalCase の名前で import する（例: `Copy`, `ArrowSquareOut`）。
 - スマホのタップ領域とアイコンサイズは `.cursor/skills/mobile-touch-targets/SKILL.md` と `src/touchTarget.ts` に従う。単独の `ActionIcon` は `xl`（44px）、Phosphor アイコンは 24px。検索欄は `TextInput` `lg`。16px / 18px のアイコンは使わない。
 
-### Toolchain / runtime
+### ツールチェーン / ランタイム
 
-- Node is managed by Vite Plus (matches `.node-version` `24.19.0`), and `pnpm` is pinned to `11.22.0` (matches the `devEngines` requirement). Use `vp install` / `vp add` / `vp remove` rather than calling pnpm directly; Vite+ downloads the pinned pnpm.
-- `vp` is a project-local binary (`node_modules/.bin/vp`), not global here. Invoke it via `vp run <script>` (`vp run dev`, `vp run check`, `vp run build`) or `./node_modules/.bin/vp`. Do not use `npx` / `npm`; Vite+ does not translate mismatched package-manager commands.
+- Node は Vite Plus が管理する（`.node-version` の `24.19.0` と一致）。`pnpm` は `11.22.0` に固定（`devEngines` の要件と一致）。pnpm を直接呼ばず、`vp install` / `vp add` / `vp remove` を使う。固定版の pnpm は Vite+ がダウンロードする。
+- `vp` はプロジェクトローカルのバイナリ（`node_modules/.bin/vp`）で、グローバルには入っていない。`vp run <script>`（`vp run dev`、`vp run check`、`vp run build`）か `./node_modules/.bin/vp` で呼ぶ。`npx` / `npm` は使わない。Vite+ は、別のパッケージマネージャ向けのコマンドには置き換えない。
 
-### Run / lint / build / test
+### 実行 / lint / build / test
 
-- Dev server: `vp run dev` (runs `vp dev`). ポートは worktree ごとに `scripts/worktree-ports.ts` で決まる（ベース 5173 + cwd 由来の offset）。`vp run print:dev-port` またはターミナルの Local URL を使う。CI / Cloud は offset 0。上書きは `VITE_DEV_PORT` または `PORT`。
-- Lint + typecheck + mapping validation: `vp run check` (`cmk` then `vp check` then stylelint then `scripts/check-mapping.json.js`).
-- Unit + Browser Mode tests: `vp test`.
-- E2E (clipboard copy and open-in-new-tab): `vp exec playwright test`. Playwright は同じ worktree ポートを `baseURL` にする。別 worktree の dev server は使わない。
-- Build: `vp run build` (`cmk && tsc -b && vp build`). `tsc` is TypeScript 7 (`typescript-7`); `typescript` is aliased to TypeScript 6 for CSS Modules Kit.
-- CSS: stylelint (`vp run lint:css`) plus CSS Modules Kit (`cmk` / ts-plugin). Formatting stays on Oxfmt.
+- Dev server: `vp run dev`（中身は `vp dev`）。ポートは worktree ごとに `scripts/worktree-ports.ts` で決まる（ベース 5173 + cwd 由来の offset）。`vp run print:dev-port` またはターミナルの Local URL を使う。CI / Cloud は offset 0。上書きは `VITE_DEV_PORT` または `PORT`。
+- Lint + 型チェック + mapping 検証: `vp run check`（`cmk`、続けて `vp check`、stylelint、`scripts/check-mapping.json.js`）。
+- Unit + Browser Mode のテスト: `vp test`。
+- E2E（クリップボードへのコピーと、新しいタブで開く）: `vp exec playwright test`。Playwright は同じ worktree のポートを `baseURL` にする。別 worktree の dev server は使わない。
+- Build: `vp run build`（`cmk && tsc -b && vp build`）。`tsc` は TypeScript 7（`typescript-7`）。CSS Modules Kit 向けに `typescript` は TypeScript 6 へエイリアスされている。
+- CSS: stylelint（`vp run lint:css`）と CSS Modules Kit（`cmk` / ts-plugin）。フォーマットは Oxfmt のまま。
 
-### Worktree ports
+### Worktree のポート
 
 複数 worktree を同時に起動してもポートがぶつからないようにする。
 
@@ -67,7 +67,7 @@ This repo is a single frontend app: `recipe-suggester` ("レシピGET!"), a Reac
 
 Playwright UI は config にポートが無い。`vp exec playwright test --ui --ui-port <8080+offset>` のようにずらす。
 
-### Safety hooks
+### 安全フック
 
 `.cursor/hooks.json` の bash hook（`failClosed`、危険そうなコマンドだけ matcher）が戻らない破壊を拒否する。実装は `scripts/dangerous-command-policy.sh`。
 
@@ -77,14 +77,14 @@ Playwright UI は config にポートが無い。`vp exec playwright test --ui -
 
 許可する例: `git push --force-with-lease`、`git clean -fd`、`rm -rf tmp` / `node_modules` / `/tmp/...`、`cp file /tmp/file`、`git reset`（`--hard` なし）、単一ファイルの `git restore`。
 
-### Project skills
+### プロジェクトのスキル
 
-Detailed workflows live in `.cursor/skills/` and `.agents/skills/` — read the matching skill when relevant:
+詳しい手順は `.cursor/skills/` と `.agents/skills/` にある。該当するスキルを読んでから作業する。
 
-| Skill                  | When to use                                                             |
-| ---------------------- | ----------------------------------------------------------------------- |
-| `recipe-mapping`       | Adding or editing `src/mapping.json`                                    |
-| `playwright-e2e`       | Writing or running E2E tests, debugging Playwright/CI failures          |
-| `cursor-cloud-setup`   | Cloud Agent bootstrap, Node/nvm issues, `.cursor/install.sh`            |
-| `mobile-touch-targets` | Changing buttons, icons, search/address-bar size, or mobile tap targets |
-| `natural-japanese`     | Writing or revising Japanese so it reads naturally                      |
+| Skill                  | 使うとき                                                                    |
+| ---------------------- | --------------------------------------------------------------------------- |
+| `recipe-mapping`       | `src/mapping.json` の追加・編集                                             |
+| `playwright-e2e`       | E2E テストの作成・実行、Playwright / CI の失敗調査                          |
+| `cursor-cloud-setup`   | Cloud Agent の初期化、Node / nvm の不整合、`.cursor/install.sh`             |
+| `mobile-touch-targets` | ボタン、アイコン、検索欄（アドレスバー相当）のサイズ、スマホのタップ領域    |
+| `natural-japanese`     | 日本語を自然に書く・直す                                                    |
