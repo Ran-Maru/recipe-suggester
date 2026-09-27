@@ -35,9 +35,25 @@
 }
 
 .colLink,
-.colCopy {
+.colMemo {
   width: rem(80);
   white-space: nowrap;
+}
+
+.colCopy {
+  display: none;
+  width: rem(80);
+  white-space: nowrap;
+
+  @media (min-width: $mantine-breakpoint-sm) {
+    display: table-cell;
+  }
+}
+
+.memoTooltip {
+  max-width: rem(240);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 .titleCell {

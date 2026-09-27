@@ -3,6 +3,8 @@ export type Recipe = {
   kana: string;
   url: string;
   addedDate?: string;
+  /** 一覧のメモ列に出す。空文字のときはアイコンを出さない。 */
+  memo: string;
 };
 
 const SMALL_TO_LARGE_KANA: Record<string, string> = {

@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useRef, useState, type PointerEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ActionIcon, Table, Text, TextInput, Title } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
-import { ArrowSquareOut, Copy, X } from "@phosphor-icons/react";
+import {
+  ActionIcon,
+  Table,
+  Text,
+  TextInput,
+  Title,
+  Tooltip,
+} from "@mantine/core";
+import { useDebouncedValue, useWindowEvent } from "@mantine/hooks";
+import { ArrowSquareOut, Copy, Note, X } from "@phosphor-icons/react";
 import { copyUrl } from "../copyUrl.ts";
 import data from "../mapping.json" with { type: "json" };
 import { searchRecipes } from "../searchRecipes.ts";
@@ -17,6 +24,84 @@ import styles from "./recipes.module.css";
 export const Route = createFileRoute("/recipes")({
   component: Recipes,
 });
+
+function RecipeMemoButton({ title, memo }: { title: string; memo: string }) {
+  const [opened, setOpened] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  // iOS Safari はタップでボタンにフォーカスを渡さないため、開閉はクリックで切り替える
+  const lastPointerTypeRef = useRef<string | null>(null);
+
+  useWindowEvent("keydown", (event) => {
+    if (opened && event.key === "Escape") {
+      setOpened(false);
+    }
+  });
+
+  useWindowEvent("pointerdown", (event) => {
+    if (
+      opened &&
+      event.target instanceof Node &&
+      !buttonRef.current?.contains(event.target)
+    ) {
+      setOpened(false);
+    }
+  });
+
+  function openFromPointer(event: PointerEvent<HTMLButtonElement>) {
+    if (event.pointerType === "mouse") {
+      setOpened(true);
+    }
+  }
+
+  function closeFromPointer(event: PointerEvent<HTMLButtonElement>) {
+    if (event.pointerType === "mouse") {
+      setOpened(false);
+    }
+  }
+
+  function handleClick() {
+    const pointerType = lastPointerTypeRef.current;
+    lastPointerTypeRef.current = null;
+    if (pointerType === "mouse") {
+      setOpened(true);
+      return;
+    }
+    setOpened((current) => !current);
+  }
+
+  return (
+    <Tooltip
+      label={memo}
+      multiline
+      opened={opened}
+      position="left"
+      classNames={{ tooltip: styles.memoTooltip }}
+    >
+      <ActionIcon
+        ref={buttonRef}
+        variant="subtle"
+        size={TOUCH_ACTION_ICON_SIZE}
+        aria-label={`${title}のメモ`}
+        onPointerDown={(event) => {
+          lastPointerTypeRef.current = event.pointerType;
+        }}
+        onPointerEnter={openFromPointer}
+        onPointerLeave={closeFromPointer}
+        onClick={handleClick}
+        onFocus={(event) => {
+          if (event.currentTarget.matches(":focus-visible")) {
+            setOpened(true);
+          }
+        }}
+        onBlur={() => {
+          setOpened(false);
+        }}
+      >
+        <Note size={TOUCH_ICON_PX} aria-hidden="true" />
+      </ActionIcon>
+    </Tooltip>
+  );
+}
 
 function Recipes() {
   const [query, setQuery] = useState("");
@@ -78,6 +163,7 @@ function Recipes() {
               <Table.Th>メニュー名</Table.Th>
               <Table.Th className={styles.colLink}>リンク</Table.Th>
               <Table.Th className={styles.colCopy}>コピー</Table.Th>
+              <Table.Th className={styles.colMemo}>メモ</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -99,7 +185,7 @@ function Recipes() {
                     <ArrowSquareOut size={TOUCH_ICON_PX} aria-hidden="true" />
                   </ActionIcon>
                 </Table.Td>
-                <Table.Td>
+                <Table.Td className={styles.colCopy}>
                   <ActionIcon
                     variant="default"
                     size={TOUCH_ACTION_ICON_SIZE}
@@ -111,6 +197,11 @@ function Recipes() {
                   >
                     <Copy size={TOUCH_ICON_PX} aria-hidden="true" />
                   </ActionIcon>
+                </Table.Td>
+                <Table.Td className={styles.colMemo}>
+                  {recipe.memo.trim() === "" ? null : (
+                    <RecipeMemoButton title={recipe.title} memo={recipe.memo} />
+                  )}
                 </Table.Td>
               </Table.Tr>
             ))}

@@ -25,6 +25,10 @@ try {
         );
       }
     });
+    // memo は空文字を許す。未設定や文字列以外は不正
+    if (typeof item.memo !== "string") {
+      errors.push(`[${index}] memo が不正です: ${JSON.stringify(item.memo)}`);
+    }
   });
   if (errors.length > 0) {
     throw new Error(`テスト失敗:\n${errors.join("\n")}`);

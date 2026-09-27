@@ -52,8 +52,14 @@ test.describe("レシピGETページ", () => {
 });
 
 test.describe("一覧ページ", () => {
-  test("リンクをコピーできる", async ({ page, context, browserName }) => {
+  test("リンクをコピーできる", async ({
+    page,
+    context,
+    browserName,
+    isMobile,
+  }) => {
     test.skip(browserName === "webkit", "WebKit lacks clipboard API support");
+    test.skip(isMobile, "スマホ幅ではコピー列を出さない");
 
     await context.grantPermissions(["clipboard-read", "clipboard-write"], {
       origin: appOrigin(),

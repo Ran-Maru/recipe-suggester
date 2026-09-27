@@ -1,7 +1,19 @@
 import { describe, expect, it } from "vite-plus/test";
-import { page } from "vite-plus/test/browser/context";
+import { page, userEvent } from "vite-plus/test/browser/context";
 import { renderApp } from "../test/renderApp.tsx";
 import { MIN_TOUCH_TARGET_PX, TOUCH_ICON_PX } from "../touchTarget.ts";
+
+const MEMO_TEXT = "破れたり余ったキャベツを鍋に入れるとたくさん食べれて嬉しい";
+
+/** タップ相当。iOS Safari と同じく、フォーカスは移さない。 */
+function tap(element: Element) {
+  element.dispatchEvent(
+    new PointerEvent("pointerdown", { pointerType: "touch", bubbles: true }),
+  );
+  if (element instanceof HTMLElement) {
+    element.click();
+  }
+}
 
 function documentWidth() {
   return {
@@ -25,7 +37,8 @@ describe("一覧ページ", () => {
       .toBeVisible();
     await expect
       .element(page.getByText("コピー", { exact: true }))
-      .toBeVisible();
+      .not.toBeVisible();
+    await expect.element(page.getByText("メモ", { exact: true })).toBeVisible();
     await expect
       .element(page.getByRole("cell", { name: "しょうが焼き", exact: true }))
       .toBeVisible();
@@ -35,8 +48,15 @@ describe("一覧ページ", () => {
       )
       .toBeVisible();
     await expect
-      .element(page.getByRole("button", { name: "しょうが焼きのURLをコピー" }))
-      .toBeVisible();
+      .poll(() =>
+        page.getByRole("button", { name: "しょうが焼きのURLをコピー" }).query(),
+      )
+      .toBeNull();
+    await expect
+      .poll(() =>
+        page.getByRole("button", { name: "しょうが焼きのメモ" }).query(),
+      )
+      .toBeNull();
   });
 
   it("タイトルで絞り込める", async () => {
@@ -100,20 +120,20 @@ describe("一覧ページ", () => {
   it("アイコンボタンと検索欄がスマホのタップ領域を満たす", async () => {
     await renderApp("/recipes");
 
-    const copyButton = page.getByRole("button", {
-      name: "しょうが焼きのURLをコピー",
+    const memoButton = page.getByRole("button", {
+      name: "ロールキャベツのメモ",
     });
     const openLink = page.getByRole("link", {
       name: "しょうが焼きのレシピサイトを開く",
     });
     const searchInput = page.getByRole("textbox", { name: "レシピを検索" });
 
-    await expect.element(copyButton).toBeVisible();
+    await expect.element(memoButton).toBeVisible();
     await expect.element(openLink).toBeVisible();
 
-    const copyRect = copyButton.element().getBoundingClientRect();
-    expect(copyRect.width).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX);
-    expect(copyRect.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX);
+    const memoRect = memoButton.element().getBoundingClientRect();
+    expect(memoRect.width).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX);
+    expect(memoRect.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX);
 
     const openRect = openLink.element().getBoundingClientRect();
     expect(openRect.width).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX);
@@ -122,10 +142,10 @@ describe("一覧ページ", () => {
     const searchRect = searchInput.element().getBoundingClientRect();
     expect(searchRect.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX);
 
-    const copyIcon = copyButton.element().querySelector("svg");
-    expect(copyIcon).not.toBeNull();
-    expect(Number(copyIcon?.getAttribute("width"))).toBe(TOUCH_ICON_PX);
-    expect(Number(copyIcon?.getAttribute("height"))).toBe(TOUCH_ICON_PX);
+    const memoIcon = memoButton.element().querySelector("svg");
+    expect(memoIcon).not.toBeNull();
+    expect(Number(memoIcon?.getAttribute("width"))).toBe(TOUCH_ICON_PX);
+    expect(Number(memoIcon?.getAttribute("height"))).toBe(TOUCH_ICON_PX);
 
     await searchInput.fill("しょうが");
     const clearButton = page.getByRole("button", { name: "検索をクリア" });
@@ -138,6 +158,80 @@ describe("一覧ページ", () => {
     const clearIcon = clearButton.element().querySelector("svg");
     expect(clearIcon).not.toBeNull();
     expect(Number(clearIcon?.getAttribute("width"))).toBe(TOUCH_ICON_PX);
+  });
+
+  it("メモはタップで開き、もう一度タップすると閉じる", async () => {
+    await renderApp("/recipes");
+
+    const memoButton = page.getByRole("button", {
+      name: "ロールキャベツのメモ",
+    });
+    await expect.element(memoButton).toBeVisible();
+
+    tap(memoButton.element());
+    await expect
+      .element(page.getByRole("tooltip"))
+      .toHaveTextContent(MEMO_TEXT);
+
+    tap(memoButton.element());
+    await expect.poll(() => page.getByRole("tooltip").query()).toBeNull();
+  });
+
+  it("メモは外側をタップすると閉じる", async () => {
+    await renderApp("/recipes");
+
+    const memoButton = page.getByRole("button", {
+      name: "ロールキャベツのメモ",
+    });
+    await expect.element(memoButton).toBeVisible();
+
+    tap(memoButton.element());
+    await expect.element(page.getByRole("tooltip")).toBeVisible();
+
+    tap(document.body);
+    await expect.poll(() => page.getByRole("tooltip").query()).toBeNull();
+  });
+
+  it("メモは Escape で閉じる", async () => {
+    await renderApp("/recipes");
+
+    const memoButton = page.getByRole("button", {
+      name: "ロールキャベツのメモ",
+    });
+    await expect.element(memoButton).toBeVisible();
+
+    tap(memoButton.element());
+    await expect.element(page.getByRole("tooltip")).toBeVisible();
+
+    await userEvent.keyboard("{Escape}");
+    await expect.poll(() => page.getByRole("tooltip").query()).toBeNull();
+  });
+
+  it("メモはマウスでクリックしても開いたまま", async () => {
+    await renderApp("/recipes");
+
+    const memoButton = page.getByRole("button", {
+      name: "ロールキャベツのメモ",
+    });
+    await memoButton.click();
+
+    await expect
+      .element(page.getByRole("tooltip"))
+      .toHaveTextContent(MEMO_TEXT);
+  });
+
+  it("メモがある行はホバーで文面を出す", async () => {
+    await renderApp("/recipes");
+
+    const memoButton = page.getByRole("button", {
+      name: "ロールキャベツのメモ",
+    });
+    await expect.element(memoButton).toBeVisible();
+    await memoButton.hover();
+
+    await expect
+      .element(page.getByRole("tooltip"))
+      .toHaveTextContent(MEMO_TEXT);
   });
 
   it("検索入力中もページがビューポート幅を超えない", async () => {
