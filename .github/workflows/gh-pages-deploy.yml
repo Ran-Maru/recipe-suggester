@@ -1,8 +1,8 @@
 name: Deploy Static React Apps to GitHub Pages
 
 on:
-  push:
-    branches: ["main"]
+  # main へマージしたときのデプロイは、ci.yml の test 成功後に呼ばれる。
+  workflow_call:
   # 手動実行を許可
   workflow_dispatch:
 
