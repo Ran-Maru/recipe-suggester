@@ -6,49 +6,49 @@ description: >-
   version mismatches, environment.json, or .cursor/install.sh.
 ---
 
-# Cursor Cloud setup
+# Cursor Cloud のセットアップ
 
-Cloud Agent bootstrap for this repo is defined under `.cursor/`.
+このリポジトリの Cloud Agent 初期化は `.cursor/` 配下で定義している。
 
 ## environment.json
 
-`.cursor/environment.json` configures:
+`.cursor/environment.json` の設定:
 
-| Key            | Value                                           |
-| -------------- | ----------------------------------------------- |
-| `install`      | `bash .cursor/install.sh`                       |
-| `terminals[0]` | `vp run dev`（Cloud はベースポート 5173）       |
-| `ports`        | 5173 (Vite+ dev), 9323 (Playwright HTML report) |
+| キー           | 値                                                |
+| -------------- | ------------------------------------------------- |
+| `install`      | `bash .cursor/install.sh`                         |
+| `terminals[0]` | `vp run dev`（Cloud はベースポート 5173）         |
+| `ports`        | 5173（Vite+ dev）、9323（Playwright HTML report） |
 
 ローカルで複数 worktree を並列起動する場合、dev / preview / Playwright HTML のポートは `scripts/worktree-ports.ts` が cwd からずらす。Cloud VM と CI は隔離済みなので 5173 / 4173 / 9323 のまま。この `environment.json` のポート宣言は Cloud 用なので変更しない。
 
 ## install.sh
 
-`.cursor/install.sh` runs on Cloud Agent boot:
+`.cursor/install.sh` は Cloud Agent の起動時に走る。
 
-1. Sources nvm and installs/uses Node from `.node-version` (`24.19.0`)
-2. Prepends nvm Node to `PATH` (avoids `/exec-daemon/node` v22 in non-login shells)
-3. Ensures `node_modules/.bin/vp` exists (bootstraps pnpm `11.22.0` via corepack if needed)
-4. Runs `vp install`
-5. Runs `vp exec playwright install --with-deps chromium webkit`
+1. nvm を読み込み、`.node-version` の Node（`24.19.0`）を入れて使う
+2. nvm の Node を `PATH` の先頭に置く（非ログインシェルで `/exec-daemon/node` の v22 を避ける）
+3. `node_modules/.bin/vp` があることを確認する（無ければ corepack で pnpm `11.22.0` を用意する）
+4. `vp install` を実行する
+5. `vp exec playwright install --with-deps chromium webkit` を実行する
 
-## Node / nvm gotcha
+## Node / nvm の落とし穴
 
-Non-login shells may resolve `node` to `/exec-daemon/node` (v22) instead of the pinned Node.
+非ログインシェルでは、固定した Node ではなく `/exec-daemon/node`（v22）が `node` として解決されることがある。
 
-- Run commands in a **login shell** so nvm is sourced (Cursor terminals handle this by default).
-- The install script also prepends nvm's Node onto `PATH`.
+- nvm が読み込まれるよう、**ログインシェル**でコマンドを実行する（Cursor のターミナルは既定でそうなる）。
+- install スクリプトも、nvm の Node を `PATH` の先頭に置く。
 
-Verify with:
+確認:
 
 ```bash
-node --version   # expect v24.19.0
-which node       # should be under ~/.nvm/versions/node/...
+node --version   # v24.19.0 であること
+which node       # ~/.nvm/versions/node/... の下であること
 ```
 
-## vp invocation
+## vp の呼び方
 
-`vp` is project-local (`node_modules/.bin/vp`), not global.
+`vp` はプロジェクトローカル（`node_modules/.bin/vp`）で、グローバルではない。
 
 ```bash
 vp run dev
@@ -57,13 +57,13 @@ vp run build
 vp exec playwright test
 ```
 
-Do **not** use `npx` or `npm`; Vite+ does not translate mismatched package-manager commands.
+`npx` や `npm` は使わない。Vite+ は、別のパッケージマネージャ向けのコマンドには置き換えない。
 
-Use `vp install` / `vp add` / `vp remove` instead of calling pnpm directly.
+pnpm を直接呼ばず、`vp install` / `vp add` / `vp remove` を使う。
 
-## Git hooks note
+## Git hook について
 
-`vp config` (pnpm `prepare`) leaves `core.hooksPath` alone when Cursor already points at agent hooks. This is expected, not an error.
+`vp config`（pnpm の `prepare`）は、Cursor がすでに agent hook を指しているとき `core.hooksPath` を触らない。想定どおりで、エラーではない。
 
 ## Cloud Agent のコミットメール
 
@@ -73,8 +73,8 @@ Cursor アカウントの個人メールが `Co-authored-by` に付くのを防�
 
 ローカルでも `bash .cursor/hooks/deny-dangerous-commands.sh` と `deny-outside-worktree.sh` が、素の force push / `reset --hard` / 危険な `rm -rf`（`/`・ホーム・`.git`・`src/`・worktree ルート）/ worktree 外への編集を拒否する。`git push --force-with-lease` と `git clean -fd` は許可する。
 
-## When setup looks wrong
+## セットアップがおかしいとき
 
-1. Re-run `bash .cursor/install.sh`
-2. Run `vp env doctor` and include output when asking for help
-3. Confirm `vp run check` passes before declaring the environment ready
+1. `bash .cursor/install.sh` を再実行する
+2. `vp env doctor` を実行し、助けを求めるときにその出力を添える
+3. 環境の準備ができたと伝える前に、`vp run check` が通ることを確認する

@@ -7,63 +7,51 @@ description: >-
   アイコンサイズ, or アドレスバー.
 ---
 
-# Mobile tap targets and icon size
+# スマホのタップ領域とアイコンサイズ
 
-This app is used on phones first. Browser tests already use a 390×844 viewport.
-Size **the control** (tap target) and **the glyph** (Phosphor icon) separately.
+このアプリはスマホでの利用が先。ブラウザテストはすでに 390×844 のビューポートを使っている。
+**操作対象**（タップ領域）と **字形**（Phosphor アイコン）は別々にサイズを決める。
 
-Shared values live in `src/touchTarget.ts`. Import those constants instead of
-hard-coding `16` / `18` or Mantine's default `sm` / `md`.
+共通の値は `src/touchTarget.ts` にある。`16` / `18` や Mantine の既定 `sm` / `md` を直書きせず、そこの定数を import する。
 
-## Why the old sizes were too small
+## 以前のサイズが小さすぎた理由
 
-| Control                                | Previous  | Problem                                    |
-| -------------------------------------- | --------- | ------------------------------------------ |
-| `ActionIcon` (default `md`)            | 28×28px   | Below the 44px thumb target                |
-| Phosphor icon in list actions          | 18px      | Hard to see; does not enlarge the hit area |
-| Search clear icon                      | 16px      | Same                                       |
-| Search `TextInput` (default `sm`)      | 36px tall | Below 44px; easy to miss on a phone        |
-| Home secondary `Button` (default `sm`) | 36px tall | Same                                       |
+| 操作対象                               | 以前      | 問題                                |
+| -------------------------------------- | --------- | ----------------------------------- |
+| `ActionIcon`（既定 `md`）              | 28×28px   | 親指の目安 44px を下回る            |
+| 一覧の操作にある Phosphor アイコン     | 18px      | 見づらい。当たり判定は広がらない    |
+| 検索のクリアアイコン                   | 16px      | 同上                                |
+| 検索の `TextInput`（既定 `sm`）        | 高さ 36px | 44px 未満。スマホでは押し外しやすい |
+| ホームの副ボタン `Button`（既定 `sm`） | 高さ 36px | 同上                                |
 
-Mantine's default `ActionIcon` / `Button` / `Input` sizes are desktop-oriented.
-Do not assume the default is mobile-safe.
+Mantine の `ActionIcon` / `Button` / `Input` の既定サイズはデスクトップ向けだ。既定がスマホで安全だとは考えない。
 
-## Rules
+## ルール
 
-1. **Tap target ≥ 44×44 CSS px.** Follow Apple HIG and WCAG 2.5.5. WCAG 2.5.8
-   (24px) is the floor, not the goal.
-2. **Icon glyph is 24px**, not 16 or 18. Phosphor's own default is 24. The
-   glyph must stay smaller than the button so extra padding remains tappable.
-3. **Standalone icon buttons** use Mantine `ActionIcon` `size="xl"` (44px) plus
-   `TOUCH_ICON_PX` (24).
-4. **Search / address-bar field** uses `TextInput` `size="lg"` (50px). Keep
-   `font-size: rem(16)` on the input (`searchInput`) so iOS does not zoom on
-   focus. The clear `ActionIcon` uses `size="input-lg"` so it fills the field
-   height.
-5. **Text buttons** use `Button` `size="lg"` (50px), including secondary
-   actions on `/`.
-6. Adjacent icon buttons (open + copy) need enough column width that the 44px
-   targets do not overlap. Use about `rem(80)` per icon column.
+1. **タップ領域は 44×44 CSS px 以上。** Apple HIG と WCAG 2.5.5 に合わせる。WCAG 2.5.8（24px）は下限であり、目標ではない。
+2. **アイコンの字形は 24px。** 16 でも 18 でもない。Phosphor 自身の既定も 24。字形はボタンより小さく保ち、余白をタップできるようにする。
+3. **単独のアイコンボタン**は Mantine `ActionIcon` の `size="xl"`（44px）に `TOUCH_ICON_PX`（24）を足す。
+4. **検索欄（アドレスバー相当）**は `TextInput` の `size="lg"`（50px）。input（`searchInput`）の `font-size` は `rem(16)` のままにし、iOS がフォーカス時にズームしないようにする。クリアの `ActionIcon` は `size="input-lg"` にし、欄の高さいっぱいにする。
+5. **テキストボタン**は `Button` の `size="lg"`（50px）。`/` の副アクションも含む。
+6. 隣り合うアイコンボタン（開く + コピー）は、44px の領域が重ならない列幅を取る。アイコン列あたりおよそ `rem(80)`。
 
-## Mapping
+## 対応表
 
-| Role             | Mantine `size`                              | Box       | Phosphor `size`      |
-| ---------------- | ------------------------------------------- | --------- | -------------------- |
-| List open / copy | `TOUCH_ACTION_ICON_SIZE` (`xl`)             | 44px      | `TOUCH_ICON_PX` (24) |
-| Search field     | `TOUCH_INPUT_SIZE` (`lg`)                   | 50px tall | —                    |
-| Search clear     | `TOUCH_INPUT_ACTION_ICON_SIZE` (`input-lg`) | 50px      | `TOUCH_ICON_PX` (24) |
-| Home buttons     | `TOUCH_BUTTON_SIZE` (`lg`)                  | 50px tall | —                    |
+| 役割                | Mantine の `size`                            | ボックス  | Phosphor の `size`    |
+| ------------------- | -------------------------------------------- | --------- | --------------------- |
+| 一覧の開く / コピー | `TOUCH_ACTION_ICON_SIZE`（`xl`）             | 44px      | `TOUCH_ICON_PX`（24） |
+| 検索欄              | `TOUCH_INPUT_SIZE`（`lg`）                   | 高さ 50px | —                     |
+| 検索のクリア        | `TOUCH_INPUT_ACTION_ICON_SIZE`（`input-lg`） | 50px      | `TOUCH_ICON_PX`（24） |
+| ホームのボタン      | `TOUCH_BUTTON_SIZE`（`lg`）                  | 高さ 50px | —                     |
 
-## Do not
+## やってはいけないこと
 
-- Use Phosphor `size={16}` or `size={18}` for tappable UI.
-- Enlarge only the SVG inside a 28px `ActionIcon`. That overflows or clips;
-  the hit area stays too small.
-- Shrink the search field below `md` (42px). Prefer `lg`.
-- Use Mantine `style` / `styles` props to fake a larger target. Use `size`
-  props and CSS Modules as in `AGENTS.md`.
+- タップできる UI に Phosphor の `size={16}` や `size={18}` を使わない。
+- 28px の `ActionIcon` の中の SVG だけを大きくしない。はみ出すか切れる。当たり判定は小さいままだ。
+- 検索欄を `md`（42px）より小さくしない。`lg` を使う。
+- タップ領域を大きく見せるために Mantine の `style` / `styles` prop を使わない。`size` prop と CSS Modules を使う（`AGENTS.md` と同じ）。
 
-## When adding a new icon button
+## 新しいアイコンボタンを足すとき
 
 ```tsx
 import { Copy } from "@phosphor-icons/react";
