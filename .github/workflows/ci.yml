@@ -64,3 +64,15 @@ jobs:
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # main への push では、test が成功してから GitHub Pages へデプロイする。
+  # PR ではデプロイしない。同じ内容の出し直しは gh-pages-deploy.yml の手動実行。
+  pages:
+    name: Deploy to GitHub Pages
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/gh-pages-deploy.yml
