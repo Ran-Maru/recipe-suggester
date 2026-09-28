@@ -85,6 +85,8 @@ test.skip(browserName === "webkit", "WebKit lacks clipboard API support");
 - `retries: 2` は CI のみ
 - `workers: 1` は CI
 - Reporter: CI は `github` + `html`、ローカルは `html`
+- ブラウザバイナリ（`~/.cache/ms-playwright`）は GitHub Actions のキャッシュに載せる。キーは OS、アーキテクチャ、Playwright のバージョン
+- OS パッケージはランナーへ毎回 `install-deps` する。ブラウザの取得と同時に走らせ、キャッシュが当たったときはダウンロードを飛ばす
 
 ## トラブルシューティング
 
