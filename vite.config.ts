@@ -23,9 +23,10 @@ export default defineConfig({
     "*.css": "stylelint --fix",
   },
   lint: {
-    plugins: ["oxc", "typescript", "unicorn", "react"],
+    plugins: ["eslint", "oxc", "typescript", "unicorn", "react", "jsx-a11y"],
     categories: {
       correctness: "warn",
+      suspicious: "warn",
     },
     env: {
       builtin: true,
@@ -115,8 +116,12 @@ export default defineConfig({
           "typescript/prefer-as-const": "error",
           "typescript/prefer-namespace-keyword": "error",
           "typescript/triple-slash-reference": "error",
+          "typescript/no-misused-promises": "warn",
+          "typescript/switch-exhaustiveness-check": "warn",
           "react/rules-of-hooks": "error",
           "react/exhaustive-deps": "warn",
+          // tsconfig の jsx は react-jsx。JSX に React の import は不要
+          "react/react-in-jsx-scope": "off",
           "react/only-export-components": [
             "error",
             {
@@ -151,9 +156,17 @@ export default defineConfig({
         },
       },
       {
-        files: ["src/**/*.test.ts", "src/**/*.browser.test.tsx", "src/test/**"],
+        files: [
+          "src/**/*.test.ts",
+          "src/**/*.browser.test.tsx",
+          "src/test/**",
+          "scripts/**/*.test.ts",
+        ],
+        plugins: ["vitest"],
         rules: {
           "react/only-export-components": "off",
+          // Vitest の expect は第2引数に失敗時のメッセージを取れる
+          "vitest/valid-expect": ["warn", { maxArgs: 2 }],
         },
       },
     ],
@@ -169,6 +182,18 @@ export default defineConfig({
     ],
     rules: {
       "vite-plus/prefer-vite-plus-imports": "error",
+      complexity: ["warn", { max: 20 }],
+      // TanStack Router の Link は遷移先を to で渡す
+      "jsx-a11y/anchor-is-valid": ["warn", { specialLink: ["to"] }],
+    },
+    settings: {
+      "jsx-a11y": {
+        components: {
+          ActionIcon: "button",
+          Anchor: "a",
+          Button: "button",
+        },
+      },
     },
   },
   fmt: {

@@ -10,12 +10,25 @@ const denyShell = path.join(
 const denyEdit = path.join(repoRoot, ".cursor/hooks/deny-outside-worktree.sh");
 const cwd = process.cwd();
 
+function readPermission(output: string): { permission: string } {
+  const parsed: unknown = JSON.parse(output);
+  if (
+    typeof parsed !== "object" ||
+    parsed === null ||
+    !("permission" in parsed) ||
+    typeof parsed.permission !== "string"
+  ) {
+    throw new Error(`hook returned an unexpected payload: ${output}`);
+  }
+  return { permission: parsed.permission };
+}
+
 function decideCommand(command: string) {
   const output = execFileSync("bash", [denyShell], {
     encoding: "utf8",
     input: JSON.stringify({ command, cwd }),
   });
-  return JSON.parse(output) as { permission: string };
+  return readPermission(output);
 }
 
 function decidePath(filePath: string) {
@@ -27,7 +40,7 @@ function decidePath(filePath: string) {
       cwd,
     }),
   });
-  return JSON.parse(output) as { permission: string };
+  return readPermission(output);
 }
 
 describe("dangerous-command-policy", () => {
