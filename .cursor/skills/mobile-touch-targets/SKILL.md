@@ -39,7 +39,7 @@ Mantine の `ActionIcon` / `Button` / `Input` の既定サイズはデスクト�
 - タップできる UI に Phosphor の `size={16}` や `size={18}` を使わない。
 - 28px の `ActionIcon` の中の SVG だけを大きくしない。はみ出すか切れる。当たり判定は小さいままだ。
 - 検索欄を `md`（42px）より小さくしない。`lg` を使う。
-- タップ領域を大きく見せるために Mantine の `style` / `styles` prop を使わない。`size` prop と CSS Modules を使う（`AGENTS.md` と同じ）。
+- タップ領域を大きく見せるために Mantine の `style` / `styles` prop を使わない。`size` prop と CSS Modules を使う（`.cursor/rules/mantine-ui.mdc` と同じ）。
 
 ## 新しいアイコンボタンを足すとき
 

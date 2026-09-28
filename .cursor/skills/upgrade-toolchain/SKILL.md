@@ -124,10 +124,9 @@ vp install
 
 ## バージョン表記の追随
 
-ピンを変えたら、同じ番号が書いてある次の文書も更新する。
+ピンを変えたら、同じ番号が書いてある `.cursor/skills/cursor-cloud-setup/SKILL.md` も更新する。
 
-- `AGENTS.md`（`CLAUDE.md` はシンボリックリンク）
-- `.cursor/skills/cursor-cloud-setup/SKILL.md`
+`AGENTS.md` はどの作業でどのスキルを読むかの索引だけなので、バージョン番号は書かない。`CLAUDE.md` はそのシンボリックリンクで、Cursor は `.cursorignore` で無視する。
 
 ## 検証
 
