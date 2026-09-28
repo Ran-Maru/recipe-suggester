@@ -11,6 +11,12 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+function getRandomInt(max: number) {
+  // Math.random() は 0以上1未満の小数を返す
+  // それに max を掛けて切り捨てることで 0 〜 max-1 にし、最後に +1 する
+  return Math.floor(Math.random() * max) + 1;
+}
+
 function Home() {
   // recipeの型付けをする。
   const [recipe, setRecipe] = useState<Recipe>();
@@ -23,12 +29,6 @@ function Home() {
     const nth = getRandomInt(count - 1);
 
     setRecipe(recipes[nth]);
-  }
-
-  function getRandomInt(max: number) {
-    // Math.random() は 0以上1未満の小数を返す
-    // それに max を掛けて切り捨てることで 0 〜 max-1 にし、最後に +1 する
-    return Math.floor(Math.random() * max) + 1;
   }
 
   function openUrl() {
