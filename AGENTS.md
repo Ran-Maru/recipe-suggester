@@ -70,9 +70,11 @@ Playwright UI は config にポートが無い。`vp exec playwright test --ui -
 
 ### 安全フック
 
-`.cursor/hooks.json` の bash hook（`failClosed`、危険そうなコマンドだけ matcher）が戻らない破壊を拒否する。実装は `scripts/dangerous-command-policy.sh`。
+`.cursor/hooks.json` の bash hook（`failClosed`、危険そうなコマンドだけ matcher）が戻らない破壊を拒否する。破壊系は `scripts/dangerous-command-policy.sh`。整形の抜け道は `scripts/format-commit-policy.mjs` と `scripts/format-agent-files.mjs`。
 
 - `beforeShellExecution`: 素の `git push --force` / `-f` / `+refspec`、`git reset --hard`、`git clean -x`/`-X`、worktree 全体を捨てる `checkout`/`restore`、`rm -rf` の `/` / `$HOME` / `.git` / `src/` / worktree ルート、`chmod 777`、worktree 外への `mv`、`/tmp` 以外の worktree 外への `cp`
+- `beforeShellExecution`（`format-before-commit.sh`）: コミットに入るファイルへ `vp fmt` をかける。Markdown だけでも対象。matcher は付けない。`bash script.sh` の中に `commit` を隠しても見る。`--no-verify` / `-n`、`VP_GIT_HOOKS=0` / `HUSKY=0` / `VITE_GIT_HOOKS=0`、`core.hooksPath` の変更（`GIT_CONFIG_KEY_*` を含む）、それらを隠した `bash -c` や alias は拒否する。インデックスが空の `git commit --amend --no-verify`（メッセージだけ。Co-authored-by の付け替え）は許可する。ステージした変更があるときは拒否する
+- `afterFileEdit` / `afterShellExecution`: エージェントが書いたファイルを `vp fmt` する。シェルのリダイレクトで書いた Markdown も含む。`.agents/**/*.md` は Oxfmt の無視設定のまま
 - `preToolUse` (`Write` / `StrReplace` / `Delete` / `EditNotebook`): 現在の worktree の外と `.git/` 配下の編集
 - Cloud 専用: commit と push の同一コマンド禁止、commit 後の Co-authored-by 修正
 

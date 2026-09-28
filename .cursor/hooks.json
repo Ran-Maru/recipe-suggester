@@ -16,6 +16,27 @@
       {
         "command": ".cursor/hooks/deny-commit-and-push.sh",
         "matcher": "git commit"
+      },
+      {
+        "command": "bash .cursor/hooks/format-before-commit.sh",
+        "failClosed": true,
+        "timeout": 60
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "bash .cursor/hooks/format-after-edit.sh",
+        "timeout": 60
+      }
+    ],
+    "afterShellExecution": [
+      {
+        "command": ".cursor/hooks/after-git-commit.sh",
+        "matcher": "git commit"
+      },
+      {
+        "command": "bash .cursor/hooks/format-after-shell.sh",
+        "timeout": 60
       }
     ],
     "preToolUse": [
@@ -23,12 +44,6 @@
         "command": "bash .cursor/hooks/deny-outside-worktree.sh",
         "failClosed": true,
         "matcher": "Write|StrReplace|Delete|EditNotebook"
-      }
-    ],
-    "afterShellExecution": [
-      {
-        "command": ".cursor/hooks/after-git-commit.sh",
-        "matcher": "git commit"
       }
     ]
   }

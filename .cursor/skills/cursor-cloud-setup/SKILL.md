@@ -71,6 +71,8 @@ Cursor アカウントの個人メールが `Co-authored-by` に付くのを防�
 `.cursor/hooks.json` の `afterShellExecution` が、ホスト型 Cloud Agent（`/run/cursor/api.sock` があるとき）の `git commit` 直後だけメッセージを直す。
 同じコマンドで `git commit` と `git push` をつなぐと、その前に `beforeShellExecution` が拒否する。ローカルではその commit+push 分割 hook は動かない。
 
+`format-before-commit.sh` はコマンドの matcher を持たない。`bash script.sh` の中に `git commit --no-verify` が隠れても、コミット前に `vp fmt` をかけ、フックを外す操作は拒否する。Markdown だけの変更でも整形が抜けないようにするため。インデックスが空の `git commit --amend --no-verify`（メッセージだけ）は、Co-authored-by の付け替えが使うので許可する。`afterFileEdit` と `afterShellExecution` も、書いたファイルを `vp fmt` する。
+
 ローカルでも `bash .cursor/hooks/deny-dangerous-commands.sh` と `deny-outside-worktree.sh` が、素の force push / `reset --hard` / 危険な `rm -rf`（`/`・ホーム・`.git`・`src/`・worktree ルート）/ worktree 外への編集を拒否する。`git push --force-with-lease` と `git clean -fd` は許可する。
 
 ## セットアップがおかしいとき
