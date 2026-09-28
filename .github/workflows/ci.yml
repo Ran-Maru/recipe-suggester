@@ -73,10 +73,29 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
+  # シェルスクリプトは ShellCheck、ワークフローは actionlint。
+  # actionlint は同じ ShellCheck で run: のスクリプトも見る。
+  # 版とチェックサムは scripts/install-ci-linters.sh。
+  lint:
+    name: ShellCheck and actionlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - name: ShellCheck and actionlint
+        env:
+          LINT_TOOL_DIR: ${{ runner.temp }}/lint-tools
+        run: |
+          bash scripts/install-ci-linters.sh "$LINT_TOOL_DIR"
+          export PATH="${LINT_TOOL_DIR}:${PATH}"
+          bash scripts/lint-shell-and-workflows.sh
+
   # ブランチの保護ルール（特定CI Checkを必須化） + `gh pr merge --auto --merge "$PR_URL"` で対応する方法もあった。
   # しかしブランチ保護ルールはPrivate Repositoryでは有料プランでしか使えないため、この方式を採用した。
   dependabot-auto-merge:
-    needs: test
+    needs: [test, lint]
     if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'
     runs-on: ubuntu-slim
     timeout-minutes: 5
@@ -106,11 +125,11 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # main への push では、test が成功してから GitHub Pages へデプロイする。
+  # main への push では、test と lint が成功してから GitHub Pages へデプロイする。
   # PR ではデプロイしない。同じ内容の出し直しは gh-pages-deploy.yml の手動実行。
   pages:
     name: Deploy to GitHub Pages
-    needs: test
+    needs: [test, lint]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: read
