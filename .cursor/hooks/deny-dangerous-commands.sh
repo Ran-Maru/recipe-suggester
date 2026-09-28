@@ -2,8 +2,8 @@
 # beforeShellExecution: block destructive git and system commands.
 set -u
 
-SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-REPO_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd)
+SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+REPO_ROOT=$(CDPATH='' cd -- "$SCRIPT_DIR/../.." && pwd)
 # shellcheck source=../../scripts/dangerous-command-policy.sh
 . "$REPO_ROOT/scripts/dangerous-command-policy.sh"
 

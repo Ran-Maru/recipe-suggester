@@ -2,8 +2,8 @@
 # sessionStart: tell the agent this worktree's dev / preview / report ports.
 set -u
 
-SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-REPO_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd)
+SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+REPO_ROOT=$(CDPATH='' cd -- "$SCRIPT_DIR/../.." && pwd)
 # shellcheck source=../../scripts/worktree-ports.sh
 . "$REPO_ROOT/scripts/worktree-ports.sh"
 

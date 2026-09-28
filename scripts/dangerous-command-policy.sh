@@ -48,7 +48,7 @@ worktree_root() {
     printf '%s\n' "$root"
     return
   fi
-  (CDPATH= cd -- "$cwd" && pwd -P)
+  (CDPATH='' cd -- "$cwd" && pwd -P)
 }
 
 resolve_user_path() {
@@ -64,11 +64,11 @@ resolve_user_path() {
   dir=$(dirname -- "$raw")
   base=$(basename -- "$raw")
   if [[ -d "$raw" ]]; then
-    (CDPATH= cd -- "$raw" && pwd -P)
+    (CDPATH='' cd -- "$raw" && pwd -P)
     return
   fi
   if [[ -d "$dir" ]]; then
-    printf '%s/%s\n' "$(CDPATH= cd -- "$dir" && pwd -P)" "$base"
+    printf '%s/%s\n' "$(CDPATH='' cd -- "$dir" && pwd -P)" "$base"
     return
   fi
   printf '%s\n' "$raw"
@@ -146,7 +146,8 @@ skip_env_assignments() {
 }
 
 split_shell_commands() {
-  printf '%s' "$1" | sed -E 's/(&&|\|\||;|\|)/\'$'\n/g'
+  # $'...\n' だと改行で sed の s 命令が途切れるので、置換先はバックスラッシュ＋改行にする。
+  printf '%s' "$1" | sed -E $'s/(&&|\\|\\||;|\\|)/\\\n/g'
 }
 
 command_tokens() {
