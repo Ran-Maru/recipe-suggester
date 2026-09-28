@@ -51,8 +51,7 @@ release. Add a tool name to select part of the graph. For example, run
 - E2E（クリップボードへのコピーと、新しいタブで開く）: `vp exec playwright test`。Playwright は同じ worktree のポートを `baseURL` にする。別 worktree の dev server は使わない。
 - Build: `vp run build`（`cmk && tsc -b && vp build`）。`tsc` は TypeScript 7（`typescript-7`）。CSS Modules Kit 向けに `typescript` は TypeScript 6 へエイリアスされている。
 - CSS: stylelint（`vp run lint:css`）と CSS Modules Kit（`cmk` / ts-plugin）。フォーマットは Oxfmt のまま。
-- ShellCheck と actionlint: CI の `ShellCheck and actionlint` ジョブ。ローカルでは `scripts/install-ci-linters.sh <dir>` で同じ版を入れ、PATH を通して `bash scripts/lint-shell-and-workflows.sh`。
-- ShellCheck と actionlint: CI の `ShellCheck and actionlint` ジョブ。ローカルでは `scripts/install-ci-linters.sh <dir>` で同じ版を入れ、PATH を通して `bash scripts/lint-shell-and-workflows.sh`。
+- ShellCheck と actionlint: CI の `ShellCheck and actionlint` ジョブ。Linux では `scripts/install-ci-linters.sh <dir>` で同じ版を入れ、PATH を通して `bash scripts/lint-shell-and-workflows.sh`。ほかの OS では、PATH にある shellcheck と actionlint で同じスクリプトを実行する。
 
 ### Worktree のポート
 

@@ -7,7 +7,7 @@ CDPATH='' cd -- "$(dirname -- "$0")/.."
 require_tool() {
   local name="$1"
   if ! command -v "$name" >/dev/null 2>&1; then
-    printf '%s が PATH にありません。scripts/install-ci-linters.sh で入れてください。\n' "$name" >&2
+    printf '%s が PATH にありません。Linux では scripts/install-ci-linters.sh で入れられます。\n' "$name" >&2
     exit 1
   fi
 }
