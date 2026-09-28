@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vite-plus/test";
 import mapping from "./mapping.json" with { type: "json" };
+import originalRecipes from "./original-recipes.json" with { type: "json" };
 import { loadRecipes } from "./loadRecipes.ts";
 
 describe("loadRecipes", () => {
@@ -8,7 +9,7 @@ describe("loadRecipes", () => {
     const gyoza = loaded.filter((recipe) => recipe.title === "うちの餃子");
 
     expect(loaded.slice(0, mapping.length)).toEqual(mapping);
-    expect(loaded).toHaveLength(mapping.length + 1);
+    expect(loaded).toHaveLength(mapping.length + originalRecipes.length);
     expect(gyoza).toEqual([
       {
         title: "うちの餃子",
