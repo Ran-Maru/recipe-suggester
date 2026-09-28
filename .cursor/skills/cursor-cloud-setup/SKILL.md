@@ -2,8 +2,10 @@
 name: cursor-cloud-setup
 description: >-
   Sets up and troubleshoots the Cursor Cloud Agent environment for
-  recipe-suggester. Use when configuring Cloud Agent, debugging Node or nvm
-  version mismatches, environment.json, or .cursor/install.sh.
+  recipe-suggester, and documents how to call vp. Use when configuring Cloud
+  Agent, debugging Node or nvm version mismatches, environment.json, or
+  .cursor/install.sh, when running vp run dev, vp run check, vp run build, or
+  vp test, or when a safety hook blocks a command.
 ---
 
 # Cursor Cloud のセットアップ
@@ -20,7 +22,7 @@ description: >-
 | `terminals[0]` | `vp run dev`（Cloud はベースポート 5173）         |
 | `ports`        | 5173（Vite+ dev）、9323（Playwright HTML report） |
 
-ローカルで複数 worktree を並列起動する場合、dev / preview / Playwright HTML のポートは `scripts/worktree-ports.ts` が cwd からずらす。Cloud VM と CI は隔離済みなので 5173 / 4173 / 9323 のまま。この `environment.json` のポート宣言は Cloud 用なので変更しない。
+ローカルで複数 worktree を並列起動する場合、dev / preview / Playwright HTML のポートは `scripts/worktree-ports.ts` が cwd からずらす。Cloud VM と CI は隔離済みなので 5173 / 4173 / 9323 のまま。この `environment.json` のポート宣言は Cloud 用なので変更しない。ポートの一覧（Vitest Browser API の 63315 を含む）と `strictPort` は `playwright-e2e` スキルにある。
 
 ## install.sh
 
@@ -61,6 +63,13 @@ vp exec playwright test
 
 pnpm を直接呼ばず、`vp install` / `vp add` / `vp remove` を使う。
 
+## lint / build / CSS
+
+- Lint + 型チェック + レシピ検証: `vp run check`。中身は `cmk -p tsconfig.app.json`、続けて `vp check`、stylelint（`src/**/*.css`）、`scripts/check-mapping.json.js`、`scripts/check-original-recipes.json.js`。
+- Unit + Browser Mode のテスト: `vp test`。E2E は `playwright-e2e` スキル。
+- Build: `vp run build`（`cmk -p tsconfig.app.json && tsc -b && vp build`）。`tsc` は TypeScript 7（`typescript-7`）。CSS Modules Kit 向けに `typescript` は TypeScript 6 へエイリアスされている。
+- CSS: stylelint（`vp run lint:css`）と CSS Modules Kit（`cmk` / `@css-modules-kit/ts-plugin`）。フォーマットは Oxfmt のまま。
+
 ## Git hook について
 
 `vp config`（pnpm の `prepare`）は、Cursor がすでに agent hook を指しているとき `core.hooksPath` を触らない。想定どおりで、エラーではない。
@@ -71,7 +80,15 @@ Cursor アカウントの個人メールが `Co-authored-by` に付くのを防�
 `.cursor/hooks.json` の `afterShellExecution` が、ホスト型 Cloud Agent（`/run/cursor/api.sock` があるとき）の `git commit` 直後だけメッセージを直す。
 同じコマンドで `git commit` と `git push` をつなぐと、その前に `beforeShellExecution` が拒否する。ローカルではその commit+push 分割 hook は動かない。
 
-ローカルでも `bash .cursor/hooks/deny-dangerous-commands.sh` と `deny-outside-worktree.sh` が、素の force push / `reset --hard` / 危険な `rm -rf`（`/`・ホーム・`.git`・`src/`・worktree ルート）/ worktree 外への編集を拒否する。`git push --force-with-lease` と `git clean -fd` は許可する。
+## 安全フック
+
+`.cursor/hooks.json` の bash hook（`failClosed`、危険そうなコマンドだけ matcher）が戻らない破壊を拒否する。実装は `scripts/dangerous-command-policy.sh`。ローカルでも `deny-dangerous-commands.sh` と `deny-outside-worktree.sh` が動く。
+
+- `beforeShellExecution`: 素の `git push --force` / `-f` / `+refspec`、`git reset --hard`、`git clean -x`/`-X`、worktree 全体を捨てる `checkout`/`restore`、`rm -rf` の `/` / `$HOME` / `.git` / `src/` / worktree ルート、`chmod 777`、worktree 外への `mv`、`/tmp` 以外の worktree 外への `cp`
+- `preToolUse` (`Write` / `StrReplace` / `Delete` / `EditNotebook`): 現在の worktree の外と `.git/` 配下の編集
+- Cloud 専用: commit と push の同一コマンド禁止、commit 後の Co-authored-by 修正
+
+許可する例: `git push --force-with-lease`、`git clean -fd`、`rm -rf tmp` / `node_modules` / `/tmp/...`、`cp file /tmp/file`、`git reset`（`--hard` なし）、単一ファイルの `git restore`。
 
 ## セットアップがおかしいとき
 

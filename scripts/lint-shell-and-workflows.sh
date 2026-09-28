@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # 追跡しているシェルスクリプトを ShellCheck し、ワークフローを actionlint する。
+# Linux では scripts/install-ci-linters.sh <dir> で CI と同じ版を入れ、そのディレクトリを PATH に通してから実行する。
+# ほかの OS では、PATH にある shellcheck と actionlint でこのスクリプトを実行する。
 set -euo pipefail
 
 CDPATH='' cd -- "$(dirname -- "$0")/.."

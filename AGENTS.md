@@ -32,15 +32,15 @@ release. Add a tool name to select part of the graph. For example, run
 
 該当するものを読んでから作業する。手順の本文はスキルとルール側にある。
 
-| 読むもの                                                                 | 使うとき                                                                                                                                                                                                                                              |
-| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `.cursor/rules/mantine-ui.mdc`                                           | `src/**/*.{tsx,css}` の Mantine、CSS Modules、Phosphor                                                                                                                                                                                                |
-| `.cursor/rules/mobile-touch-targets.mdc` とスキル `mobile-touch-targets` | ボタン、アイコン、検索欄（アドレスバー相当）、スマホのタップ領域                                                                                                                                                                                      |
-| `recipe-mapping`                                                         | `src/mapping.json` の追加・編集                                                                                                                                                                                                                       |
-| `playwright-e2e`                                                         | E2E テストの作成・実行、Playwright / CI の失敗調査、worktree のポート                                                                                                                                                                                 |
-| `cursor-cloud-setup`                                                     | Cloud Agent の初期化、Node / nvm の不整合、`.cursor/install.sh`、`vp` の呼び方、lint / build、安全フック                                                                                                                                              |
-| `scripts/lint-shell-and-workflows.sh`                                    | ShellCheck と actionlint（CI の `ShellCheck and actionlint`）。Linux では `scripts/install-ci-linters.sh <dir>` で同じ版を入れ、PATH を通してこのスクリプトを実行する。ほかの OS では PATH にある shellcheck と actionlint で同じスクリプトを実行する |
-| `natural-japanese`                                                       | 日本語を自然に書く・直す                                                                                                                                                                                                                              |
-| `upgrade-toolchain`                                                      | Vite Plus、Node.js、pnpm、Vitest ピンのバージョンアップ                                                                                                                                                                                               |
+| 読むもの                                                                 | 使うとき                                                                                                 |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `.cursor/rules/mantine-ui.mdc`                                           | `src/**/*.{tsx,css}` の Mantine、CSS Modules、Phosphor                                                   |
+| `.cursor/rules/mobile-touch-targets.mdc` とスキル `mobile-touch-targets` | ボタン、アイコン、検索欄（アドレスバー相当）、スマホのタップ領域                                         |
+| `recipe-mapping`                                                         | `src/mapping.json` の追加・編集                                                                          |
+| `playwright-e2e`                                                         | E2E テストの作成・実行、Playwright / CI の失敗調査、worktree のポート                                    |
+| `cursor-cloud-setup`                                                     | Cloud Agent の初期化、Node / nvm の不整合、`.cursor/install.sh`、`vp` の呼び方、lint / build、安全フック |
+| `scripts/lint-shell-and-workflows.sh`                                    | ShellCheck と actionlint（CI の同名ジョブ）。Linux と他 OS の入れ方はスクリプト先頭のコメント            |
+| `natural-japanese`                                                       | 日本語を自然に書く・直す                                                                                 |
+| `upgrade-toolchain`                                                      | Vite Plus、Node.js、pnpm、Vitest ピンのバージョンアップ                                                  |
 
 スキルは `.cursor/skills/` と `.agents/skills/` にある。`.cursor/rules/` は `alwaysApply: false` で、上の glob のファイルを触るときだけ付く。
