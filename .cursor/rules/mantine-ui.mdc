@@ -1,0 +1,12 @@
+---
+description: Mantine、CSS Modules、Phosphor アイコンの使い方。src の tsx と css を編集するときに従う。
+globs: "src/**/*.{tsx,css}"
+alwaysApply: false
+---
+
+# UI
+
+- UI コンポーネントは [Mantine](https://mantine.dev/)（`@mantine/core` / `@mantine/hooks`）。`src/main.tsx` が `@mantine/core/styles.css` を import し、ルーターを `MantineProvider` で包む。テーマは `src/theme.ts`（ブランドパレットは `#646cff` から生成、`defaultColorScheme="auto"`）。
+- `postcss.config.cjs` は `postcss-preset-mantine`（`@mixin dark` や `rem()`）と、`$mantine-breakpoint-*` 用の `postcss-simple-vars` を有効にする。Mantine の `style` prop（`w`, `mt`, `bg` など）は使わない。コンポーネント固有の props（`variant`, `layout`, `striped` など）は積極的に使う。見た目は `className` / `classNames` と CSS Modules で実装し、動的スタイルが必要な場合のみ `style` で CSS Modules 内の CSS 変数を参照する。Mantine の `styles` prop は使わない。
+- `src/index.css` には、Mantine のリセットがカバーしない少数のグローバルだけを置く。
+- アイコンは `@phosphor-icons/react`。PascalCase の名前で import する（例: `Copy`, `ArrowSquareOut`）。

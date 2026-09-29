@@ -1,0 +1,13 @@
+---
+description: スマホのタップ領域とアイコンサイズ。src の tsx と css を編集するときに従う。
+globs: "src/**/*.{tsx,css}"
+alwaysApply: false
+---
+
+# タップ領域
+
+スマホのタップ領域とアイコンサイズは `.cursor/skills/mobile-touch-targets/SKILL.md` と `src/touchTarget.ts` に従う。`TOUCH_ACTION_ICON_SIZE` や `TOUCH_ICON_PX` などの定数を import し、`16` / `18` や Mantine の既定 `sm` / `md` を直書きしない。
+
+- 単独の `ActionIcon` は `xl`（44px）。Phosphor アイコンは 24px。
+- 検索欄は `TextInput` の `lg`。
+- 16px / 18px のアイコンは使わない。

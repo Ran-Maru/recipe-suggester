@@ -2,8 +2,9 @@
 name: playwright-e2e
 description: >-
   Runs and authors Playwright E2E tests for recipe-suggester. Use when writing
-  E2E tests, debugging Playwright or CI test failures, or running
-  vp exec playwright test.
+  E2E tests, debugging Playwright or CI test failures, running
+  vp exec playwright test, or choosing worktree ports (Vite dev and preview,
+  Playwright HTML report, Vitest browser API).
 ---
 
 # Playwright E2E
@@ -27,14 +28,26 @@ vp exec playwright test
 先に `vp run dev` を起動しない。`playwright.config.ts` が `webServer` で dev server を自動起動する。
 
 - コマンド: `vp dev`
-- URL: この worktree のポート（`scripts/worktree-ports.ts`。`vp run print:dev-port` で確認。CI / Cloud は offset 0）
+- URL: この worktree の dev ポート（下の表。`vp run print:dev-port` でも確認できる）
 - `reuseExistingServer: !process.env.CI` — 同じ worktree で既に立っている dev server だけ再利用する。別 worktree の dev server には繋がない。
-- HTML report のポートも同じ offset（ベース 9323）
 
-Playwright UI を並行起動するときは `--ui-port` を worktree ごとにずらす。
+## Worktree のポート
+
+複数 worktree を同時に起動してもポートがぶつからないように、`scripts/worktree-ports.ts` が cwd から offset を足す。`CI` または `/run/cursor/api.sock` があるときは offset 0（ベースポートのまま）。
+
+| 用途                   | ベース | 上書き                    |
+| ---------------------- | ------ | ------------------------- |
+| Vite+ dev              | 5173   | `VITE_DEV_PORT` / `PORT`  |
+| Vite+ preview          | 4173   | `PREVIEW_PORT`            |
+| Playwright HTML report | 9323   | `PLAYWRIGHT_HTML_PORT`    |
+| Vitest Browser API     | 63315  | `VITEST_BROWSER_API_PORT` |
+
+Vite は `strictPort: true`。衝突したら次の空きポートへ逃げず失敗するので、表の環境変数で上書きする。
+
+Playwright UI は config にポートが無い。ベース 8080 に dev と同じ offset を足して `--ui-port` を渡す。
 
 ```bash
-vp exec playwright test --ui --ui-port 8080
+vp exec playwright test --ui --ui-port <8080+offset>
 ```
 
 ## package.json の script

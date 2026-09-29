@@ -1,0 +1,4 @@
+# 検索インデックスから外す。スキルがパスを指定して読むときは読める。
+.agents/skills/natural-japanese/references/
+.agents/skills/natural-japanese/scripts/
+src/mapping.json
