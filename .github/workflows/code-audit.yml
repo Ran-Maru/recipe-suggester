@@ -1,0 +1,82 @@
+name: Knip and similarity-ts
+
+on:
+  schedule:
+    # 金曜 21:00 JST（12:00 UTC）。隔週かどうかは gate で判定する。
+    - cron: "0 12 * * 5"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: Biweekly gate
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.decide.outputs.run }}
+    steps:
+      - name: Decide whether to run the audit
+        id: decide
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # 起点 2026-10-02（金曜）から 14 日ごと。日本には夏時間がないので UTC+9 で日付を取る。
+          # cron が遅れて土曜になっても、その回は実行する。
+          today=$(date -u -d '9 hours' +%F)
+          anchor=2026-10-02
+          today_s=$(date -d "$today 00:00:00" +%s)
+          anchor_s=$(date -d "$anchor 00:00:00" +%s)
+          days=$(((today_s - anchor_s) / 86400))
+          if ((days < 0)); then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          mod=$((days % 14))
+          if ((mod == 0 || mod == 1)); then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  knip:
+    name: knip
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: voidzero-dev/setup-vp@v1.21.1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+          run-install: true
+      - name: Run knip
+        run: vp exec knip --reporter github-actions
+
+  similarity:
+    name: similarity-ts
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install similarity-ts
+        env:
+          SIMILARITY_DIR: ${{ runner.temp }}/similarity
+        run: |
+          bash scripts/install-similarity-ts.sh "$SIMILARITY_DIR"
+          echo "$SIMILARITY_DIR" >> "$GITHUB_PATH"
+      - name: Run similarity-ts
+        # routeTree.gen.ts は TanStack Router の生成物で、型の並びが意図的に似ている。
+        run: >-
+          similarity-ts src --print --fail-on-duplicates
+          --exclude src/routeTree.gen.ts
