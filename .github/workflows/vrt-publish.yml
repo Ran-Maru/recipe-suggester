@@ -1,0 +1,130 @@
+name: Publish Visual Regression Report
+
+on:
+  workflow_run:
+    workflows: ["Visual Regression"]
+    types: [completed]
+
+# 公開処理は default branch の定義で動く。PR が差し替えた HTML は載せず、画像から作り直す。
+permissions:
+  actions: read
+  contents: read
+  pages: write
+  id-token: write
+  pull-requests: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event.workflow_run.conclusion != 'cancelled'
+    runs-on: ubuntu-slim
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: voidzero-dev/setup-vp@v1.21.1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+          run-install: true
+
+      - name: Download meta
+        id: meta
+        continue-on-error: true
+        uses: actions/download-artifact@v7
+        with:
+          name: vrt-meta
+          path: vrt-meta
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Download before screenshots
+        id: before
+        continue-on-error: true
+        uses: actions/download-artifact@v7
+        with:
+          name: vrt-before
+          path: vrt-output/before
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Download after screenshots
+        id: after
+        continue-on-error: true
+        uses: actions/download-artifact@v7
+        with:
+          name: vrt-after
+          path: vrt-output/after
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Setup Pages
+        id: pages
+        if: steps.meta.outcome == 'success' && steps.before.outcome == 'success' && steps.after.outcome == 'success'
+        uses: actions/configure-pages@v6
+
+      - name: Build site
+        if: steps.pages.outcome == 'success'
+        run: vp run build
+        env:
+          VITE_BASE: ${{ steps.pages.outputs.base_path }}
+
+      - name: SPA fallback for GitHub Pages
+        if: steps.pages.outcome == 'success'
+        run: cp dist/index.html dist/404.html
+
+      - name: Add visual regression report
+        id: prepare
+        if: steps.pages.outcome == 'success'
+        env:
+          VRT_PAGES_BASE_URL: ${{ steps.pages.outputs.base_url }}
+          VRT_DIST: dist
+          VRT_BEFORE_DIR: vrt-output/before
+          VRT_AFTER_DIR: vrt-output/after
+          VRT_REPORT_DIR: vrt-output/report
+          VRT_RUN_ID: ${{ github.event.workflow_run.id }}
+          VRT_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          VRT_CREATED_AT: ${{ github.event.workflow_run.created_at }}
+          META_PATH: vrt-meta/meta.json
+        run: node scripts/vrt/publish-report.ts
+
+      - name: Upload Pages artifact
+        if: steps.prepare.outputs.report_ready == 'true'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        if: steps.prepare.outputs.report_ready == 'true'
+        uses: actions/deploy-pages@v5
+
+      - name: Render comment
+        id: comment
+        if: always() && steps.meta.outcome == 'success'
+        env:
+          META_PATH: vrt-meta/meta.json
+          SUMMARY_PATH: vrt-output/report/summary.json
+          COMMENT_BODY_FILE: vrt-output/comment.md
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          REPORT_URL: ${{ steps.deployment.conclusion == 'success' && steps.prepare.outputs.report_url || '' }}
+        run: node scripts/vrt/render-comment.ts
+
+      - name: Comment on pull request
+        if: always() && steps.meta.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          META_PATH: vrt-meta/meta.json
+          COMMENT_BODY_FILE: vrt-output/comment.md
+        run: |
+          set -euo pipefail
+          PR_NUMBER="$(node --input-type=module -e 'import { readFileSync } from "node:fs"; const meta = JSON.parse(readFileSync(process.env.META_PATH, "utf8")); process.stdout.write(String(meta.prNumber));')"
+          export PR_NUMBER
+          bash scripts/vrt/post-comment.sh

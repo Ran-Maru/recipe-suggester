@@ -24,6 +24,8 @@
     "playwright.config.ts",
     "scripts/worktree-ports.ts",
     "scripts/worktree-ports.test.ts",
-    "scripts/dangerous-command-policy.test.ts"
+    "scripts/dangerous-command-policy.test.ts",
+    "scripts/vrt/**/*.ts",
+    "scripts/vrt/**/*.d.ts"
   ]
 }
