@@ -24,5 +24,6 @@ generated
 /test-results/
 /playwright-report/
 /blob-report/
+/vrt-output/
 /playwright/.cache/
 /playwright/.auth/

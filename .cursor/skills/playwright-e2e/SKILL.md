@@ -81,6 +81,22 @@ test.skip(browserName === "webkit", "WebKit lacks clipboard API support");
 
 この skip を失敗として扱わない。
 
+## 見た目の比較（VRT）
+
+`.github/workflows/vrt.yml` が PR と手動実行で動く。手動実行の入力は PR 番号。変更前・変更後の画面をその場でビルドして Playwright で撮り、画素比較する。画像は `vrt-output/`（gitignore）と Actions の artifact（`vrt-before`、`vrt-after`、`vrt-diff`、`vrt-report`）にだけ置く。スナップショットはリポジトリにコミットしない。
+
+保持は 14 日。期限が切れても、保存済みの画像は使わず、PR 番号から SHA を引き直して同じ比較をやり直す。開いている PR は base と、head にその base をマージしたビルド。マージ済みならマージコミットと、その第一親（マージ直前）を比べる。
+
+結果の HTML は `.github/workflows/vrt-publish.yml` が GitHub Pages の `/vrt/runs/<run-id>/` に載せ、URL を PR コメントへ書く。本番デプロイ（`gh-pages-deploy.yml`）は既存の `/vrt/` を消さない。
+
+撮影シーンは `tests/vrt/vrt.spec.ts`。通常の E2E では `testIgnore` により走らない。
+
+```bash
+VRT=1 VRT_PREVIEW_CWD="$PWD" VRT_OUT_DIR=vrt-output/after bash scripts/vrt/capture.sh
+```
+
+`VRT_PREVIEW_CWD` は `vp run build` 済みのディレクトリ。比較は `node scripts/vrt/compare.ts <before> <after> <report>`。
+
 ## テスト範囲
 
 `tests/test.spec.ts` がカバーするもの:
