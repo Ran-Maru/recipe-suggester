@@ -1,0 +1,185 @@
+name: Visual Regression
+
+run-name: 見た目の比較 #${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "比較する PR 番号"
+        required: true
+        type: string
+
+# 撮影と比較は PR のコードをビルドする。トークンは読み取りだけにして、画像を push できないようにする。
+permissions:
+  contents: read
+
+concurrency:
+  group: vrt-${{ github.event.pull_request.number || github.event.inputs.pr_number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: voidzero-dev/setup-vp@v1.21.1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+          run-install: true
+
+      - name: Resolve pull request
+        id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/vrt/resolve-pr.ts
+
+      - name: Install Japanese fonts
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+
+      # ci.yml と同じく、ブラウザ本体はキャッシュし、OS パッケージは毎回入れる。
+      - name: Resolve Playwright version
+        id: playwright-version
+        run: |
+          version="$(vp exec playwright --version)"
+          version="${version#Version }"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+.][0-9A-Za-z.]+)?$ ]]; then
+            echo "Playwright のバージョンを読めませんでした: ${version}" >&2
+            exit 1
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Playwright browsers
+        id: playwright-browsers-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-${{ runner.arch }}-playwright-${{ steps.playwright-version.outputs.version }}
+
+      - name: Install Playwright Browsers
+        run: |
+          set -euo pipefail
+          deps_log="$RUNNER_TEMP/playwright-deps.log"
+          vp exec playwright install-deps chromium webkit > "$deps_log" 2>&1 &
+          deps_pid=$!
+          install_status=0
+          vp exec playwright install chromium webkit || install_status=$?
+          deps_status=0
+          wait "$deps_pid" || deps_status=$?
+          cat "$deps_log"
+          if [[ "$install_status" -ne 0 ]]; then
+            exit "$install_status"
+          fi
+          exit "$deps_status"
+
+      - name: Save Playwright browsers
+        if: success() && steps.playwright-browsers-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ steps.playwright-browsers-cache.outputs.cache-primary-key }}
+
+      - name: Build before and after
+        id: prepare
+        env:
+          CHECKOUT_MODE: ${{ steps.resolve.outputs.mode }}
+          PR_NUMBER: ${{ steps.resolve.outputs.pr_number }}
+          BEFORE_SHA: ${{ steps.resolve.outputs.before_sha }}
+          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
+          MERGE_COMMIT_SHA: ${{ steps.resolve.outputs.merge_commit_sha }}
+          BEFORE_DIR: ${{ runner.temp }}/vrt-src-before
+          AFTER_DIR: ${{ runner.temp }}/vrt-src-after
+        run: bash scripts/vrt/prepare-checkouts.sh
+
+      - name: Capture before
+        id: capture_before
+        env:
+          VRT_PREVIEW_CWD: ${{ runner.temp }}/vrt-src-before
+          VRT_OUT_DIR: ${{ github.workspace }}/vrt-output/before
+        run: bash scripts/vrt/capture.sh
+
+      - name: Capture after
+        id: capture_after
+        env:
+          VRT_PREVIEW_CWD: ${{ runner.temp }}/vrt-src-after
+          VRT_OUT_DIR: ${{ github.workspace }}/vrt-output/after
+        run: bash scripts/vrt/capture.sh
+
+      - name: Compare screenshots
+        id: compare
+        if: steps.capture_before.outcome == 'success' && steps.capture_after.outcome == 'success'
+        env:
+          PR_NUMBER: ${{ steps.resolve.outputs.pr_number }}
+          PR_URL: ${{ steps.resolve.outputs.pr_url }}
+        run: node scripts/vrt/compare.ts vrt-output/before vrt-output/after vrt-output/report
+
+      - name: Write meta
+        if: always()
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          PR_URL: ${{ steps.resolve.outputs.pr_url }}
+          CHECKOUT_MODE: ${{ steps.resolve.outputs.mode }}
+          BEFORE_SHA: ${{ steps.prepare.outputs.before_sha }}
+          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
+          BUILT_AFTER_SHA: ${{ steps.prepare.outputs.built_after_sha }}
+          CAPTURE_FAILED: ${{ (steps.capture_before.outcome != 'success' || steps.capture_after.outcome != 'success') && 'true' || 'false' }}
+          COMPARE_PASSED: ${{ steps.compare.outcome == 'success' && 'true' || 'false' }}
+        run: node scripts/vrt/write-meta.ts
+
+      - name: Upload before screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: vrt-before
+          path: vrt-output/before/
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Upload after screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: vrt-after
+          path: vrt-output/after/
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Upload diff screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: vrt-diff
+          path: vrt-output/report/images/**/diff.png
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: vrt-report
+          path: vrt-output/report/
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Upload meta
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: vrt-meta
+          path: vrt-output/meta.json
+          retention-days: 14
+          if-no-files-found: error
