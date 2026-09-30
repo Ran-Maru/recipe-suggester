@@ -24,6 +24,9 @@
     "playwright.config.ts",
     "scripts/worktree-ports.ts",
     "scripts/worktree-ports.test.ts",
-    "scripts/dangerous-command-policy.test.ts"
+    "scripts/dangerous-command-policy.test.ts",
+    "scripts/recipe-additions-only.ts",
+    "scripts/recipe-additions-only.test.ts",
+    "scripts/merge-recipe-additions-pr.test.ts"
   ]
 }
