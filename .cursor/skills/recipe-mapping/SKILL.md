@@ -109,3 +109,5 @@ URL は外部の `https://` リンクにする。アプリ内のオリジナル�
 
 - `/recipes` の一覧は結合後の配列を読む。新しいエントリはビルド後、自動でそこに出る。
 - オリジナルレシピのページは `src/routes/family-recipe.$id.tsx` の1枚。未知の `id` は「レシピが見つかりません」と出す。
+- 変更が `src/mapping.json` と `src/original-recipes.json` への追加だけで、既存の要素を直したり消したりしていない PR は、CI が成功すると main へ squash マージされる。その main の CI が成功すると GitHub Pages に出る。
+- 下書き、フォークからの PR、`no-auto-merge` ラベル、既存レシピの修正や削除は自動ではマージしない。辞書やテストも一緒に変えた PR も対象外。下書きは Ready for review にしたあと、そのコミットの CI が既に成功していればマージする。
