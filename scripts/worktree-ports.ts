@@ -2,18 +2,18 @@ import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 
 export const DEV_PORT_BASE = 5173;
-export const PREVIEW_PORT_BASE = 4173;
-export const PLAYWRIGHT_HTML_PORT_BASE = 9323;
-export const VITEST_BROWSER_API_PORT_BASE = 63315;
+const PREVIEW_PORT_BASE = 4173;
+const PLAYWRIGHT_HTML_PORT_BASE = 9323;
+const VITEST_BROWSER_API_PORT_BASE = 63315;
 export const WORKTREE_PORT_RANGE = 500;
 
 type Env = Record<string, string | undefined>;
 
-export function cloudAgentSocketPath(env: Env = process.env): string {
+function cloudAgentSocketPath(env: Env = process.env): string {
   return env.CURSOR_AGENT_SOCKET ?? "/run/cursor/api.sock";
 }
 
-export function isIsolatedAgentEnvironment(
+function isIsolatedAgentEnvironment(
   env: Env = process.env,
   socketPath: string = cloudAgentSocketPath(env),
 ): boolean {
@@ -43,7 +43,7 @@ export function worktreePortOffset(
   return digest.readUInt16BE(0) % WORKTREE_PORT_RANGE;
 }
 
-export function worktreePort(
+function worktreePort(
   base: number,
   envNames: readonly string[] = [],
   options: { cwd?: string; env?: Env; socketPath?: string } = {},

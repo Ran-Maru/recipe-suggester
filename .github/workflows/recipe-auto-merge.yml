@@ -1,0 +1,46 @@
+# レシピ追加だけの PR を、CI 成功後に main へ squash マージする。
+# 追加は各 JSON 配列の末尾だけ。デプロイ自体は ci.yml の pages が、その main への push の CI 成功後に行う。
+#
+# 判定スクリプトは main のものを使う。PR のコードは checkout も実行もしない。
+# workflow_run は既定ブランチのワークフロー定義で動く。
+# 下書きはマージしない。Ready for review にしたあとは、CI を再実行する。
+name: Auto-merge recipe additions
+
+on:
+  workflow_run:
+    workflows: ["Tests & Dependabot Auto Merge"]
+    types: [completed]
+
+# レシピ PR が重なったとき、マージは1件ずつ行う。進行中のマージは取り消さない。
+concurrency:
+  group: recipe-auto-merge
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    name: Merge when the diff only adds recipes
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: ".node-version"
+      - name: レシピ追加だけならマージする
+        env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/merge-recipe-additions-pr.sh
