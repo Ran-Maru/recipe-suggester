@@ -6,7 +6,6 @@ set -euo pipefail
 
 : "${HEAD_SHA:?HEAD_SHA が必要です}"
 : "${REPO:?REPO が必要です}"
-: "${CI_TRUSTED:?CI_TRUSTED が必要です}"
 
 if [[ ! "$HEAD_SHA" =~ ^[0-9a-fA-F]{40}$ ]]; then
   printf '%s\n' "HEAD_SHA がコミット SHA ではありません。" >&2
@@ -15,11 +14,6 @@ fi
 
 if [[ ! "$REPO" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
   printf '%s\n' "REPO の形式が不正です。" >&2
-  exit 1
-fi
-
-if [[ "$CI_TRUSTED" != "true" && "$CI_TRUSTED" != "false" ]]; then
-  printf '%s\n' "CI_TRUSTED は true か false です。" >&2
   exit 1
 fi
 
@@ -85,22 +79,6 @@ fi
 if [[ ! "$head_ref" =~ ^[A-Za-z0-9._/-]+$ || "$head_ref" == *..* || "$head_ref" == /* || "$head_ref" == -* ]]; then
   printf '%s\n' "ブランチ名が不正です。" >&2
   exit 1
-fi
-
-if [[ "$CI_TRUSTED" != "true" ]]; then
-  count=$(
-    gh api \
-      "repos/${REPO}/actions/workflows/ci.yml/runs?head_sha=${HEAD_SHA}&event=pull_request&status=success&per_page=1" \
-      --jq '.total_count'
-  )
-  if [[ ! "$count" =~ ^[0-9]+$ ]]; then
-    printf '%s\n' "CI の成功件数を読めませんでした。" >&2
-    exit 1
-  fi
-  if [[ "$count" -lt 1 ]]; then
-    printf '%s\n' "このコミットの CI はまだ成功していません。" >&2
-    exit 0
-  fi
 fi
 
 git fetch --no-tags origin main

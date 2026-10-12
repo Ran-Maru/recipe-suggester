@@ -1,5 +1,5 @@
-// 既存の要素が同じ順序で残り、新しい要素だけが増えているときに追加とみなす。
-// 既存要素の修正、削除、並べ替えは追加ではない。途中への挿入は追加とみなす。
+// 既存の要素が先頭からそのまま残り、末尾に新しい要素だけが増えているときに追加とみなす。
+// 途中への挿入、既存要素の修正、削除、並べ替えは追加ではない。
 import { execFileSync } from "node:child_process";
 import { readFileSync, realpathSync } from "node:fs";
 import { pathToFileURL } from "node:url";
@@ -80,29 +80,17 @@ export function additionsOnly(base: unknown, head: unknown): DiffDecision {
     return { ok: false, reason: "ルートが配列ではありません" };
   }
 
-  let headIndex = 0;
-  let added = 0;
-  for (let baseIndex = 0; baseIndex < base.length; baseIndex += 1) {
-    let found = false;
-    while (headIndex < head.length) {
-      if (jsonEqual(base[baseIndex], head[headIndex])) {
-        found = true;
-        headIndex += 1;
-        break;
-      }
-      added += 1;
-      headIndex += 1;
-    }
-    if (!found) {
+  for (let index = 0; index < base.length; index += 1) {
+    if (!jsonEqual(base[index], head[index])) {
       return {
         ok: false,
-        reason: `既存の ${baseIndex + 1} 件目が残っていません`,
+        reason: `既存の ${index + 1} 件目が残っていません`,
       };
     }
   }
 
-  added += head.length - headIndex;
-  if (added === 0) {
+  const added = head.length - base.length;
+  if (added <= 0) {
     return { ok: false, reason: "追加がありません" };
   }
   return { ok: true, reason: `${added} 件追加しています` };
@@ -286,7 +274,7 @@ function rejectionReason(pull: RecipePullRequest, repo: string): string | null {
     return "PR は開いていません";
   }
   if (pull.draft) {
-    return "下書きのためマージしません。Ready for review にすると、このコミットの CI が成功していればマージします";
+    return "下書きのためマージしません。Ready for review にしたあと、このコミットの CI を再実行するとマージします";
   }
   if (pull.baseRef !== "main") {
     return "ベースブランチが main ではありません";

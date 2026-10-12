@@ -76,12 +76,15 @@ describe("additionsOnly", () => {
     expect(decision.ok).toBe(true);
   });
 
-  it("途中への挿入を認める", () => {
+  it("途中への挿入は拒否する", () => {
     const decision = additionsOnly(
       [recipe("先"), recipe("後")],
       [recipe("先"), recipe("中"), recipe("後")],
     );
-    expect(decision.ok).toBe(true);
+    expect(decision).toEqual({
+      ok: false,
+      reason: "既存の 2 件目が残っていません",
+    });
   });
 
   it("キーの並びが違っても既存要素は同一とみなす", () => {
@@ -112,13 +115,6 @@ describe("additionsOnly", () => {
     expect(decision.ok).toBe(false);
   });
 
-  it("並べ替えは拒否する", () => {
-    expect(
-      additionsOnly([recipe("先"), recipe("後")], [recipe("後"), recipe("先")])
-        .ok,
-    ).toBe(false);
-  });
-
   it("追加がなければ拒否する", () => {
     expect(additionsOnly([recipe("既存")], [recipe("既存")])).toEqual({
       ok: false,
@@ -131,14 +127,6 @@ describe("additionsOnly", () => {
       ok: false,
       reason: "ルートが配列ではありません",
     });
-  });
-
-  it("先頭を書き換えて元の要素を後ろに残しても拒否する", () => {
-    const decision = additionsOnly(
-      [recipe("既存"), recipe("次")],
-      [recipe("改変"), recipe("次"), recipe("既存")],
-    );
-    expect(decision.ok).toBe(false);
   });
 
   it("オリジナルレシピの本文追加を新しい要素として認める", () => {
@@ -348,5 +336,7 @@ describe("workflow name", () => {
     expect(autoMerge).toContain('"Tests & Dependabot Auto Merge"');
     expect(autoMerge).toContain("actions/checkout@v7");
     expect(autoMerge).toContain("ref: main");
+    expect(autoMerge).not.toContain("pull_request_target");
+    expect(autoMerge).not.toContain("CI_TRUSTED");
   });
 });

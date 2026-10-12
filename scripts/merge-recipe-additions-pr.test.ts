@@ -96,11 +96,7 @@ function pull(fixture: Fixture, patch: Record<string, unknown> = {}) {
   };
 }
 
-function run(
-  fixture: Fixture,
-  pulls: unknown,
-  env: Record<string, string> = {},
-) {
+function run(fixture: Fixture, pulls: unknown) {
   const bin = path.join(fixture.root, "bin");
   mkdirSync(bin);
   const pullsFile = path.join(fixture.root, "pulls.json");
@@ -114,10 +110,6 @@ if [[ "\${1:-}" == "api" ]]; then
   url="\${2:-}"
   if [[ "$url" == *"/commits/"*"/pulls" ]]; then
     cat "\${PULLS_FILE:?}"
-    exit 0
-  fi
-  if [[ "$url" == *"/actions/workflows/ci.yml/runs"* ]]; then
-    printf '%s' "\${CI_COUNT:?}"
     exit 0
   fi
   printf 'unexpected api %s\\n' "$url" >&2
@@ -140,12 +132,9 @@ exit 1
       PATH: `${bin}:${process.env.PATH ?? ""}`,
       HEAD_SHA: fixture.headSha,
       REPO: repo,
-      CI_TRUSTED: "true",
       GH_TOKEN: "fake",
       PULLS_FILE: pullsFile,
-      CI_COUNT: "1",
       MERGE_LOG: mergeLog,
-      ...env,
     },
   });
   const merged = (() => {
@@ -216,35 +205,6 @@ describe("merge-recipe-additions-pr.sh", () => {
       expect(result.status, result.stderr).toBe(0);
       expect(merged).toBe("");
       expect(result.stderr).toContain("下書き");
-    } finally {
-      rmSync(fixture.root, { recursive: true, force: true });
-    }
-  });
-
-  it("CI がまだ成功していなければマージしない", () => {
-    const fixture = createFixture(appendRecipe);
-    try {
-      const { result, merged } = run(fixture, [pull(fixture)], {
-        CI_TRUSTED: "false",
-        CI_COUNT: "0",
-      });
-      expect(result.status, result.stderr).toBe(0);
-      expect(merged).toBe("");
-      expect(result.stderr).toContain("CI はまだ成功していません");
-    } finally {
-      rmSync(fixture.root, { recursive: true, force: true });
-    }
-  });
-
-  it("Ready for review で CI が成功済みならマージする", () => {
-    const fixture = createFixture(appendRecipe);
-    try {
-      const { result, merged } = run(fixture, [pull(fixture)], {
-        CI_TRUSTED: "false",
-        CI_COUNT: "1",
-      });
-      expect(result.status, result.stderr).toBe(0);
-      expect(merged).toContain("--squash");
     } finally {
       rmSync(fixture.root, { recursive: true, force: true });
     }
