@@ -16,6 +16,10 @@
 - レシピGET の「開く」で別タブが開くこと
 - レシピGET の「コピーする」と一覧のコピーボタンで URL がクリップボードに入ること
 
+## 見た目の比較（VRT）
+
+`tests/vrt/` は通常の `vp run test:e2e` では動かない。`VRT=1` のときだけ動き、`scripts/vrt/run-playwright.sh` から呼ぶ。手順は README の「見た目の比較（VRT）」を参照。
+
 ## 参考
 
 - https://vitest.dev/guide/

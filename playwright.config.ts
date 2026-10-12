@@ -1,6 +1,11 @@
 // processの型定義を参照させるために必要
 /// <reference types="node" />
-import { defineConfig, devices } from "@playwright/test";
+import path from "node:path";
+import {
+  defineConfig,
+  devices,
+  type ReporterDescription,
+} from "@playwright/test";
 import {
   worktreeDevPort,
   worktreePlaywrightHtmlPort,
@@ -11,6 +16,9 @@ const devPort = worktreeDevPort();
 const previewPort = worktreePreviewPort();
 const playwrightHtmlPort = worktreePlaywrightHtmlPort();
 const vrt = process.env.VRT === "1";
+// VRT_MODE=update は変更前の画面を基準画像として書き出し、compare は変更後を基準画像と比べる。
+const vrtMode = process.env.VRT_MODE === "update" ? "update" : "compare";
+const vrtOutDir = path.resolve(process.env.VRT_OUT_DIR ?? "vrt-output");
 const baseURL = vrt
   ? `http://127.0.0.1:${previewPort}`
   : `http://localhost:${devPort}`;
@@ -29,6 +37,26 @@ const baseURL = vrt
 export default defineConfig({
   testDir: "./tests",
   testIgnore: vrt ? undefined : "**/vrt/**",
+  ...(vrt
+    ? {
+        outputDir: path.join(vrtOutDir, "test-results"),
+        // 基準画像はリポジトリに置かず、変更前の実行で vrt-output/snapshots に作る。
+        snapshotPathTemplate: path.join(
+          vrtOutDir,
+          "snapshots",
+          "{projectName}",
+          "{arg}{ext}",
+        ),
+        expect: {
+          toHaveScreenshot: {
+            maxDiffPixels: 0,
+            threshold: 0,
+            animations: "disabled" as const,
+            caret: "hide" as const,
+          },
+        },
+      }
+    : {}),
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -38,11 +66,11 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. VRT は画素が揺れないよう常に 1 本。 */
   workers: process.env.CI || vrt ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: vrt
-    ? "line"
-    : process.env.CI
+  reporter:
+    vrtReporter() ??
+    (process.env.CI
       ? [["github"], ["html", { port: playwrightHtmlPort }]]
-      : [["html", { port: playwrightHtmlPort }]],
+      : [["html", { port: playwrightHtmlPort }]]),
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
@@ -92,6 +120,20 @@ export default defineConfig({
 
   webServer: vrtWebServer(baseURL, previewPort),
 });
+
+function vrtReporter(): ReporterDescription[] | undefined {
+  if (!vrt) {
+    return undefined;
+  }
+  if (vrtMode === "update") {
+    return [["line"]];
+  }
+  return [
+    ["line"],
+    ["html", { open: "never", outputFolder: path.join(vrtOutDir, "report") }],
+    ["json", { outputFile: path.join(vrtOutDir, "results.json") }],
+  ];
+}
 
 function vrtWebServer(
   url: string,

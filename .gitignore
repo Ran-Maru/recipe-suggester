@@ -27,3 +27,4 @@ generated
 /playwright/.cache/
 /playwright/.auth/
 .vitest/
+/vrt-output/

@@ -92,6 +92,14 @@ test.skip(browserName === "webkit", "WebKit lacks clipboard API support");
 
 セレクタはアクセシブルなロールを優先する（`getByRole`、`getByTestId`）。
 
+## 見た目の比較（VRT）
+
+- `tests/vrt/vrt.spec.ts` は `toHaveScreenshot` で 5 画面を撮る。`VRT=1` のときだけ対象になる（`playwright.config.ts` の `testIgnore`）
+- `VRT_MODE=update` は変更前を基準画像として `$VRT_OUT_DIR/snapshots` に書く。`compare` は変更後を比べ、`$VRT_OUT_DIR/report`（HTML）と `results.json` を出す
+- 基準画像はコミットしない。`vrt-output/` は gitignore 済み
+- レポートは `.github/workflows/vrt.yml` が Cloudflare Worker（`workers/vrt/`、R2）に載せる。マージ時の削除は `vrt-cleanup.yml`、Worker のデプロイは `vrt-worker-deploy.yml`
+- 設定とローカルでの試し方は README の「見た目の比較（VRT）」
+
 ## CI の挙動
 
 - `forbidOnly: !!process.env.CI`
