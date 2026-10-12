@@ -28,3 +28,4 @@ generated
 /playwright/.auth/
 .vitest/
 /vrt-output/
+.wrangler/
