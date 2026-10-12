@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # CI が成功した「レシピ追加だけ」の PR を squash マージする。
+# マージ後は main の CI を手動起動する。成功すると ci.yml の pages がデプロイする。
 # このスクリプトは既定ブランチのものを使う。PR ブランチのコードは実行しない。
 # カレントディレクトリは、ベース側を checkout した git リポジトリであること。
 set -euo pipefail
@@ -120,3 +121,7 @@ fi
 
 printf '%s\n' "レシピの追加だけなので、PR #${number} をマージします。"
 gh pr merge "$number" --repo "$REPO" --squash --match-head-commit "$HEAD_SHA"
+
+# GITHUB_TOKEN のマージでは push が発火しないため、main の CI（test と lint のあとに pages）を手動で起動する。
+printf '%s\n' "main の CI を起動してデプロイします。"
+gh workflow run ci.yml --repo "$REPO" --ref main

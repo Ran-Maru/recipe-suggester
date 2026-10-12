@@ -3,6 +3,7 @@
 #
 # 判定スクリプトは main のものを使う。PR のコードは checkout も実行もしない。
 # workflow_run は既定ブランチのワークフロー定義で動く。
+# GITHUB_TOKEN によるマージでは main への push で CI が起動しない。マージ後に ci.yml を手動起動し、デプロイまで行う。
 # 下書きはマージしない。Ready for review にしたあとは、CI を再実行する。
 name: Auto-merge recipe additions
 
@@ -26,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
+      actions: write
       contents: write
       pull-requests: write
     steps:

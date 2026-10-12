@@ -4,6 +4,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # GITHUB_TOKEN で main にマージしても push は発火しない。recipe-auto-merge.yml がここを手動起動してデプロイまでつなぐ。
+  workflow_dispatch:
 jobs:
   test:
     timeout-minutes: 10
@@ -126,12 +128,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # main への push では、test と lint が成功してから GitHub Pages へデプロイする。
-  # レシピ追加だけの PR は recipe-auto-merge.yml が squash マージし、その push でここがデプロイする。
+  # レシピ追加だけの PR は recipe-auto-merge.yml が squash マージし、main を指定して CI を手動起動する。
+  # GITHUB_TOKEN のマージでは push が発火しないため、手動起動（workflow_dispatch）でもデプロイする。
   # それ以外の PR ではデプロイしない。同じ内容の出し直しは gh-pages-deploy.yml の手動実行。
   pages:
     name: Deploy to GitHub Pages
     needs: [test, lint]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: >-
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/main'
     permissions:
       contents: read
       pages: write

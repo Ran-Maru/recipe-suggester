@@ -339,4 +339,18 @@ describe("workflow name", () => {
     expect(autoMerge).not.toContain("pull_request_target");
     expect(autoMerge).not.toContain("CI_TRUSTED");
   });
+
+  it("GITHUB_TOKEN のマージ後でもデプロイできるよう、CI を手動起動できる", () => {
+    const ci = readFileSync(
+      new URL("../.github/workflows/ci.yml", import.meta.url),
+      "utf8",
+    );
+    const autoMerge = readFileSync(
+      new URL("../.github/workflows/recipe-auto-merge.yml", import.meta.url),
+      "utf8",
+    );
+    expect(ci).toMatch(/^ {2}workflow_dispatch:/m);
+    expect(ci).toContain("github.event_name == 'workflow_dispatch'");
+    expect(autoMerge).toContain("actions: write");
+  });
 });
