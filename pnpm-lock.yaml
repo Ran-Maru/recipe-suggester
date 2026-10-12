@@ -225,6 +225,9 @@ importers:
       '@types/node':
         specifier: ^24.19.1
         version: 24.19.1
+      '@types/pngjs':
+        specifier: ^6.0.5
+        version: 6.0.5
       '@types/react':
         specifier: ^19.3.0
         version: 19.3.0
@@ -243,9 +246,15 @@ importers:
       oxc-transform-react:
         specifier: ^0.153.0
         version: 0.153.0
+      pixelmatch:
+        specifier: ^7.2.0
+        version: 7.2.0
       playwright:
         specifier: 1.63.0
         version: 1.63.0
+      pngjs:
+        specifier: ^7.0.0
+        version: 7.0.0
       postcss:
         specifier: ^8.5.29
         version: 8.5.29
@@ -1425,6 +1434,9 @@ packages:
   '@types/node@24.19.1':
     resolution: {integrity: sha512-aS3/DG0oM05K0RIXXP+hKjinGG5IgSSVGzswZxW3O0sS3pH4/fycXundUC9XsszgKCk4gHXylTEK6hyFxVxnoQ==}
 
+  '@types/pngjs@6.0.5':
+    resolution: {integrity: sha512-0k5eKfrA83JOZPppLtS2C7OUtyNAl2wKNxfyYl9Q5g9lPkgBl/9hNyAu6HuEH2J4XmIv2znEpkDd0SaZVxW6iQ==}
+
   '@types/react-dom@19.3.0':
     resolution: {integrity: sha512-ZI7bU42mZXXKHn/qNLEw2IrbiINU7X5+vfgdixBHkCNpYWXjKgfQ/P+uyGb5CjOLB9UcnTeg3rylQtV2hym44Q==}
     peerDependencies:
@@ -2498,6 +2510,10 @@ packages:
   picomatch@4.0.7:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
+
+  pixelmatch@7.2.0:
+    resolution: {integrity: sha512-xhcb4yHu9sM/G7foGzoLtXYcC0zHEaOXXjRKhGup0fw78Nf2Tkiapv4EQyMzrbcmQPsllAI7DbFY2UT7PlI9Pg==}
+    hasBin: true
 
   playwright-core@1.63.0:
     resolution: {integrity: sha512-rYCsBF/M5HjUch52bbtVONEFjv6Xu8sm8h72dNlR5bzIE1fvC/bxgspzkjSfU+MweEMmPM8KJebG6nnyxo5mCg==}
@@ -3850,6 +3866,10 @@ snapshots:
     dependencies:
       undici-types: 7.24.6
 
+  '@types/pngjs@6.0.5':
+    dependencies:
+      '@types/node': 24.19.1
+
   '@types/react-dom@19.3.0(@types/react@19.3.0)':
     dependencies:
       '@types/react': 19.3.0
@@ -4717,6 +4737,10 @@ snapshots:
   picomatch@2.3.2: {}
 
   picomatch@4.0.7: {}
+
+  pixelmatch@7.2.0:
+    dependencies:
+      pngjs: 7.0.0
 
   playwright-core@1.63.0: {}
 

@@ -9,7 +9,7 @@
 
 ## Playwright E2E
 
-`tests/` の `@playwright/test`。コマンドは `package.json` の `test:e2e*`。
+`tests/` の `@playwright/test`。コマンドは `package.json` の `test:e2e*`。`tests/vrt/` は見た目の比較で、通常の `playwright test` には含まれない。`VRT=1` のときだけ動く。
 
 残しているケース:
 
