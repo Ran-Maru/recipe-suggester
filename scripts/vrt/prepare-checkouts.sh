@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-# 変更前と変更後のコミットを worktree に取り出してビルドする。
+# 変更前（PR の分岐点）と変更後（PR の head）を worktree に取り出してビルドする。
+# 分岐点は head と base の merge-base。base が先に進んでいても、PR 自身の変更だけが差分になる。
+# マージ済みの PR は、マージ直前の main（マージコミットの第一親）を base とする。
 # 手動再実行のときも、保存済みの画像には依存しない。
 set -euo pipefail
 
-mode="${CHECKOUT_MODE:?}"
 before_dir="${BEFORE_DIR:?}"
 after_dir="${AFTER_DIR:?}"
 pr_number="${PR_NUMBER:?}"
-before_sha="${BEFORE_SHA:-}"
-head_sha="${HEAD_SHA:-}"
+head_sha="${HEAD_SHA:?}"
+base_sha="${BASE_SHA:-}"
 merge_commit_sha="${MERGE_COMMIT_SHA:-}"
 
 if [[ ! "$pr_number" =~ ^[0-9]+$ ]]; then
@@ -25,9 +26,13 @@ else
   vp_bin="$repo_root/node_modules/.bin/vp"
 fi
 
-fetch_sha() {
+has_commit() {
+  git cat-file -e "${1}^{commit}" 2>/dev/null
+}
+
+fetch_commit() {
   local sha="$1"
-  if git cat-file -e "${sha}^{commit}" 2>/dev/null; then
+  if has_commit "$sha"; then
     return 0
   fi
   git fetch --no-tags origin "$sha"
@@ -42,52 +47,38 @@ build_tree() {
   )
 }
 
-case "$mode" in
-  open)
-    if [[ -z "$before_sha" || -z "$head_sha" ]]; then
-      printf 'open モードでは BEFORE_SHA と HEAD_SHA が必要です\n' >&2
-      exit 1
-    fi
-    if ! git fetch --no-tags origin "pull/${pr_number}/head"; then
-      printf 'pull/%s/head を取得できません。PR のコミットが残っているか確認してください。\n' "$pr_number" >&2
-      exit 1
-    fi
-    fetch_sha "$before_sha"
-    fetch_sha "$head_sha"
-    git worktree add --detach "$before_dir" "$before_sha"
-    git worktree add --detach "$after_dir" "$head_sha"
-    if ! GIT_AUTHOR_NAME='github-actions[bot]' \
-      GIT_AUTHOR_EMAIL='41898282+github-actions[bot]@users.noreply.github.com' \
-      GIT_COMMITTER_NAME='github-actions[bot]' \
-      GIT_COMMITTER_EMAIL='41898282+github-actions[bot]@users.noreply.github.com' \
-      git -C "$after_dir" merge --no-edit "$before_sha"; then
-      printf 'base と head のマージで衝突しています。衝突を解いてから再実行してください。\n' >&2
-      exit 1
-    fi
-    ;;
-  merged)
-    if [[ -z "$merge_commit_sha" ]]; then
-      printf 'merged モードでは MERGE_COMMIT_SHA が必要です\n' >&2
-      exit 1
-    fi
-    fetch_sha "$merge_commit_sha"
-    before_sha=$(git rev-parse "${merge_commit_sha}^1")
-    git worktree add --detach "$before_dir" "$before_sha"
-    git worktree add --detach "$after_dir" "$merge_commit_sha"
-    ;;
-  *)
-    printf '未知のモードです: %s\n' "$mode" >&2
+if ! has_commit "$head_sha"; then
+  if ! git fetch --no-tags origin "pull/${pr_number}/head"; then
+    printf 'pull/%s/head を取得できません。PR のコミットが残っているか確認してください。\n' "$pr_number" >&2
     exit 1
-    ;;
-esac
+  fi
+fi
+if ! has_commit "$head_sha"; then
+  printf 'head のコミットが見つかりません: %s\n' "$head_sha" >&2
+  exit 1
+fi
+
+if [[ -n "$merge_commit_sha" ]]; then
+  fetch_commit "$merge_commit_sha"
+  base_sha=$(git rev-parse "${merge_commit_sha}^1")
+fi
+if [[ -z "$base_sha" ]]; then
+  printf 'BASE_SHA か MERGE_COMMIT_SHA が必要です\n' >&2
+  exit 1
+fi
+fetch_commit "$base_sha"
+
+before_sha=$(git merge-base "$base_sha" "$head_sha")
+
+git worktree add --detach "$before_dir" "$before_sha"
+git worktree add --detach "$after_dir" "$head_sha"
 
 build_tree "$before_dir"
 build_tree "$after_dir"
 
-built_after=$(git -C "$after_dir" rev-parse HEAD)
 if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   {
     printf 'before_sha=%s\n' "$before_sha"
-    printf 'built_after_sha=%s\n' "$built_after"
+    printf 'head_sha=%s\n' "$head_sha"
   } >> "$GITHUB_OUTPUT"
 fi

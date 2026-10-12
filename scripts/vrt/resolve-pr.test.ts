@@ -15,13 +15,12 @@ describe("decideShas", () => {
       baseSha: sha,
       headSha: head,
     });
-    expect(plan.mode).toBe("open");
-    expect(plan.beforeSha).toBe(sha);
+    expect(plan.baseSha).toBe(sha);
     expect(plan.headSha).toBe(head);
     expect(plan.mergeCommitSha).toBe("");
   });
 
-  it("マージ済み PR はマージコミットを返す", () => {
+  it("マージ済み PR は head とマージコミットを返し、base は空にする", () => {
     const plan = decideShas({
       eventName: "workflow_dispatch",
       prNumber: 7,
@@ -34,9 +33,9 @@ describe("decideShas", () => {
         mergeCommitOid: merge,
       },
     });
-    expect(plan.mode).toBe("merged");
     expect(plan.mergeCommitSha).toBe(merge);
-    expect(plan.beforeSha).toBe("");
+    expect(plan.headSha).toBe(head);
+    expect(plan.baseSha).toBe("");
   });
 
   it("手動実行でも未マージなら今の base と head を使う", () => {
@@ -52,9 +51,9 @@ describe("decideShas", () => {
         mergeCommitOid: null,
       },
     });
-    expect(plan.mode).toBe("open");
-    expect(plan.beforeSha).toBe(sha);
+    expect(plan.baseSha).toBe(sha);
     expect(plan.headSha).toBe(head);
+    expect(plan.mergeCommitSha).toBe("");
   });
 
   it("PR 番号が不正なら止める", () => {

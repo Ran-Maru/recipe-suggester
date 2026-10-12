@@ -4,12 +4,14 @@ import path from "node:path";
 import { PNG } from "pngjs";
 import { describe, expect, it } from "vite-plus/test";
 import {
+  REPORT_FILE,
   VRT_RETENTION_DAYS,
   compareDirectories,
   escapeHtml,
+  parseCompareSummary,
   renderComment,
-  reportPageUrl,
-  type VrtMeta,
+  type CommentInput,
+  type SceneResult,
 } from "./report.ts";
 
 function writePng(
@@ -33,140 +35,175 @@ function tempDir(): string {
   return mkdtempSync(path.join(tmpdir(), "vrt-report-"));
 }
 
-const meta: VrtMeta = {
-  prNumber: 42,
-  prUrl: "https://github.com/example/recipe-suggester/pull/42",
-  mode: "open",
-  beforeSha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  headSha: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-  builtAfterSha: "cccccccccccccccccccccccccccccccccccccccc",
-  captureFailed: false,
-  passed: false,
-};
+function compare(root: string, options = {}) {
+  return compareDirectories(
+    path.join(root, "before"),
+    path.join(root, "after"),
+    path.join(root, "report"),
+    options,
+  );
+}
+
+function readReport(root: string): string {
+  return readFileSync(path.join(root, "report", REPORT_FILE), "utf8");
+}
 
 describe("compareDirectories", () => {
-  it("同じ画像は差分なしになる", () => {
+  it("同じ画像は差分なしになり、画像は埋め込まない", () => {
     const root = tempDir();
     writePng(path.join(root, "before/chromium/home.png"), 2, 2, 10);
     writePng(path.join(root, "after/chromium/home.png"), 2, 2, 10);
-    const summary = compareDirectories(
-      path.join(root, "before"),
-      path.join(root, "after"),
-      path.join(root, "report"),
-    );
+    const summary = compare(root);
     expect(summary.passed).toBe(true);
     expect(summary.scenes[0]?.status).toBe("same");
-    expect(
-      readFileSync(path.join(root, "report/index.html"), "utf8"),
-    ).toContain("差分はありません");
+    const html = readReport(root);
+    expect(html).toContain("差分はありません");
+    expect(html).toContain("差分なし（1 画面）");
+    expect(html).not.toContain("data:image/png");
   });
 
-  it("1 px でも違えば差分ありになる", () => {
+  it("1 px でも違えば差分ありになり、前後と差分を HTML に埋め込む", () => {
     const root = tempDir();
     writePng(path.join(root, "before/chromium/home.png"), 2, 2, 10);
     writePng(path.join(root, "after/chromium/home.png"), 2, 2, 200);
-    const summary = compareDirectories(
-      path.join(root, "before"),
-      path.join(root, "after"),
-      path.join(root, "report"),
-      { prNumber: 42 },
-    );
+    const summary = compare(root, { prNumber: 42 });
     expect(summary.passed).toBe(false);
     expect(summary.scenes[0]?.status).toBe("changed");
     expect(summary.scenes[0]?.diffPixels).toBeGreaterThan(0);
-    expect(
-      readFileSync(
-        path.join(root, "report/images/chromium/home/diff.png"),
-      ).subarray(0, 8),
-    ).toEqual(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+    const html = readReport(root);
+    expect(html).toContain("差分が 1 件あります");
+    expect(html.match(/data:image\/png;base64,/g)).toHaveLength(3);
+  });
+
+  it("赤が 1 だけ違う画素も差分として数える", () => {
+    const root = tempDir();
+    writePng(path.join(root, "before/chromium/home.png"), 4, 4, 254);
+    writePng(path.join(root, "after/chromium/home.png"), 4, 4, 255);
+    const summary = compare(root);
+    expect(summary.passed).toBe(false);
+    expect(summary.scenes[0]?.status).toBe("changed");
   });
 
   it("サイズが違う画面は失敗にする", () => {
     const root = tempDir();
     writePng(path.join(root, "before/mobile-chrome/recipes.png"), 2, 2, 10);
     writePng(path.join(root, "after/mobile-chrome/recipes.png"), 3, 2, 10);
-    const summary = compareDirectories(
-      path.join(root, "before"),
-      path.join(root, "after"),
-      path.join(root, "report"),
-    );
+    const summary = compare(root);
     expect(summary.scenes[0]?.status).toBe("resized");
     expect(summary.passed).toBe(false);
   });
 
-  it("片側にしかない画像と、パスが不正な画像は失敗または無視する", () => {
+  it("片側にしかない画像は失敗にし、階層の違うファイルは無視する", () => {
     const root = tempDir();
     writePng(path.join(root, "before/chromium/home.png"), 2, 2, 10);
     writePng(path.join(root, "after/chromium/added.png"), 2, 2, 10);
-    mkdirSync(path.join(root, "before/../outside"), { recursive: true });
     writePng(path.join(root, "before/not-a-pair.png"), 2, 2, 1);
-    const summary = compareDirectories(
-      path.join(root, "before"),
-      path.join(root, "after"),
-      path.join(root, "report"),
-    );
+    const summary = compare(root);
     const statuses = summary.scenes.map((scene) => scene.status).toSorted();
     expect(statuses).toEqual(["added", "removed"]);
     expect(summary.passed).toBe(false);
   });
+
+  it("PNG として読めない画像は invalid にする", () => {
+    const root = tempDir();
+    writePng(path.join(root, "before/chromium/home.png"), 2, 2, 10);
+    mkdirSync(path.join(root, "after/chromium"), { recursive: true });
+    writeFileSync(path.join(root, "after/chromium/home.png"), "not a png");
+    const summary = compare(root);
+    expect(summary.scenes[0]?.status).toBe("invalid");
+    expect(summary.passed).toBe(false);
+  });
+
+  it("比較する画像が 1 枚もなければ失敗にする", () => {
+    const root = tempDir();
+    const summary = compare(root);
+    expect(summary.scenes).toEqual([]);
+    expect(summary.passed).toBe(false);
+  });
+
+  it("summary.json を読み戻せる", () => {
+    const root = tempDir();
+    writePng(path.join(root, "before/chromium/home.png"), 2, 2, 10);
+    writePng(path.join(root, "after/chromium/home.png"), 2, 2, 200);
+    const written = compare(root);
+    const parsed = parseCompareSummary(
+      readFileSync(path.join(root, "report/summary.json"), "utf8"),
+    );
+    expect(parsed).toEqual(written);
+  });
+
+  it("GitHub 以外の PR URL はリンクにしない", () => {
+    const root = tempDir();
+    writePng(path.join(root, "before/chromium/home.png"), 2, 2, 10);
+    writePng(path.join(root, "after/chromium/home.png"), 2, 2, 10);
+    compare(root, { prNumber: 7, prUrl: "javascript:alert(1)" });
+    const html = readReport(root);
+    expect(html).not.toContain("javascript:");
+    expect(html).toContain("PR #7");
+  });
 });
 
+const changedScene: SceneResult = {
+  project: "chromium",
+  name: "home",
+  status: "changed",
+  diffPixels: 12,
+  before: { width: 2, height: 2 },
+  after: { width: 2, height: 2 },
+  detail: "差分あり（12 px）",
+};
+
+const commentBase: CommentInput = {
+  prNumber: 42,
+  beforeSha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  headSha: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  captureFailed: false,
+  summary: { passed: false, scenes: [changedScene] },
+  reportUrl: "https://github.com/example/repo/actions/runs/9/artifacts/5",
+  runUrl: "https://github.com/example/repo/actions/runs/9",
+  retentionDays: VRT_RETENTION_DAYS,
+};
+
 describe("renderComment", () => {
-  it("差分・URL・再実行の PR 番号を書く", () => {
-    const body = renderComment({
-      meta,
-      summary: {
-        passed: false,
-        maxDiffPixels: 0,
-        scenes: [
-          {
-            project: "chromium",
-            name: "home",
-            status: "changed",
-            diffPixels: 12,
-            before: { width: 2, height: 2 },
-            after: { width: 2, height: 2 },
-            detail: "差分あり（12 px）",
-          },
-        ],
-      },
-      reportUrl:
-        "https://ran-maru.github.io/recipe-suggester/vrt/runs/9/index.html",
-      runUrl: "https://github.com/example/recipe-suggester/actions/runs/9",
-      retentionDays: VRT_RETENTION_DAYS,
-    });
+  it("差分・レポート URL・分岐点と head・再実行の PR 番号を書く", () => {
+    const body = renderComment(commentBase);
     expect(body).toContain("<!-- vrt-report -->");
     expect(body).toContain("差分が 1 件あります");
     expect(body).toContain("chromium / home: 12 px");
-    expect(body).toContain("vrt/runs/9/index.html");
+    expect(body).toContain("PR の分岐点 `aaaaaaa`");
+    expect(body).toContain("PR の head `bbbbbbb`");
+    expect(body).toContain(
+      "(https://github.com/example/repo/actions/runs/9/artifacts/5)",
+    );
     expect(body).toContain("`vrt-before`");
     expect(body).toContain("`vrt-after`");
-    expect(body).toContain("`vrt-diff`");
     expect(body).toContain("PR 番号に `42`");
-    expect(body).toContain(`${String(VRT_RETENTION_DAYS)} 日で消えます`);
+    expect(body).toContain(`${String(VRT_RETENTION_DAYS)} 日`);
+    expect(body).toContain("マージで消えます");
+  });
+
+  it("差分がなければその旨だけ書く", () => {
+    const body = renderComment({
+      ...commentBase,
+      summary: {
+        passed: true,
+        scenes: [{ ...changedScene, status: "same" }],
+      },
+    });
+    expect(body).toContain("差分はありません。");
+    expect(body).not.toContain("chromium / home");
   });
 
   it("撮影に失敗したときは画像の差分として扱わない", () => {
     const body = renderComment({
-      meta: { ...meta, captureFailed: true, passed: false },
+      ...commentBase,
+      captureFailed: true,
       summary: null,
       reportUrl: "",
-      runUrl: "https://github.com/example/recipe-suggester/actions/runs/9",
-      retentionDays: VRT_RETENTION_DAYS,
     });
     expect(body).toContain("スクリーンショットの取得に失敗しました");
-    expect(body).not.toContain("比較結果を開く");
+    expect(body).not.toContain("比較レポート");
     expect(body).toContain("PR 番号に `42`");
-  });
-});
-
-describe("reportPageUrl", () => {
-  it("リポジトリのパスを残してレポート URL を作る", () => {
-    expect(
-      reportPageUrl("https://ran-maru.github.io/recipe-suggester", "15"),
-    ).toBe(
-      "https://ran-maru.github.io/recipe-suggester/vrt/runs/15/index.html",
-    );
   });
 });
 

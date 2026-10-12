@@ -12,9 +12,10 @@ on:
         required: true
         type: string
 
-# 撮影と比較は PR のコードをビルドする。トークンは読み取りだけにして、画像を push できないようにする。
+# 書き込みは PR コメントだけ。fork と Dependabot の PR ではトークンが読み取り専用になるので、コメントは付けない。
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
   group: vrt-${{ github.event.pull_request.number || github.event.inputs.pr_number || github.run_id }}
@@ -24,6 +25,8 @@ jobs:
   compare:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      CAN_COMMENT: ${{ github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -95,9 +98,8 @@ jobs:
       - name: Build before and after
         id: prepare
         env:
-          CHECKOUT_MODE: ${{ steps.resolve.outputs.mode }}
           PR_NUMBER: ${{ steps.resolve.outputs.pr_number }}
-          BEFORE_SHA: ${{ steps.resolve.outputs.before_sha }}
+          BASE_SHA: ${{ steps.resolve.outputs.base_sha }}
           HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
           MERGE_COMMIT_SHA: ${{ steps.resolve.outputs.merge_commit_sha }}
           BEFORE_DIR: ${{ runner.temp }}/vrt-src-before
@@ -126,19 +128,6 @@ jobs:
           PR_URL: ${{ steps.resolve.outputs.pr_url }}
         run: node scripts/vrt/compare.ts vrt-output/before vrt-output/after vrt-output/report
 
-      - name: Write meta
-        if: always()
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
-          PR_URL: ${{ steps.resolve.outputs.pr_url }}
-          CHECKOUT_MODE: ${{ steps.resolve.outputs.mode }}
-          BEFORE_SHA: ${{ steps.prepare.outputs.before_sha }}
-          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
-          BUILT_AFTER_SHA: ${{ steps.prepare.outputs.built_after_sha }}
-          CAPTURE_FAILED: ${{ (steps.capture_before.outcome != 'success' || steps.capture_after.outcome != 'success') && 'true' || 'false' }}
-          COMPARE_PASSED: ${{ steps.compare.outcome == 'success' && 'true' || 'false' }}
-        run: node scripts/vrt/write-meta.ts
-
       - name: Upload before screenshots
         if: always()
         uses: actions/upload-artifact@v7
@@ -157,29 +146,36 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
 
-      - name: Upload diff screenshots
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: vrt-diff
-          path: vrt-output/report/images/**/diff.png
-          retention-days: 14
-          if-no-files-found: ignore
-
+      # archive: false は単一ファイルを zip せずに上げる。artifact の名前はファイル名（vrt-report.html）になる。
       - name: Upload report
+        id: upload_report
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: vrt-report
-          path: vrt-output/report/
+          path: vrt-output/report/vrt-report.html
+          archive: false
           retention-days: 14
           if-no-files-found: ignore
 
-      - name: Upload meta
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: vrt-meta
-          path: vrt-output/meta.json
-          retention-days: 14
-          if-no-files-found: error
+      - name: Render comment
+        if: always() && env.CAN_COMMENT == 'true' && steps.resolve.outcome == 'success'
+        env:
+          PR_NUMBER: ${{ steps.resolve.outputs.pr_number }}
+          BEFORE_SHA: ${{ steps.prepare.outputs.before_sha }}
+          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
+          CAPTURE_FAILED: ${{ (steps.capture_before.outcome != 'success' || steps.capture_after.outcome != 'success') && 'true' || 'false' }}
+          SUMMARY_PATH: vrt-output/report/summary.json
+          COMMENT_BODY_FILE: vrt-output/comment.md
+          REPORT_URL: ${{ steps.upload_report.outputs.artifact-url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node scripts/vrt/render-comment.ts
+
+      - name: Comment on pull request
+        if: always() && env.CAN_COMMENT == 'true' && steps.resolve.outcome == 'success'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ steps.resolve.outputs.pr_number }}
+          COMMENT_BODY_FILE: vrt-output/comment.md
+        run: bash scripts/vrt/post-comment.sh

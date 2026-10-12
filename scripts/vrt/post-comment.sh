@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# PR に VRT の結果を書く。同じ印のコメントがあれば更新する。
+# PR に VRT の結果を書く。bot が書いた同じ印のコメントがあれば更新する。
+# UPDATE_ONLY=1 のときは、更新できるコメントがなければ何も書かない。
 set -euo pipefail
 
 repo="${REPO:?}"
@@ -27,14 +28,16 @@ esac
 
 ids=$(
   gh api --paginate "repos/${repo}/issues/${pr}/comments" \
-    --jq '.[] | select(.body | contains("<!-- vrt-report -->")) | .id'
+    --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | contains("<!-- vrt-report -->"))) | .id'
 )
 existing=${ids%%$'\n'*}
 
 if [[ -n "$existing" ]]; then
   gh api --method PATCH "repos/${repo}/issues/comments/${existing}" \
-    -f "body=@${body_file}" >/dev/null
+    -F "body=@${body_file}" >/dev/null
+elif [[ "${UPDATE_ONLY:-}" == "1" ]]; then
+  printf '更新できるコメントがありません\n'
 else
   gh api --method POST "repos/${repo}/issues/${pr}/comments" \
-    -f "body=@${body_file}" >/dev/null
+    -F "body=@${body_file}" >/dev/null
 fi

@@ -23,7 +23,7 @@ process.stdout.write(`${line}\n`);
 if (process.env.GITHUB_STEP_SUMMARY) {
   appendFileSync(
     process.env.GITHUB_STEP_SUMMARY,
-    `## 見た目の比較\n\n${line}\n\nレポートの URL は、公開ワークフローが PR に付けます。\n`,
+    `## 見た目の比較\n\n${line}\n\n比較レポート（HTML）は artifact \`vrt-report.html\` にあります。\n`,
   );
 }
 process.exit(summary.passed ? 0 : 1);

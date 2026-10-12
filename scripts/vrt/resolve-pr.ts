@@ -14,8 +14,7 @@ export type PullRequestView = {
 export type CheckoutPlan = {
   prNumber: number;
   prUrl: string;
-  mode: "open" | "merged";
-  beforeSha: string;
+  baseSha: string;
   headSha: string;
   mergeCommitSha: string;
 };
@@ -38,8 +37,7 @@ export function decideShas(input: {
       prUrl:
         input.pullRequestUrl ??
         `https://github.com/${input.repository}/pull/${String(input.prNumber)}`,
-      mode: "open",
-      beforeSha: assertSha(input.baseSha ?? "", "base"),
+      baseSha: assertSha(input.baseSha ?? "", "base"),
       headSha: assertSha(input.headSha ?? "", "head"),
       mergeCommitSha: "",
     };
@@ -58,17 +56,15 @@ export function decideShas(input: {
     return {
       prNumber: input.prNumber,
       prUrl: view.url,
-      mode: "merged",
-      beforeSha: "",
-      headSha: "",
+      baseSha: "",
+      headSha: assertSha(view.headRefOid, "head"),
       mergeCommitSha: assertSha(view.mergeCommitOid, "merge commit"),
     };
   }
   return {
     prNumber: input.prNumber,
     prUrl: view.url,
-    mode: "open",
-    beforeSha: assertSha(view.baseRefOid, "base"),
+    baseSha: assertSha(view.baseRefOid, "base"),
     headSha: assertSha(view.headRefOid, "head"),
     mergeCommitSha: "",
   };
@@ -160,8 +156,7 @@ if (isCli) {
     const lines = [
       `pr_number=${String(plan.prNumber)}`,
       `pr_url=${plan.prUrl}`,
-      `mode=${plan.mode}`,
-      `before_sha=${plan.beforeSha}`,
+      `base_sha=${plan.baseSha}`,
       `head_sha=${plan.headSha}`,
       `merge_commit_sha=${plan.mergeCommitSha}`,
       "",
@@ -170,8 +165,7 @@ if (isCli) {
   } else {
     outputLine("pr_number", String(plan.prNumber));
     outputLine("pr_url", plan.prUrl);
-    outputLine("mode", plan.mode);
-    outputLine("before_sha", plan.beforeSha);
+    outputLine("base_sha", plan.baseSha);
     outputLine("head_sha", plan.headSha);
     outputLine("merge_commit_sha", plan.mergeCommitSha);
   }

@@ -83,11 +83,13 @@ test.skip(browserName === "webkit", "WebKit lacks clipboard API support");
 
 ## 見た目の比較（VRT）
 
-`.github/workflows/vrt.yml` が PR と手動実行で動く。手動実行の入力は PR 番号。変更前・変更後の画面をその場でビルドして Playwright で撮り、画素比較する。画像は `vrt-output/`（gitignore）と Actions の artifact（`vrt-before`、`vrt-after`、`vrt-diff`、`vrt-report`）にだけ置く。スナップショットはリポジトリにコミットしない。
+`.github/workflows/vrt.yml` が PR と手動実行で動く。手動実行の入力は PR 番号。変更前・変更後の画面をその場でビルドして Playwright で撮り、画素比較する（1 画素でも違えば失敗）。画像は `vrt-output/`（gitignore）と Actions の artifact（`vrt-before`、`vrt-after`、`vrt-report.html`）にだけ置く。スナップショットはリポジトリにコミットしない。
 
-保持は 14 日。期限が切れても、保存済みの画像は使わず、PR 番号から SHA を引き直して同じ比較をやり直す。開いている PR は base と、head にその base をマージしたビルド。マージ済みならマージコミットと、その第一親（マージ直前）を比べる。
+変更前は PR の head と base の `git merge-base`（PR の分岐点）、変更後は PR の head。base が先に進んでいても、PR 自身の変更だけが差分になる。マージ済みの PR は、マージ直前の main（マージコミットの第一親）を base として同じ式で求める。
 
-結果の HTML は `.github/workflows/vrt-publish.yml` が GitHub Pages の `/vrt/runs/<run-id>/` に載せ、URL を PR コメントへ書く。本番デプロイ（`gh-pages-deploy.yml`）は既存の `/vrt/` を消さない。
+結果は単一の HTML（`vrt-report.html`。画像は埋め込み済みで、差分のある画面だけ載る）を `archive: false` で artifact に上げ、同じジョブが artifact の URL を PR コメントへ書く。Pages には載せない。コメントは同じ印の bot コメントがあれば更新する。fork と Dependabot の PR は書き込めないのでコメントしない。
+
+保持は 14 日。PR がマージされると `.github/workflows/vrt-cleanup.yml` がその PR の artifact を消し、コメントを案内に書き換える。消えたあとは、Actions の Visual Regression に PR 番号を渡して手動実行すると、保存済みの画像を使わず SHA を引き直して比較をやり直す。撮影の定義（`tests/vrt/vrt.spec.ts`）は実行時の main のものを使う。
 
 撮影シーンは `tests/vrt/vrt.spec.ts`。通常の E2E では `testIgnore` により走らない。
 
