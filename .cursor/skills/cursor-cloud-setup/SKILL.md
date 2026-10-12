@@ -30,7 +30,7 @@ description: >-
 
 1. nvm を読み込み、`.node-version` の Node（`24.21.0`）を入れて使う
 2. nvm の Node を `PATH` の先頭に置く（非ログインシェルで `/exec-daemon/node` の v22 を避ける）
-3. `node_modules/.bin/vp` があることを確認する（無ければ corepack で pnpm `11.22.0` を用意する）
+3. `node_modules/.bin/vp` があることを確認する（無ければ corepack で pnpm `12.12.1` を用意する）
 4. `vp install` を実行する
 5. `vp exec playwright install --with-deps chromium webkit` を実行する
 
