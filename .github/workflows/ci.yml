@@ -126,7 +126,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # main への push では、test と lint が成功してから GitHub Pages へデプロイする。
-  # PR ではデプロイしない。同じ内容の出し直しは gh-pages-deploy.yml の手動実行。
+  # レシピ追加だけの PR は recipe-auto-merge.yml が squash マージし、その push でここがデプロイする。
+  # それ以外の PR ではデプロイしない。同じ内容の出し直しは gh-pages-deploy.yml の手動実行。
   pages:
     name: Deploy to GitHub Pages
     needs: [test, lint]
