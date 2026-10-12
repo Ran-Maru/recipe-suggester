@@ -21,7 +21,7 @@ const SMALL_TO_LARGE_KANA: Record<string, string> = {
 };
 
 /** Normalize text for partial match (katakana → hiragana, ignore dakuten/handakuten, small kana, spaces). */
-export function normalizeForSearch(text: string): string {
+function normalizeForSearch(text: string): string {
   return text
     .toLowerCase()
     .replace(/[\u30a1-\u30f6]/g, (char) =>
