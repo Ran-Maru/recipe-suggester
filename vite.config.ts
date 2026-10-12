@@ -161,6 +161,7 @@ export default defineConfig({
           "src/**/*.browser.test.tsx",
           "src/test/**",
           "scripts/**/*.test.ts",
+          "workers/**/*.test.ts",
         ],
         plugins: ["vitest"],
         rules: {
@@ -213,7 +214,11 @@ export default defineConfig({
         extends: true,
         test: {
           name: "unit",
-          include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
+          include: [
+            "src/**/*.test.ts",
+            "scripts/**/*.test.ts",
+            "workers/**/*.test.ts",
+          ],
           environment: "node",
         },
       },

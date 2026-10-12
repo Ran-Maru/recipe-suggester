@@ -1,0 +1,184 @@
+name: Visual Regression
+
+run-name: 見た目の比較 #${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "比較する PR 番号"
+        required: true
+        type: string
+
+# 書き込みは PR コメントだけ。fork と Dependabot の PR ではトークンが読み取り専用になるので、コメントは付けない。
+# Cloudflare への secret は、載せるステップだけに渡す。PR のコードをビルドするステップには渡さない。
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: vrt-${{ github.event.pull_request.number || github.event.inputs.pr_number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CAN_COMMENT: ${{ github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: voidzero-dev/setup-vp@v1.21.1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+          run-install: true
+
+      - name: Resolve pull request
+        id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/vrt/resolve-pr.ts
+
+      - name: Install Japanese fonts
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+
+      # ci.yml と同じく、ブラウザ本体はキャッシュし、OS パッケージは毎回入れる。
+      - name: Resolve Playwright version
+        id: playwright-version
+        run: |
+          version="$(vp exec playwright --version)"
+          version="${version#Version }"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+.][0-9A-Za-z.]+)?$ ]]; then
+            echo "Playwright のバージョンを読めませんでした: ${version}" >&2
+            exit 1
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Playwright browsers
+        id: playwright-browsers-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-${{ runner.arch }}-playwright-${{ steps.playwright-version.outputs.version }}
+
+      - name: Install Playwright Browsers
+        run: |
+          set -euo pipefail
+          deps_log="$RUNNER_TEMP/playwright-deps.log"
+          vp exec playwright install-deps chromium webkit > "$deps_log" 2>&1 &
+          deps_pid=$!
+          install_status=0
+          vp exec playwright install chromium webkit || install_status=$?
+          deps_status=0
+          wait "$deps_pid" || deps_status=$?
+          cat "$deps_log"
+          if [[ "$install_status" -ne 0 ]]; then
+            exit "$install_status"
+          fi
+          exit "$deps_status"
+
+      - name: Save Playwright browsers
+        if: success() && steps.playwright-browsers-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ steps.playwright-browsers-cache.outputs.cache-primary-key }}
+
+      - name: Build before and after
+        id: prepare
+        env:
+          PR_NUMBER: ${{ steps.resolve.outputs.pr_number }}
+          BASE_SHA: ${{ steps.resolve.outputs.base_sha }}
+          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
+          MERGE_COMMIT_SHA: ${{ steps.resolve.outputs.merge_commit_sha }}
+          BEFORE_DIR: ${{ runner.temp }}/vrt-src-before
+          AFTER_DIR: ${{ runner.temp }}/vrt-src-after
+        run: bash scripts/vrt/prepare-checkouts.sh
+
+      # 変更前の画面を基準画像として vrt-output/snapshots に書き出す。
+      - name: Capture before
+        id: capture_before
+        env:
+          VRT_MODE: update
+          VRT_PREVIEW_CWD: ${{ runner.temp }}/vrt-src-before
+          VRT_OUT_DIR: ${{ github.workspace }}/vrt-output
+        run: bash scripts/vrt/run-playwright.sh
+
+      # 変更後の画面を基準画像と比べる。画素が 1 つでも違えば失敗し、HTML レポートを出す。
+      - name: Compare after
+        id: compare
+        if: steps.capture_before.outcome == 'success'
+        env:
+          VRT_MODE: compare
+          VRT_PREVIEW_CWD: ${{ runner.temp }}/vrt-src-after
+          VRT_OUT_DIR: ${{ github.workspace }}/vrt-output
+        run: bash scripts/vrt/run-playwright.sh
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: vrt-report
+          path: vrt-output/report/
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Check Cloudflare settings
+        id: cloudflare
+        if: always()
+        env:
+          VRT_WORKER_URL: ${{ vars.VRT_WORKER_URL }}
+          VRT_UPLOAD_TOKEN: ${{ secrets.VRT_UPLOAD_TOKEN }}
+        run: |
+          if [[ -n "$VRT_WORKER_URL" && -n "$VRT_UPLOAD_TOKEN" ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "VRT_WORKER_URL と VRT_UPLOAD_TOKEN がないので、Cloudflare には載せません（fork と Dependabot の PR、または未設定）。"
+          fi
+
+      - name: Upload report to Cloudflare
+        id: publish
+        if: always() && steps.cloudflare.outputs.enabled == 'true' && hashFiles('vrt-output/report/index.html') != ''
+        env:
+          VRT_WORKER_URL: ${{ vars.VRT_WORKER_URL }}
+          VRT_UPLOAD_TOKEN: ${{ secrets.VRT_UPLOAD_TOKEN }}
+          REPORT_DIR: vrt-output/report
+          PR_NUMBER: ${{ steps.resolve.outputs.pr_number }}
+          RUN_ID: ${{ github.run_id }}
+        run: bash scripts/vrt/upload-report.sh
+
+      - name: Render comment
+        if: always() && env.CAN_COMMENT == 'true' && steps.resolve.outcome == 'success'
+        env:
+          PR_NUMBER: ${{ steps.resolve.outputs.pr_number }}
+          BEFORE_SHA: ${{ steps.prepare.outputs.before_sha }}
+          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
+          CAPTURE_FAILED: ${{ (steps.prepare.outcome != 'success' || steps.capture_before.outcome != 'success') && 'true' || 'false' }}
+          RESULTS_PATH: vrt-output/results.json
+          COMMENT_BODY_FILE: vrt-output/comment.md
+          REPORT_URL: ${{ steps.publish.outputs.report_url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node scripts/vrt/render-comment.ts
+
+      - name: Comment on pull request
+        if: always() && env.CAN_COMMENT == 'true' && steps.resolve.outcome == 'success'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ steps.resolve.outputs.pr_number }}
+          COMMENT_BODY_FILE: vrt-output/comment.md
+        run: bash scripts/vrt/post-comment.sh

@@ -1,0 +1,17 @@
+{
+  "name": "recipe-suggester-vrt",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "recipe-suggester-vrt",
+    },
+  ],
+  "vars": {
+    "RETENTION_DAYS": "14",
+  },
+  "triggers": {
+    "crons": ["17 3 * * *"],
+  },
+}

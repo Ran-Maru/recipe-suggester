@@ -27,6 +27,8 @@
     "scripts/dangerous-command-policy.test.ts",
     "scripts/recipe-additions-only.ts",
     "scripts/recipe-additions-only.test.ts",
-    "scripts/merge-recipe-additions-pr.test.ts"
+    "scripts/merge-recipe-additions-pr.test.ts",
+    "scripts/vrt/**/*.ts",
+    "workers/**/*.ts"
   ]
 }
