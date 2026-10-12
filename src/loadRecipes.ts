@@ -10,11 +10,11 @@ export type OriginalRecipe = {
   paragraphs: readonly string[];
 };
 
-export function familyRecipeUrl(id: string): string {
+function familyRecipeUrl(id: string): string {
   return `./family-recipe/${id}`;
 }
 
-export function toCatalogRecipe(recipe: OriginalRecipe): Recipe {
+function toCatalogRecipe(recipe: OriginalRecipe): Recipe {
   return {
     title: recipe.title,
     kana: recipe.kana,

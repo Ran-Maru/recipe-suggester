@@ -4,10 +4,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, realpathSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
-export const RECIPE_PATHS = [
-  "src/mapping.json",
-  "src/original-recipes.json",
-] as const;
+const RECIPE_PATHS = ["src/mapping.json", "src/original-recipes.json"] as const;
 
 export const OPT_OUT_LABEL = "no-auto-merge";
 
@@ -71,7 +68,7 @@ function stableStringify(value: unknown): string {
   return JSON.stringify(value) ?? '"undefined"';
 }
 
-export function jsonEqual(left: unknown, right: unknown): boolean {
+function jsonEqual(left: unknown, right: unknown): boolean {
   return stableStringify(left) === stableStringify(right);
 }
 
@@ -350,7 +347,7 @@ function gitOutput(args: readonly string[]): string {
   return execFileSync("git", args, { encoding: "utf8" });
 }
 
-export function readGitDiff(baseSha: string, headSha: string): DiffDecision {
+function readGitDiff(baseSha: string, headSha: string): DiffDecision {
   assertSha(baseSha, "base");
   assertSha(headSha, "head");
   const output = gitOutput([
