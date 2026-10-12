@@ -104,7 +104,11 @@ function readLog(file: string): string {
   }
 }
 
-function run(fixture: Fixture, pulls: unknown) {
+function run(
+  fixture: Fixture,
+  pulls: unknown,
+  options: { mergeExit?: number; prState?: string } = {},
+) {
   const bin = path.join(fixture.root, "bin");
   mkdirSync(bin);
   const pullsFile = path.join(fixture.root, "pulls.json");
@@ -126,6 +130,10 @@ if [[ "\${1:-}" == "api" ]]; then
 fi
 if [[ "\${1:-}" == "pr" && "\${2:-}" == "merge" ]]; then
   printf '%s\\n' "$*" >> "\${MERGE_LOG:?}"
+  exit "\${MERGE_EXIT:-0}"
+fi
+if [[ "\${1:-}" == "pr" && "\${2:-}" == "view" ]]; then
+  printf '%s\\n' "\${PR_STATE:?}"
   exit 0
 fi
 if [[ "\${1:-}" == "workflow" && "\${2:-}" == "run" ]]; then
@@ -149,6 +157,10 @@ exit 1
       PULLS_FILE: pullsFile,
       MERGE_LOG: mergeLog,
       DISPATCH_LOG: dispatchLog,
+      ...(options.mergeExit === undefined
+        ? {}
+        : { MERGE_EXIT: String(options.mergeExit) }),
+      ...(options.prState === undefined ? {} : { PR_STATE: options.prState }),
     },
   });
   return {
@@ -175,6 +187,39 @@ describe("merge-recipe-additions-pr.sh", () => {
       expect(merged).toContain("--squash");
       expect(merged).toContain(`--match-head-commit ${fixture.headSha}`);
       expect(result.stdout).toContain("マージします");
+    } finally {
+      rmSync(fixture.root, { recursive: true, force: true });
+    }
+  });
+
+  it("マージ済みなら CI の起動まで進む", () => {
+    const fixture = createFixture(appendRecipe);
+    try {
+      const { result, merged, dispatched } = run(fixture, [pull(fixture)], {
+        mergeExit: 1,
+        prState: "MERGED",
+      });
+      expect(result.status, result.stderr).toBe(0);
+      expect(merged).toContain("pr merge 10");
+      expect(dispatched).toContain(
+        `workflow run ci.yml --repo ${repo} --ref main`,
+      );
+      expect(result.stdout).toContain("マージ済み");
+    } finally {
+      rmSync(fixture.root, { recursive: true, force: true });
+    }
+  });
+
+  it("マージに失敗し、まだ開いているときは CI を起動しない", () => {
+    const fixture = createFixture(appendRecipe);
+    try {
+      const { result, dispatched } = run(fixture, [pull(fixture)], {
+        mergeExit: 1,
+        prState: "OPEN",
+      });
+      expect(result.status).not.toBe(0);
+      expect(dispatched).toBe("");
+      expect(result.stderr).toContain("マージできませんでした");
     } finally {
       rmSync(fixture.root, { recursive: true, force: true });
     }

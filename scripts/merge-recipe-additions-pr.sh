@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # CI が成功した「レシピ追加だけ」の PR を squash マージする。
 # マージ後は main の CI を手動起動する。成功すると ci.yml の pages がデプロイする。
+# マージコマンドが失敗しても、PR がマージ済みなら起動まで進む。
 # このスクリプトは既定ブランチのものを使う。PR ブランチのコードは実行しない。
 # カレントディレクトリは、ベース側を checkout した git リポジトリであること。
 set -euo pipefail
@@ -120,7 +121,19 @@ if [[ "$diff_ok" != "true" ]]; then
 fi
 
 printf '%s\n' "レシピの追加だけなので、PR #${number} をマージします。"
-gh pr merge "$number" --repo "$REPO" --squash --match-head-commit "$HEAD_SHA"
+merge_status=0
+gh pr merge "$number" --repo "$REPO" --squash --match-head-commit "$HEAD_SHA" || merge_status=$?
+
+# 起動だけ失敗したジョブを再実行すると、マージは済みで merge が失敗する。
+# そのときも main の CI は起動する。未マージの失敗では起動しない。
+if [[ "$merge_status" -ne 0 ]]; then
+  state=$(gh pr view "$number" --repo "$REPO" --json state --jq .state)
+  if [[ "$state" != "MERGED" ]]; then
+    printf '%s\n' "PR #${number} をマージできませんでした。" >&2
+    exit "$merge_status"
+  fi
+  printf '%s\n' "PR #${number} はマージ済みです。main の CI を起動します。"
+fi
 
 # GITHUB_TOKEN のマージでは push が発火しないため、main の CI（test と lint のあとに pages）を手動で起動する。
 printf '%s\n' "main の CI を起動してデプロイします。"

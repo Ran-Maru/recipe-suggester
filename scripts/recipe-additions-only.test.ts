@@ -352,5 +352,7 @@ describe("workflow name", () => {
     expect(ci).toMatch(/^ {2}workflow_dispatch:/m);
     expect(ci).toContain("github.event_name == 'workflow_dispatch'");
     expect(autoMerge).toContain("actions: write");
+    expect(autoMerge).toContain("マージ後に ci.yml を手動起動し");
+    expect(autoMerge).not.toContain("push の CI 成功後");
   });
 });

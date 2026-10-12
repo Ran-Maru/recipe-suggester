@@ -1,9 +1,9 @@
 # レシピ追加だけの PR を、CI 成功後に main へ squash マージする。
-# 追加は各 JSON 配列の末尾だけ。デプロイ自体は ci.yml の pages が、その main への push の CI 成功後に行う。
+# 追加は各 JSON 配列の末尾だけ。マージ後に ci.yml を手動起動し、pages がデプロイする。
 #
 # 判定スクリプトは main のものを使う。PR のコードは checkout も実行もしない。
 # workflow_run は既定ブランチのワークフロー定義で動く。
-# GITHUB_TOKEN によるマージでは main への push で CI が起動しない。マージ後に ci.yml を手動起動し、デプロイまで行う。
+# GITHUB_TOKEN によるマージでは main への push で CI が起動しない。
 # 下書きはマージしない。Ready for review にしたあとは、CI を再実行する。
 name: Auto-merge recipe additions
 
