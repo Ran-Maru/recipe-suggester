@@ -18,7 +18,7 @@ fi
 VP="node_modules/.bin/vp"
 if [[ ! -x "${VP}" ]]; then
   corepack enable
-  corepack prepare pnpm@11.22.0 --activate
+  corepack prepare pnpm@12.12.1 --activate
   pnpm install
 fi
 
