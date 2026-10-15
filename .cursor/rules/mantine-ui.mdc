@@ -2,6 +2,7 @@
 description: Mantine、CSS Modules、Phosphor アイコンの使い方。src の tsx と css を編集するときに従う。
 globs: "src/**/*.{tsx,css}"
 alwaysApply: false
+paths: "src/**/*.{tsx,css}"
 ---
 
 # UI

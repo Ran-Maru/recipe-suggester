@@ -124,9 +124,9 @@ vp install
 
 ## バージョン表記の追随
 
-ピンを変えたら、同じ番号が書いてある `.cursor/skills/cursor-cloud-setup/SKILL.md` も更新する。
+ピンを変えたら、同じ番号が書いてある `.agents/skills/cursor-cloud-setup/SKILL.md` も更新する。
 
-`AGENTS.md` はどの作業でどのスキルを読むかの索引だけなので、バージョン番号は書かない。`CLAUDE.md` はそのシンボリックリンクで、Cursor は `.cursorignore` で無視する。
+`AGENTS.md` はどの作業でどのスキルを読むかの索引だけなので、バージョン番号は書かない。Claude Code もこのファイルを読む。`.claude/skills` と `.claude/rules` は実体へのリンクで、Cursor は `.cursorignore` で読まない。
 
 ## 検証
 
