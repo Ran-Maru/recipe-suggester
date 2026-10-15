@@ -38,7 +38,7 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
 - catalog の `vite-plus` と `vite`（`@voidzero-dev/vite-plus-core`）が同じバージョンか、`pnpm-workspace.yaml` の `vitest@*` が `vp toolchain vitest` のバージョンかを確認する。
 - 依存の入れ直しは `vp install`。`vp update` は依存全体が上がる。
 
-詳細は [`.cursor/skills/upgrade-toolchain/SKILL.md`](.cursor/skills/upgrade-toolchain/SKILL.md) を参照する。
+詳細は [`.agents/skills/upgrade-toolchain/SKILL.md`](.agents/skills/upgrade-toolchain/SKILL.md) を参照する。
 
 ## Node.jsのアップデート方法
 

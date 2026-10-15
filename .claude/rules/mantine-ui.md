@@ -1,0 +1,1 @@
+../../.cursor/rules/mantine-ui.mdc

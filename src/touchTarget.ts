@@ -1,6 +1,6 @@
 /**
  * Mobile-first tap-target and icon sizes.
- * See `.cursor/skills/mobile-touch-targets/SKILL.md`.
+ * See `.agents/skills/mobile-touch-targets/SKILL.md`.
  */
 
 /** Apple HIG / WCAG 2.5.5 minimum control size, in CSS pixels. */

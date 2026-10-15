@@ -1,0 +1,1 @@
+../../.cursor/rules/mobile-touch-targets.mdc

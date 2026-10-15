@@ -43,4 +43,6 @@ release. Add a tool name to select part of the graph. For example, run
 | `natural-japanese`                                                       | 日本語を自然に書く・直す                                                                                 |
 | `upgrade-toolchain`                                                      | Vite Plus、Node.js、pnpm、Vitest ピンのバージョンアップ                                                  |
 
-スキルは `.cursor/skills/` と `.agents/skills/` にある。`.cursor/rules/` は `alwaysApply: false` で、上の glob のファイルを触るときだけ付く。
+スキルの実体は `.agents/skills/` にある。Claude Code は `.claude/skills`（`.agents/skills` へのシンボリックリンク）から同じディレクトリを読む。
+
+`.cursor/rules/` は `alwaysApply: false` で、上の glob のファイルを触るときだけ付く。Claude Code は同じファイルを `.claude/rules/*.md` のシンボリックリンクから、`paths` が一致するときだけ読む。
