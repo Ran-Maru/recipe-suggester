@@ -3,5 +3,7 @@ export function toAbsoluteUrl(url: string): string {
 }
 
 export async function copyUrl(url: string) {
-  await navigator.clipboard.writeText(toAbsoluteUrl(url));
+  // Playwright の GitHub reporter 表示を見るための一時的な失敗。
+  // URL ではなく、https:// でもアプリの origin でも始まらない文字列を書く。
+  await navigator.clipboard.writeText(`not-a-url:${toAbsoluteUrl(url)}`);
 }
