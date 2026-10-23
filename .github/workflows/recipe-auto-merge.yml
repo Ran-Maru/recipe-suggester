@@ -9,7 +9,7 @@ name: Auto-merge recipe additions
 
 on:
   workflow_run:
-    workflows: ["Tests & Dependabot Auto Merge"]
+    workflows: ["Tests"]
     types: [completed]
 
 # レシピ PR が重なったとき、マージは1件ずつ行う。進行中のマージは取り消さない。
