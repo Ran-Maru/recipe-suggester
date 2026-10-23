@@ -17,8 +17,17 @@ fi
 
 VP="node_modules/.bin/vp"
 if [[ ! -x "${VP}" ]]; then
+  # vp is not installed yet. Renovate updates devEngines.packageManager.version,
+  # and this fallback reads that pin instead of hardcoding it.
   corepack enable
-  corepack prepare pnpm@12.12.1 --activate
+  PNPM_VERSION="$(
+    node -p 'JSON.parse(require("fs").readFileSync("package.json","utf8")).devEngines.packageManager.version'
+  )"
+  if [[ ! "${PNPM_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+([+][A-Za-z0-9.]+)?$ ]]; then
+    echo "pnpm のバージョンを読めませんでした: ${PNPM_VERSION}" >&2
+    exit 1
+  fi
+  corepack prepare "pnpm@${PNPM_VERSION}" --activate
   pnpm install
 fi
 

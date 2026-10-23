@@ -114,7 +114,7 @@ CI と GitHub Pages は `voidzero-dev/setup-vp` の `node-version-file: ".node-v
 vp env list-remote pnpm
 ```
 
-`package.json` の `devEngines.packageManager.version` を書き換え、`onFail` は `"download"` のままにする。続けて同じバージョンを `.cursor/install.sh` の `corepack prepare pnpm@...` に書く。これは `node_modules/.bin/vp` がまだ無いときのフォールバックである。
+`package.json` の `devEngines.packageManager.version` を書き換え、`onFail` は `"download"` のままにする。`.cursor/install.sh` はそのフィールドを読んで corepack に渡す。版はスクリプトに書かない。
 
 ```bash
 vp install
@@ -124,7 +124,7 @@ vp install
 
 ## バージョン表記の追随
 
-ピンを変えたら、同じ番号が書いてある `.agents/skills/cursor-cloud-setup/SKILL.md` も更新する。
+`.agents/skills/cursor-cloud-setup/SKILL.md` には Node と pnpm の版番号を書かない。正は `.node-version` と `package.json` の `devEngines.packageManager.version` である。
 
 `AGENTS.md` はどの作業でどのスキルを読むかの索引だけなので、バージョン番号は書かない。Claude Code もこのファイルを読む。`.claude/skills` と `.claude/rules` は実体へのリンクで、Cursor は `.cursorignore` で読まない。
 

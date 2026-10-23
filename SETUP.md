@@ -48,7 +48,7 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
 ## pnpmのアップデート方法
 
 - `package.json` の `devEngines.packageManager.version` を変更する。
-- 同じバージョンを [`.cursor/install.sh`](.cursor/install.sh) の `corepack prepare pnpm@...` にも書く（`node_modules/.bin/vp` がまだ無いときのフォールバック）。
+- [`.cursor/install.sh`](.cursor/install.sh) はそのフィールドを読む。同じ番号をスクリプトに書かない。
 - `vp install` を実行する。
 
 ## npm Packages, Action(GitHub Actions)のアップデート方法
