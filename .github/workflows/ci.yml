@@ -1,4 +1,4 @@
-name: Tests & Dependabot Auto Merge
+name: Tests
 on:
   push:
     branches: [main]
@@ -94,11 +94,12 @@ jobs:
           export PATH="${LINT_TOOL_DIR}:${PATH}"
           bash scripts/lint-shell-and-workflows.sh
 
-  # ブランチの保護ルール（特定CI Checkを必須化） + `gh pr merge --auto --merge "$PR_URL"` で対応する方法もあった。
-  # しかしブランチ保護ルールはPrivate Repositoryでは有料プランでしか使えないため、この方式を採用した。
-  dependabot-auto-merge:
+  # ブランチ保護は Private Repository では有料プランでしか使えない。
+  # Renovate の automerge は必須チェックが無いと CI 完了前にマージし得るので、ここで待つ。
+  # hold は vite-plus、oxc-transform-react、major に付く（renovate.json5）。
+  dependency-auto-merge:
     needs: [test, lint]
-    if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'
+    if: github.actor == 'renovate[bot]' && github.event_name == 'pull_request'
     runs-on: ubuntu-slim
     timeout-minutes: 5
 
@@ -107,25 +108,18 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Dependabot metadata取得
-        id: metadata
-        uses: dependabot/fetch-metadata@v3
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-
-      # vite-plus グループはパッチでも型・設定 API が壊れやすい（dependabot.yml / #63）。
-      # && は || より優先されるため、update-type の判定は括弧でまとめる。
-      - name: マージ実行(minor/patchのみ。vite-plus グループは除く)
-        if: |
-          steps.metadata.outputs.dependency-group != 'vite-plus' &&
-          (
-            steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
-            steps.metadata.outputs.update-type == 'version-update:semver-minor'
-          )
-        run: gh pr merge --squash "$PR_URL"
+      - name: hold が無ければ squash マージする
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          has_hold="$(gh pr view "$PR_URL" --json labels --jq 'any(.labels[]; .name == "hold")')"
+          if [[ "${has_hold}" == "true" ]]; then
+            echo "hold ラベルがあるためマージしません"
+            exit 0
+          fi
+          gh pr merge --squash "$PR_URL"
 
   # main への push では、test と lint が成功してから GitHub Pages へデプロイする。
   # レシピ追加だけの PR は recipe-auto-merge.yml が squash マージし、main を指定して CI を手動起動する。
