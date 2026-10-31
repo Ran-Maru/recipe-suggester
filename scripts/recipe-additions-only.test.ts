@@ -332,8 +332,8 @@ describe("workflow name", () => {
       "utf8",
     );
     const matched = /^name: (.+)$/m.exec(ci);
-    expect(matched?.[1]).toBe("Tests & Dependabot Auto Merge");
-    expect(autoMerge).toContain('"Tests & Dependabot Auto Merge"');
+    expect(matched?.[1]).toBe("Tests");
+    expect(autoMerge).toContain('"Tests"');
     expect(autoMerge).toContain("actions/checkout@v7");
     expect(autoMerge).toContain("ref: main");
     expect(autoMerge).not.toContain("pull_request_target");

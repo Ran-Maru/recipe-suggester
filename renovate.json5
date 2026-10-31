@@ -1,0 +1,86 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:recommended"],
+  timezone: "Asia/Tokyo",
+  // ホスト版は毎時ちょうどには来ない。金曜 20:00–23:59（日本時間）に窓を開ける。
+  schedule: ["* 20-23 * * 5"],
+  // Dependabot は範囲に収まる更新でも下限を書き換えていた。ピンはそのままピンで上がる。
+  rangeStrategy: "bump",
+  minimumReleaseAge: "3 days",
+  // ブランチ保護が無い。Renovate の automerge は CI 完了前にマージし得るので使わない。
+  // ci.yml が renovate[bot] の PR を、hold ラベルが無いときだけ squash する。
+  automerge: false,
+  labels: ["dependencies"],
+  // 待ち時間の既定は null。脆弱性 PR に 3 日は掛けない。
+  vulnerabilityAlerts: {
+    enabled: true,
+    minimumReleaseAge: null,
+  },
+  // #100: 受け皿グループに破壊的更新が混ざると、週次のひとまとまりが落ちる。
+  // PR は依存ごと、または下のグループごとに分ける。
+  packageRules: [
+    {
+      description: "minor/patch は CI が squash する",
+      matchUpdateTypes: ["minor", "patch"],
+      addLabels: ["automerge"],
+    },
+    {
+      description: "major は人が見る",
+      matchUpdateTypes: ["major"],
+      addLabels: ["hold"],
+    },
+    {
+      description: "Node は 24 系だけ。26 は allowedVersions を付け替えてから",
+      matchManagers: ["nodenv"],
+      matchPackageNames: ["node"],
+      allowedVersions: "^24",
+    },
+    {
+      description: "@types/node の major は Node の major と人が一緒に上げる",
+      matchPackageNames: ["@types/node"],
+      matchUpdateTypes: ["major"],
+      enabled: false,
+    },
+    {
+      // パッチでも型と設定 API が壊れ得る（#63）。vp migrate は走らない。
+      description: "vite-plus はパッチでも自動マージしない",
+      matchPackageNames: [
+        "vite-plus",
+        "vite",
+        "@voidzero-dev/vite-plus-core",
+        "vitest",
+        "vitest-browser-react",
+        "@vitest/**",
+      ],
+      groupName: "vite-plus",
+      addLabels: ["hold"],
+    },
+    {
+      description: "0.x の oxc は minor でも壊れ得る",
+      matchPackageNames: ["oxc-transform-react"],
+      addLabels: ["hold"],
+    },
+    {
+      matchPackageNames: [
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "@vitejs/plugin-react",
+      ],
+      groupName: "react",
+    },
+    {
+      matchPackageNames: ["playwright", "@playwright/test"],
+      groupName: "playwright",
+    },
+    {
+      matchPackageNames: [
+        "typescript",
+        "typescript-7",
+        "@typescript/typescript6",
+      ],
+      groupName: "typescript",
+    },
+  ],
+}

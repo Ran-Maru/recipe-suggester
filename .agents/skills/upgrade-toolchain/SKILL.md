@@ -85,7 +85,7 @@ vp migrate --no-interactive
 
 `@vitest/browser-playwright` は `vitest@*` と同じバージョンに揃える。`playwright` と `@playwright/test` は互いのバージョンを揃える。`vitest-browser-react` は Vitest 本体とは別パッケージなので、互換を確認してから上げる。
 
-Dependabot の `vite-plus` グループ（`vite-plus`、`vite`、`vitest`、`@vitest/*`、`vitest-browser-react`）は CI の自動マージ対象外。このグループの PR を取り込むときも、catalog と `vitest@*` が同時に揃っているか見る。
+Renovate の `vite-plus` グループ（`vite-plus`、`vite`、`@voidzero-dev/vite-plus-core`、`vitest`、`@vitest/*`、`vitest-browser-react`）には `hold` が付き、CI はマージしない。Renovate は `vp migrate` を実行しない。このグループの PR を取り込むときも、catalog と `vitest@*` が同時に揃っているか見る。
 
 `vp update` は依存全体を上げる。Vite+ だけの更新では使わない。インストールは `vp install`。
 
@@ -104,7 +104,7 @@ vp env current
 
 `vp env pin <version> --target node-version --force` でも同じファイルを更新できる。`--target` を省略すると、このリポジトリでは既存の `.node-version` が更新される。`devEngines.runtime` へ書かない。
 
-Node.js のメジャーを上げたら `@types/node` のメジャーも合わせる。Dependabot は `@types/node` のメジャー更新を無視している。
+Node.js のメジャーを上げたら `@types/node` のメジャーも合わせる。Renovate は `.node-version` を 24 系（`allowedVersions: "^24"`）だけ自動更新し、`@types/node` のメジャー更新は出さない。26 へ進むときは両方を同じ PR で上げ、Vite+ と `setup-vp` が通ってから `allowedVersions` を付け替える。
 
 CI と GitHub Pages は `voidzero-dev/setup-vp` の `node-version-file: ".node-version"` を読む。ワークフローに Node のバージョンを直書きしない。
 
@@ -114,7 +114,7 @@ CI と GitHub Pages は `voidzero-dev/setup-vp` の `node-version-file: ".node-v
 vp env list-remote pnpm
 ```
 
-`package.json` の `devEngines.packageManager.version` を書き換え、`onFail` は `"download"` のままにする。続けて同じバージョンを `.cursor/install.sh` の `corepack prepare pnpm@...` に書く。これは `node_modules/.bin/vp` がまだ無いときのフォールバックである。
+`package.json` の `devEngines.packageManager.version` を書き換え、`onFail` は `"download"` のままにする。`.cursor/install.sh` はそのフィールドを読んで corepack に渡す。版はスクリプトに書かない。
 
 ```bash
 vp install
@@ -124,7 +124,7 @@ vp install
 
 ## バージョン表記の追随
 
-ピンを変えたら、同じ番号が書いてある `.agents/skills/cursor-cloud-setup/SKILL.md` も更新する。
+`.agents/skills/cursor-cloud-setup/SKILL.md` には Node と pnpm の版番号を書かない。正は `.node-version` と `package.json` の `devEngines.packageManager.version` である。
 
 `AGENTS.md` はどの作業でどのスキルを読むかの索引だけなので、バージョン番号は書かない。Claude Code もこのファイルを読む。`.claude/skills` と `.claude/rules` は実体へのリンクで、Cursor は `.cursorignore` で読まない。
 
