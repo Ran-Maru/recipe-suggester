@@ -104,7 +104,7 @@ vp env current
 
 `vp env pin <version> --target node-version --force` でも同じファイルを更新できる。`--target` を省略すると、このリポジトリでは既存の `.node-version` が更新される。`devEngines.runtime` へ書かない。
 
-Node.js のメジャーを上げたら `@types/node` のメジャーも合わせる。Renovate は `.node-version` を 24 系（`allowedVersions: "^24"`）だけ自動更新し、`@types/node` のメジャー更新は出さない。26 へ進むときは両方を同じ PR で上げ、Vite+ と `setup-vp` が通ってから `allowedVersions` を付け替える。
+Node.js のメジャーを上げたら `@types/node` のメジャーも合わせる。Renovate は `.node-version` を 26 系（`allowedVersions: "^26"`）だけ自動更新し、`@types/node` のメジャー更新は出さない。次のメジャーへ進むときは両方を同じ PR で上げ、Vite+ と `setup-vp` が通ってから `allowedVersions` を付け替える。
 
 CI と GitHub Pages は `voidzero-dev/setup-vp` の `node-version-file: ".node-version"` を読む。ワークフローに Node のバージョンを直書きしない。
 
