@@ -42,7 +42,7 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
 
 ## Node.jsのアップデート方法
 
-- 24 系は Renovate が `.node-version` を更新する。メジャーは人が上げる。
+- 26 系は Renovate が `.node-version` を更新する。メジャーは人が上げる。
 - `vp env list-remote`でインストール可能なnode.jsのバージョンを確認する。
 - .node-version に記載されている node.js のバージョンを変更してから`vp env install`を実行する。メジャーのときは `@types/node` のメジャーも合わせる。
 
@@ -56,7 +56,7 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
 
 - Renovate が作る PR のうち、`hold` が無いものは CI が squash マージする。
 - `hold` が付いた PR（vite-plus グループ、`oxc-transform-react`、major）は内容を見てからマージする。
-- Node の 24 系は `.node-version`、pnpm は `devEngines.packageManager.version` を Renovate が更新する。
+- Node の 26 系は `.node-version`、pnpm は `devEngines.packageManager.version` を Renovate が更新する。
 
 ## Zed Editorについて
 

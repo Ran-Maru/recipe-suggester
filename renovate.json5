@@ -30,10 +30,10 @@
       addLabels: ["hold"],
     },
     {
-      description: "Node は 24 系だけ。26 は allowedVersions を付け替えてから",
+      description: "Node は 26 系だけ。次のメジャーは allowedVersions を付け替えてから",
       matchManagers: ["nodenv"],
       matchPackageNames: ["node"],
-      allowedVersions: "^24",
+      allowedVersions: "^26",
     },
     {
       description: "@types/node の major は Node の major と人が一緒に上げる",
