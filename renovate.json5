@@ -2,8 +2,10 @@
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: ["config:recommended"],
   timezone: "Asia/Tokyo",
-  // ホスト版は毎時ちょうどには来ない。金曜 20:00–23:59（日本時間）に窓を開ける。
-  schedule: ["* 20-23 * * 5"],
+  // ホスト版は毎時ちょうどには来ない。毎日 20:00–23:59（日本時間）に窓を開ける。
+  schedule: ["* 20-23 * * *"],
+  // 既定は 1 時間に 2 件。窓の中で 1 回来るだけだと、1 日 2 件で止まる。
+  prHourlyLimit: 0,
   // Dependabot は範囲に収まる更新でも下限を書き換えていた。ピンはそのままピンで上がる。
   rangeStrategy: "bump",
   minimumReleaseAge: "3 days",
@@ -16,7 +18,7 @@
     enabled: true,
     minimumReleaseAge: null,
   },
-  // #100: 受け皿グループに破壊的更新が混ざると、週次のひとまとまりが落ちる。
+  // #100: 受け皿グループに破壊的更新が混ざると、ひとまとまりの PR が落ちる。
   // PR は依存ごと、または下のグループごとに分ける。
   packageRules: [
     {
