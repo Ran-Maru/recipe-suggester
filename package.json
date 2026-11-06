@@ -48,7 +48,7 @@
     "postcss-simple-vars": "^7.0.1",
     "stylelint": "^17.16.0",
     "stylelint-config-css-modules": "^4.6.0",
-    "stylelint-config-standard": "^40.0.0",
+    "stylelint-config-standard": "^41.0.0",
     "typescript": "npm:@typescript/typescript6@~6.0.2",
     "typescript-7": "npm:typescript@~7.0.2",
     "vite": "catalog:",
