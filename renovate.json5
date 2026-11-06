@@ -84,5 +84,11 @@
       ],
       groupName: "typescript",
     },
+    {
+      // 本体のメジャーはルールを増減し、standard config の peer は対応するメジャーだけを指す。
+      description: "stylelint 本体と standard config は同時に上げる",
+      matchPackageNames: ["stylelint", "stylelint-config-standard"],
+      groupName: "stylelint",
+    },
   ],
 }
