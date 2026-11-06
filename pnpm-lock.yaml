@@ -205,8 +205,8 @@ importers:
         version: 19.3.1(react@19.3.1)
     devDependencies:
       '@css-modules-kit/codegen':
-        specifier: ^1.4.0
-        version: 1.4.0(@typescript/typescript6@6.0.2)
+        specifier: ^1.4.1
+        version: 1.4.1(@typescript/typescript6@6.0.2)
       '@css-modules-kit/stylelint-plugin':
         specifier: ^1.4.0
         version: 1.4.0(@typescript/typescript6@6.0.2)(stylelint@17.16.0(@typescript/typescript6@6.0.2)(supports-color@10.2.2))
@@ -365,8 +365,8 @@ packages:
   '@cacheable/utils@2.5.0':
     resolution: {integrity: sha512-buipgOVDkkPXNR5+xBpDw7Zk2n1EvU7qBJCNUcL7rhQ//kfpOXPAvQ511Os0vpLYJ1pZnvudNytkQt2hst3wqA==}
 
-  '@css-modules-kit/codegen@1.4.0':
-    resolution: {integrity: sha512-omJi7jiIg7QEe2e7FP+SIAfSOereG/5xS38y2V3B6817gL3dwA0Yz8kLVeBJ9ovziiwdQhrnIytDUULX4jmbuQ==}
+  '@css-modules-kit/codegen@1.4.1':
+    resolution: {integrity: sha512-LbXejqzJRcSWQiYsqkMP2RmvY6CEXbQqrGuUMW3VQW5LJpUa6kJ92QKdIur74S+TtcLWxXMFFBY1ua9D3RBaLQ==}
     engines: {node: '>=22.12.0'}
     hasBin: true
     peerDependencies:
@@ -374,6 +374,12 @@ packages:
 
   '@css-modules-kit/core@1.4.0':
     resolution: {integrity: sha512-WXw8BHVvr4Tvp9Wfp1vz9hZoANq2Se5wc9V+GvDpkKY56Z5Uy5hb+o+gfD0JrvYJgUft0IHe7v4StE6370Z0HQ==}
+    engines: {node: '>=22.12.0'}
+    peerDependencies:
+      typescript: ^5.7.3 || ^6.0.0
+
+  '@css-modules-kit/core@1.4.1':
+    resolution: {integrity: sha512-adGAaE+4F6n1eVRPAa7GU6B+hTV2MeH/ACJ1MvufI/1rAdzjwgT1SujoH13y9RyRvKWBhyFYpOahPd8oZsQWug==}
     engines: {node: '>=22.12.0'}
     peerDependencies:
       typescript: ^5.7.3 || ^6.0.0
@@ -1879,10 +1885,6 @@ packages:
     resolution: {integrity: sha512-XWAtwJ6OHO+tj0EKCs0Y2UamnyOxseZWltU4x2U2wh8g4AigdjwvtUjvLP2tqkA/avxHEtzxNaqGq/YGNwckKg==}
     engines: {node: '>=18'}
 
-  chokidar@4.0.3:
-    resolution: {integrity: sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA==}
-    engines: {node: '>= 14.16.0'}
-
   chokidar@5.0.0:
     resolution: {integrity: sha512-TQMmc3w+5AxjpL8iIiwebF73dRDF4fBIieAqGn9RGCWaEVwQ6Fb2cGe31Yns0RRIzii5goJ1Y7xbMwo1TxMplw==}
     engines: {node: '>= 20.19.0'}
@@ -2529,10 +2531,6 @@ packages:
     resolution: {integrity: sha512-QNhWdt7nrgVWWQG58QuGsAR3jv3Hbe4mb4vz7w2csnHavciZJgda1CPNaldF6eVxv90ud3jUXpKlHL69gO38yw==}
     engines: {node: '>=0.10.0'}
 
-  readdirp@4.1.2:
-    resolution: {integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==}
-    engines: {node: '>= 14.18.0'}
-
   readdirp@5.1.1:
     resolution: {integrity: sha512-Kko+Y5XQ6fM+Ce3dq3m9YGxnacYZYl9cA1wZjaF3Vbry2L3i1qVg8+CAgNPsXRArPMUMCaOR7oa9Nqntc43JKA==}
     engines: {node: '>= 20.19.0'}
@@ -3049,16 +3047,24 @@ snapshots:
       hashery: 1.5.1
       keyv: 5.6.0
 
-  '@css-modules-kit/codegen@1.4.0(@typescript/typescript6@6.0.2)':
+  '@css-modules-kit/codegen@1.4.1(@typescript/typescript6@6.0.2)':
     dependencies:
-      '@css-modules-kit/core': 1.4.0(@typescript/typescript6@6.0.2)
-      chokidar: 4.0.3
+      '@css-modules-kit/core': 1.4.1(@typescript/typescript6@6.0.2)
+      chokidar: 5.0.0
       typescript: '@typescript/typescript6@6.0.2'
 
   '@css-modules-kit/core@1.4.0(@typescript/typescript6@6.0.2)':
     dependencies:
       postcss: 8.5.30
       postcss-safe-parser: 7.1.0(postcss@8.5.30)
+      postcss-selector-parser: 7.1.6
+      postcss-value-parser: 4.2.0
+      typescript: '@typescript/typescript6@6.0.2'
+
+  '@css-modules-kit/core@1.4.1(@typescript/typescript6@6.0.2)':
+    dependencies:
+      postcss: 8.5.32
+      postcss-safe-parser: 7.1.0(postcss@8.5.32)
       postcss-selector-parser: 7.1.6
       postcss-value-parser: 4.2.0
       typescript: '@typescript/typescript6@6.0.2'
@@ -4073,10 +4079,6 @@ snapshots:
 
   chai@6.3.0: {}
 
-  chokidar@4.0.3:
-    dependencies:
-      readdirp: 4.1.2
-
   chokidar@5.0.0:
     dependencies:
       readdirp: 5.1.1
@@ -4691,8 +4693,6 @@ snapshots:
       '@types/react': 19.3.0
 
   react@19.3.1: {}
-
-  readdirp@4.1.2: {}
 
   readdirp@5.1.1: {}
 
