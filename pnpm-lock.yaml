@@ -211,8 +211,8 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0(@typescript/typescript6@6.0.2)(stylelint@17.16.0(@typescript/typescript6@6.0.2)(supports-color@10.2.2))
       '@css-modules-kit/ts-plugin':
-        specifier: ^1.4.0
-        version: 1.4.0(@typescript/typescript6@6.0.2)
+        specifier: ^1.4.1
+        version: 1.4.1(@typescript/typescript6@6.0.2)
       '@playwright/test':
         specifier: 1.64.1
         version: 1.64.1
@@ -390,8 +390,8 @@ packages:
     peerDependencies:
       stylelint: ^16.0.0 || ^17.0.0
 
-  '@css-modules-kit/ts-plugin@1.4.0':
-    resolution: {integrity: sha512-1UEcintU71sgy5nxvFzzNMbMojWcjBWkokd3TNbYadwTeCx91GzsmUzd3Mkwc/F2+fW6jNpv6rVaGZ1/F98mEQ==}
+  '@css-modules-kit/ts-plugin@1.4.1':
+    resolution: {integrity: sha512-RMWxKQsIyQatpLkPt4jD/FgqDmHjwghhCGGc8sXaDzytt+6DgcO7lp4eCTQtHJ5CrJHvdX6Sf+CrSwAoz3cMvg==}
     engines: {node: '>=22.12.0'}
     peerDependencies:
       typescript: ^5.6.3 || ^6.0.0
@@ -3076,9 +3076,9 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@css-modules-kit/ts-plugin@1.4.0(@typescript/typescript6@6.0.2)':
+  '@css-modules-kit/ts-plugin@1.4.1(@typescript/typescript6@6.0.2)':
     dependencies:
-      '@css-modules-kit/core': 1.4.0(@typescript/typescript6@6.0.2)
+      '@css-modules-kit/core': 1.4.1(@typescript/typescript6@6.0.2)
       '@volar/language-core': 2.4.28
       '@volar/typescript': 2.4.28(@typescript/typescript6@6.0.2)
       typescript: '@typescript/typescript6@6.0.2'
