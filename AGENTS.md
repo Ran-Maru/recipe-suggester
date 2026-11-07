@@ -32,6 +32,8 @@ release. Add a tool name to select part of the graph. For example, run
 
 該当するものを読んでから作業する。手順の本文はスキルとルール側にある。
 
+`.agents/**/*.md` 以外の Markdown を直したら、終える前にそのファイルへ `vp fmt` をかける。エージェントの編集は format-on-save を通らない。`.agents/**/*.md` は Oxfmt の無視のまま。手順は `cursor-cloud-setup`。
+
 | 読むもの                                                                 | 使うとき                                                                                                 |
 | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
 | `.cursor/rules/mantine-ui.mdc`                                           | `src/**/*.{tsx,css}` の Mantine、CSS Modules、Phosphor                                                   |
