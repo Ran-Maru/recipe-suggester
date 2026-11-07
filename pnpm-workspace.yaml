@@ -13,3 +13,7 @@ peerDependencyRules:
   allowedVersions:
     vite: "*"
     vitest: "*"
+    # stylelint 18 に、peer が 17 までの CSS Modules 関連を載せる。
+    # stylelint-config-css-modules、@css-modules-kit/stylelint-plugin、
+    # その推移依存の stylelint-scss。上流が 18 を宣言したら外す。
+    stylelint: "18"
