@@ -4,8 +4,9 @@ description: >-
   Sets up and troubleshoots the Cursor Cloud Agent environment for
   recipe-suggester, and documents how to call vp. Use when configuring Cloud
   Agent, debugging Node or nvm version mismatches, environment.json, or
-  .cursor/install.sh, when running vp run dev, vp run check, vp run build, or
-  vp test, or when a safety hook blocks a command.
+  .cursor/install.sh, when running vp run dev, vp run check, vp run build,
+  vp test, or vp fmt, when editing Markdown outside .agents, or when a safety
+  hook blocks a command.
 ---
 
 # Cursor Cloud のセットアップ
@@ -69,6 +70,12 @@ pnpm を直接呼ばず、`vp install` / `vp add` / `vp remove` を使う。
 - Unit + Browser Mode のテスト: `vp test`。E2E は `playwright-e2e` スキル。
 - Build: `vp run build`（`cmk -p tsconfig.app.json && tsc -b && vp build`）。`tsc` は TypeScript 7（`typescript-7`）。CSS Modules Kit 向けに `typescript` は TypeScript 6 へエイリアスされている。
 - CSS: stylelint（`vp run lint:css`）と CSS Modules Kit（`cmk` / `@css-modules-kit/ts-plugin`）。フォーマットは Oxfmt のまま。
+
+## Markdown の整形
+
+`.agents/**/*.md` 以外の Markdown を直したら、終える前にそのファイルへ `vp fmt` をかける。エージェントの編集は format-on-save を通らない。`.agents/**/*.md` は取り込んだ文書なので、Oxfmt の無視のままにする。
+
+通常の `git commit` では、pre-commit の `vp check --fix` も Markdown を整形する。`vp run check` は未整形の Markdown で失敗する。
 
 ## Git hook について
 
