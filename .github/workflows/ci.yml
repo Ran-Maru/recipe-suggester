@@ -24,6 +24,8 @@ jobs:
       # ブラウザのバイナリは ~/.cache/ms-playwright に入る。中身は Playwright のバージョンで決まる。
       # OS のパッケージはランナーに入るのでキャッシュできない。導入は毎回行う。
       # 導入とブラウザの取得は同時に走らせる。キャッシュがあるときは取得だけすぐ終わる。
+      # azure.archive.ubuntu.com が応答を止めると apt-get は次のミラーへ移らない。
+      # そのままだとジョブの 10 分制限まで戻らないので、ミラーを外し、導入は 2 分で打ち切って 1 回だけやり直す。
       - name: Resolve Playwright version
         id: playwright-version
         run: |
@@ -41,16 +43,42 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-${{ runner.arch }}-playwright-${{ steps.playwright-version.outputs.version }}
       - name: Install Playwright Browsers
+        timeout-minutes: 5
         run: |
           set -euo pipefail
+          if [[ -f /etc/apt/apt-mirrors.txt ]]; then
+            sudo sed -i '/azure\.archive\.ubuntu\.com/d' /etc/apt/apt-mirrors.txt
+          fi
+          printf '%s\n' \
+            'Acquire::http::Timeout "20";' \
+            'Acquire::https::Timeout "20";' \
+            'Acquire::Retries "3";' \
+            | sudo tee /etc/apt/apt.conf.d/99-ci-timeout >/dev/null
           deps_log="$RUNNER_TEMP/playwright-deps.log"
-          vp exec playwright install-deps chromium webkit > "$deps_log" 2>&1 &
-          deps_pid=$!
           install_status=0
-          vp exec playwright install chromium webkit || install_status=$?
           deps_status=0
-          wait "$deps_pid" || deps_status=$?
-          cat "$deps_log"
+          for attempt in 1 2; do
+            : >"$deps_log"
+            # setsid で別セッションにする。timeout がシェル本体ごと殺さないようにする。
+            setsid --wait timeout -k 10s 120 vp exec playwright install-deps chromium webkit >"$deps_log" 2>&1 &
+            deps_pid=$!
+            if [[ "$attempt" -eq 1 ]]; then
+              vp exec playwright install chromium webkit || install_status=$?
+            fi
+            deps_status=0
+            wait "$deps_pid" || deps_status=$?
+            cat "$deps_log"
+            if [[ "$install_status" -ne 0 || "$deps_status" -eq 0 ]]; then
+              break
+            fi
+            if [[ "$deps_status" -ne 124 && "$deps_status" -ne 137 ]]; then
+              break
+            fi
+            if [[ "$attempt" -eq 1 ]]; then
+              echo "OS パッケージの導入が 2 分で終わらなかったので、やり直します。" >&2
+              sudo timeout 30s dpkg --configure -a || true
+            fi
+          done
           if [[ "$install_status" -ne 0 ]]; then
             exit "$install_status"
           fi
