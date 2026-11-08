@@ -186,10 +186,10 @@ importers:
   .:
     dependencies:
       '@mantine/core':
-        specifier: ^9.7.4
+        specifier: ^9.7.5
         version: 9.7.5(@mantine/hooks@9.7.5(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@mantine/hooks':
-        specifier: ^9.7.4
+        specifier: ^9.7.5
         version: 9.7.5(react@19.3.1)
       '@phosphor-icons/react':
         specifier: ^2.1.10
