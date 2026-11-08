@@ -21,8 +21,8 @@
     "prepare": "vp config"
   },
   "dependencies": {
-    "@mantine/core": "^9.7.4",
-    "@mantine/hooks": "^9.7.4",
+    "@mantine/core": "^9.7.5",
+    "@mantine/hooks": "^9.7.5",
     "@phosphor-icons/react": "^2.1.10",
     "@tanstack/react-router": "^1.170.46",
     "react": "^19.3.1",
