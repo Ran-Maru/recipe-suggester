@@ -1,14 +1,15 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: ["config:recommended"],
-  timezone: "Asia/Tokyo",
-  // ホスト版は毎時ちょうどには来ない。毎日 20:00–23:59（日本時間）に窓を開ける。
-  schedule: ["* 20-23 * * *"],
-  // 既定は 1 時間に 2 件。窓の中で 1 回来るだけだと、1 日 2 件で止まる。
+  // 公開から 72 時間を過ぎた更新は、ホスト版が次に来た回で PR にする。時刻では区切らない。
+  minimumReleaseAge: "3 days",
+  // 既定はさらに 30 分待つ。72 時間を過ぎたら足さない。
+  minimumReleaseAgeBuffer: null,
+  // 既定は 1 時間に 2 件、同時に 10 件。1 回の実行で、待ちを終えたものを全部出す。
   prHourlyLimit: 0,
+  prConcurrentLimit: 0,
   // Dependabot は範囲に収まる更新でも下限を書き換えていた。ピンはそのままピンで上がる。
   rangeStrategy: "bump",
-  minimumReleaseAge: "3 days",
   // ブランチ保護が無い。Renovate の automerge は CI 完了前にマージし得るので使わない。
   // ci.yml が renovate[bot] の PR を、hold ラベルが無いときだけ squash する。
   automerge: false,
