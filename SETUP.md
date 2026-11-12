@@ -33,10 +33,11 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
 
 ## Vite Plusのアップデート手順
 
-- `vp upgrade` でグローバル CLI を上げる。
-- ワークスペースルートで `vp migrate --no-interactive` を実行する。`--full` は付けない。
-- catalog の `vite-plus` と `vite`（`@voidzero-dev/vite-plus-core`）が同じバージョンか、`pnpm-workspace.yaml` の `vitest@*` が `vp toolchain vitest` のバージョンかを確認する。
+- 手元で上げるときは `vp upgrade` でグローバル CLI を上げ、ワークスペースルートで `vp migrate --no-interactive` を実行する。`--full` は付けない。
+- catalog の `vite-plus` と `vite`（`@voidzero-dev/vite-plus-core`）が同じバージョンか、`pnpm-workspace.yaml` の `vitest` が `vp toolchain vitest` のバージョンかを確認する。override の値は `catalog:` のまま。
 - 依存の入れ直しは `vp install`。`vp update` は依存全体が上がる。
+- Renovate は `renovate/vite-plus` を開き、`hold` を付ける。ワークフローが対象版のグローバル CLI で同じ migrate を実行し、差分があれば `chore: vp migrate <版>` を同じブランチへ載せる。このコミットが載ってから見る。差分が無いときは Tests を手動起動する。
+- その push にはリポジトリシークレット `VP_MIGRATE_PUSH_TOKEN` が要る。中身は、このリポジトリの contents を読み書きできる fine-grained PAT にする。
 
 詳細は [`.agents/skills/upgrade-toolchain/SKILL.md`](.agents/skills/upgrade-toolchain/SKILL.md) を参照する。
 
@@ -55,7 +56,7 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
 ## npm Packages, Action(GitHub Actions)のアップデート方法
 
 - Renovate が作る PR のうち、`hold` が無いものは CI が squash マージする。
-- `hold` が付いた PR（vite-plus グループ、`oxc-transform-react`、major）は内容を見てからマージする。
+- `hold` が付いた PR（vite-plus、`vitest-browser-react`、`oxc-transform-react`、major）は内容を見てからマージする。vite-plus は `chore: vp migrate` のコミットが載ってから見る。
 - Node の 26 系は `.node-version`、pnpm は `devEngines.packageManager.version` を Renovate が更新する。
 
 ## Zed Editorについて

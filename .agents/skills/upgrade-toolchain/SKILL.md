@@ -85,7 +85,9 @@ vp migrate --no-interactive
 
 `@vitest/browser-playwright` は `vitest@*` と同じバージョンに揃える。`playwright` と `@playwright/test` は互いのバージョンを揃える。`vitest-browser-react` は Vitest 本体とは別パッケージなので、互換を確認してから上げる。
 
-Renovate の `vite-plus` グループ（`vite-plus`、`vite`、`@voidzero-dev/vite-plus-core`、`vitest`、`@vitest/*`、`vitest-browser-react`）には `hold` が付き、CI はマージしない。Renovate は `vp migrate` を実行しない。このグループの PR を取り込むときも、catalog と `vitest@*` が同時に揃っているか見る。
+Renovate は `vite-plus`、`vite`、`@voidzero-dev/vite-plus-core` をブランチ `renovate/vite-plus` にまとめ、`hold` を付ける。`rebaseWhen` は `never` なので、main が進んでも migrate のコミットは残る。ブランチを追随させるときは Renovate の `rebase` ラベルを付ける。Vitest と `@vitest/*` は Renovate が上げない。ピンは、その Vite+ がバンドルする版に合わせる。`vitest-browser-react` はグループの外で `hold` だけ付く。
+
+その PR では `.github/workflows/vite-plus-migrate.yml` が、catalog の版のグローバル CLI を入れてから `scripts/vp-migrate-renovate.sh apply` を実行する。中身は `vp migrate --no-interactive` と、catalog、`vite@*` / `vitest@*`、`peerDependencyRules` の戻しである。差分があれば `chore: vp migrate <版>` を同じブランチへ push する。push はリポジトリシークレット `VP_MIGRATE_PUSH_TOKEN`（contents の読み書きができる fine-grained PAT）を使う。HEAD がすでにその題名なら何もしない。差分が無いときは Tests を手動起動する。Renovate の最初のコミットでは `test` がスキップされる。`hold` は残る。マージは人が行う。
 
 `vp update` は依存全体を上げる。Vite+ だけの更新では使わない。インストールは `vp install`。
 
