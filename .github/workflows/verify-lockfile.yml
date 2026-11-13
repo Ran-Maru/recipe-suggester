@@ -21,6 +21,7 @@ jobs:
       - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
+      # 版は gh-actions-lock のリリース。renovate.json5 の constraints.ghActionsLock と揃える。
       - name: Install gh-actions-lock
         run: gh extension install github/gh-actions-lock --pin v0.4.1
       - name: Verify actions.lock
