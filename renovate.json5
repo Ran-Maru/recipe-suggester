@@ -19,6 +19,12 @@
     enabled: true,
     minimumReleaseAge: null,
   },
+  // GitHub Actions は .github/workflows/actions.lock がある。
+  // バージョンを上げる PR では Renovate が lockfile も更新する。
+  // 拡張の版は verify-lockfile.yml の --pin と揃える。
+  constraints: {
+    ghActionsLock: "v0.4.1",
+  },
   // #100: 受け皿グループに破壊的更新が混ざると、ひとまとまりの PR が落ちる。
   // PR は依存ごと、または下のグループごとに分ける。
   packageRules: [
