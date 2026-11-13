@@ -45,4 +45,5 @@ jobs:
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
           REPO: ${{ github.repository }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bash scripts/merge-recipe-additions-pr.sh
+          NODE_NO_WARNINGS: "1"
+        run: node --experimental-strip-types scripts/merge-recipe-additions-pr.ts
