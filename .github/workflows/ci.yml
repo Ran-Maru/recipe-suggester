@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - uses: voidzero-dev/setup-vp@v1.22.0
         with:
           node-version-file: ".node-version"
@@ -36,7 +36,7 @@ jobs:
           echo "version=${version}" >> "$GITHUB_OUTPUT"
       - name: Restore Playwright browsers
         id: playwright-browsers-cache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-${{ runner.arch }}-playwright-${{ steps.playwright-version.outputs.version }}
@@ -60,7 +60,7 @@ jobs:
       - name: Save Playwright browsers
         if: success() && steps.playwright-browsers-cache.outputs.cache-hit != 'true'
         continue-on-error: true
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ${{ steps.playwright-browsers-cache.outputs.cache-primary-key }}
@@ -68,7 +68,7 @@ jobs:
         run: vp test
       - name: Run Playwright tests
         run: vp exec playwright test
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7.0.2
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
@@ -85,7 +85,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: ShellCheck and actionlint
         env:
           LINT_TOOL_DIR: ${{ runner.temp }}/lint-tools
