@@ -32,6 +32,10 @@
     "scripts/recipe-additions-only.ts",
     "scripts/recipe-additions-only.test.ts",
     "scripts/merge-recipe-additions-pr.ts",
-    "scripts/merge-recipe-additions-pr.test.ts"
+    "scripts/merge-recipe-additions-pr.test.ts",
+    "scripts/vp-migrate-pins.ts",
+    "scripts/vp-migrate-pins.test.ts",
+    "scripts/vp-migrate-renovate.ts",
+    "scripts/vp-migrate-renovate.test.ts"
   ]
 }
