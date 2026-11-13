@@ -7,7 +7,10 @@ on:
   # GITHUB_TOKEN で main にマージしても push は発火しない。recipe-auto-merge.yml がここを手動起動してデプロイまでつなぐ。
   workflow_dispatch:
 jobs:
+  # Renovate が renovate/vite-plus を開いた直後は、Vitest のピンが古いままである。
+  # vite-plus-migrate.yml の push、または差分が無いときの手動起動で、この job が検査する。
   test:
+    if: github.actor != 'renovate[bot]' || github.event_name != 'pull_request' || github.head_ref != 'renovate/vite-plus'
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -80,10 +83,15 @@ jobs:
 
   # ブランチ保護は Private Repository では有料プランでしか使えない。
   # Renovate の automerge は必須チェックが無いと CI 完了前にマージし得るので、ここで待つ。
-  # hold は vite-plus、oxc-transform-react、major に付く（renovate.json5）。
+  # hold は vite-plus、vitest-browser-react、oxc-transform-react、major に付く（renovate.json5）。
+  # test がスキップされた renovate/vite-plus の最初のコミットではマージしない。
   dependency-auto-merge:
     needs: [test, lint]
-    if: github.actor == 'renovate[bot]' && github.event_name == 'pull_request'
+    if: >-
+      github.actor == 'renovate[bot]' &&
+      github.event_name == 'pull_request' &&
+      needs.test.result == 'success' &&
+      needs.lint.result == 'success'
     runs-on: ubuntu-slim
     timeout-minutes: 5
 
