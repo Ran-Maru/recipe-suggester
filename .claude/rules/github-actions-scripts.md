@@ -1,0 +1,1 @@
+../../.cursor/rules/github-actions-scripts.mdc

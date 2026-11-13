@@ -1,0 +1,18 @@
+---
+description: GitHub Actions から呼ぶスクリプトは TypeScript を優先する。ワークフローと scripts を編集するときに従う。
+globs:
+  - ".github/workflows/**/*.yml"
+  - ".github/workflows/**/*.yaml"
+  - "scripts/**/*.ts"
+  - "scripts/**/*.sh"
+alwaysApply: false
+paths:
+  - ".github/workflows/**/*.yml"
+  - ".github/workflows/**/*.yaml"
+  - "scripts/**/*.ts"
+  - "scripts/**/*.sh"
+---
+
+# Actions から呼ぶスクリプト
+
+GitHub Actions の `run` と、そこから呼ぶスクリプトは `.agents/skills/github-actions-scripts/SKILL.md` に従う。分岐と入力検証は `scripts/*.ts` にし、`node --experimental-strip-types` で呼ぶ。`curl` やチェックサムでの導入、分岐の無い1コマンド、Cursor の hook はシェルのままにする。
