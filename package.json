@@ -31,7 +31,7 @@
   "devDependencies": {
     "@css-modules-kit/codegen": "^1.4.1",
     "@css-modules-kit/stylelint-plugin": "^1.4.1",
-    "@css-modules-kit/ts-plugin": "^1.4.1",
+    "@css-modules-kit/ts-plugin": "^1.4.2",
     "@playwright/test": "1.65.0",
     "@tanstack/react-router-devtools": "^1.167.3",
     "@tanstack/router-plugin": "^1.169.0",
