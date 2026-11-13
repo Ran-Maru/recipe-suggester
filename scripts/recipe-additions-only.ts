@@ -347,7 +347,7 @@ function gitOutput(args: readonly string[]): string {
   return execFileSync("git", args, { encoding: "utf8" });
 }
 
-function readGitDiff(baseSha: string, headSha: string): DiffDecision {
+export function readGitDiff(baseSha: string, headSha: string): DiffDecision {
   assertSha(baseSha, "base");
   assertSha(headSha, "head");
   const output = gitOutput([

@@ -10,10 +10,16 @@ import {
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vite-plus/test";
+import {
+  isCommitSha,
+  isRepoSlug,
+  isSafeBranchName,
+  runMerge,
+} from "./merge-recipe-additions-pr.ts";
 
 const scriptPath = path.resolve(
   import.meta.dirname,
-  "merge-recipe-additions-pr.sh",
+  "merge-recipe-additions-pr.ts",
 );
 const repo = "Ran-Maru/recipe-suggester";
 
@@ -145,24 +151,29 @@ exit 1
 `,
   );
   chmodSync(path.join(bin, "gh"), 0o755);
-  const result = spawnSync("bash", [scriptPath], {
-    cwd: fixture.work,
-    encoding: "utf8",
-    env: {
-      ...process.env,
-      PATH: `${bin}:${process.env.PATH ?? ""}`,
-      HEAD_SHA: fixture.headSha,
-      REPO: repo,
-      GH_TOKEN: "fake",
-      PULLS_FILE: pullsFile,
-      MERGE_LOG: mergeLog,
-      DISPATCH_LOG: dispatchLog,
-      ...(options.mergeExit === undefined
-        ? {}
-        : { MERGE_EXIT: String(options.mergeExit) }),
-      ...(options.prState === undefined ? {} : { PR_STATE: options.prState }),
+  const result = spawnSync(
+    process.execPath,
+    ["--experimental-strip-types", scriptPath],
+    {
+      cwd: fixture.work,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        PATH: `${bin}:${process.env.PATH ?? ""}`,
+        HEAD_SHA: fixture.headSha,
+        REPO: repo,
+        GH_TOKEN: "fake",
+        NODE_NO_WARNINGS: "1",
+        PULLS_FILE: pullsFile,
+        MERGE_LOG: mergeLog,
+        DISPATCH_LOG: dispatchLog,
+        ...(options.mergeExit === undefined
+          ? {}
+          : { MERGE_EXIT: String(options.mergeExit) }),
+        ...(options.prState === undefined ? {} : { PR_STATE: options.prState }),
+      },
     },
-  });
+  );
   return {
     result,
     merged: readLog(mergeLog),
@@ -174,7 +185,51 @@ function appendRecipe(work: string) {
   writeFileSync(path.join(work, "src/mapping.json"), mapping(["既存", "新規"]));
 }
 
-describe("merge-recipe-additions-pr.sh", () => {
+describe("入力の形式", () => {
+  it("40桁の16進数だけをコミット SHA とみなす", () => {
+    expect(isCommitSha("a".repeat(40))).toBe(true);
+    expect(isCommitSha("G".repeat(40))).toBe(false);
+    expect(isCommitSha("a".repeat(39))).toBe(false);
+  });
+
+  it("owner/repo の形だけを受け付ける", () => {
+    expect(isRepoSlug("Ran-Maru/recipe-suggester")).toBe(true);
+    expect(isRepoSlug("recipe-suggester")).toBe(false);
+    expect(isRepoSlug("a/b/c")).toBe(false);
+  });
+
+  it("git fetch の refspec に使えないブランチ名を拒む", () => {
+    expect(isSafeBranchName("add-recipe")).toBe(true);
+    expect(isSafeBranchName("feature/add")).toBe(true);
+    expect(isSafeBranchName("a..b")).toBe(false);
+    expect(isSafeBranchName("/abs")).toBe(false);
+    expect(isSafeBranchName("-flag")).toBe(false);
+    expect(isSafeBranchName("")).toBe(false);
+    expect(isSafeBranchName("has space")).toBe(false);
+  });
+});
+
+describe("runMerge の事前条件", () => {
+  it("HEAD_SHA が無ければ git を呼ぶ前に失敗する", () => {
+    expect(() => runMerge({ headSha: "", repo: "owner/name" })).toThrow(
+      "HEAD_SHA が必要です",
+    );
+  });
+
+  it("HEAD_SHA が SHA でなければ失敗する", () => {
+    expect(() => runMerge({ headSha: "nope", repo: "owner/name" })).toThrow(
+      "HEAD_SHA がコミット SHA ではありません。",
+    );
+  });
+
+  it("REPO の形式が不正なら失敗する", () => {
+    expect(() =>
+      runMerge({ headSha: "a".repeat(40), repo: "not a repo" }),
+    ).toThrow("REPO の形式が不正です。");
+  });
+});
+
+describe("merge-recipe-additions-pr.ts", () => {
   it("レシピ追加だけなら squash マージする", () => {
     const fixture = createFixture(appendRecipe);
     try {

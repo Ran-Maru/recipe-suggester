@@ -26,14 +26,9 @@ jobs:
       # 導入とブラウザの取得は同時に走らせる。キャッシュがあるときは取得だけすぐ終わる。
       - name: Resolve Playwright version
         id: playwright-version
-        run: |
-          version="$(vp exec playwright --version)"
-          version="${version#Version }"
-          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+.][0-9A-Za-z.]+)?$ ]]; then
-            echo "Playwright のバージョンを読めませんでした: ${version}" >&2
-            exit 1
-          fi
-          echo "version=${version}" >> "$GITHUB_OUTPUT"
+        env:
+          NODE_NO_WARNINGS: "1"
+        run: node --experimental-strip-types scripts/playwright-ci.ts version
       - name: Restore Playwright browsers
         id: playwright-browsers-cache
         uses: actions/cache/restore@v6.1.0
@@ -41,20 +36,9 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-${{ runner.arch }}-playwright-${{ steps.playwright-version.outputs.version }}
       - name: Install Playwright Browsers
-        run: |
-          set -euo pipefail
-          deps_log="$RUNNER_TEMP/playwright-deps.log"
-          vp exec playwright install-deps chromium webkit > "$deps_log" 2>&1 &
-          deps_pid=$!
-          install_status=0
-          vp exec playwright install chromium webkit || install_status=$?
-          deps_status=0
-          wait "$deps_pid" || deps_status=$?
-          cat "$deps_log"
-          if [[ "$install_status" -ne 0 ]]; then
-            exit "$install_status"
-          fi
-          exit "$deps_status"
+        env:
+          NODE_NO_WARNINGS: "1"
+        run: node --experimental-strip-types scripts/playwright-ci.ts install
       # 同じキーが既にある（並行ジョブが先に保存した、fork の PR で書き込めない）ときは失敗する。
       # テストとは別なので、保存の失敗ではジョブを落とさない。
       - name: Save Playwright browsers

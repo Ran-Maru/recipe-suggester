@@ -25,8 +25,13 @@
     "scripts/worktree-ports.ts",
     "scripts/worktree-ports.test.ts",
     "scripts/dangerous-command-policy.test.ts",
+    "scripts/biweekly-gate.ts",
+    "scripts/biweekly-gate.test.ts",
+    "scripts/playwright-ci.ts",
+    "scripts/playwright-ci.test.ts",
     "scripts/recipe-additions-only.ts",
     "scripts/recipe-additions-only.test.ts",
+    "scripts/merge-recipe-additions-pr.ts",
     "scripts/merge-recipe-additions-pr.test.ts"
   ]
 }
