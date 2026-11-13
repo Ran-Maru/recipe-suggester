@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - uses: voidzero-dev/setup-vp@v1.22.0
         with:
           node-version-file: ".node-version"
@@ -36,7 +36,7 @@ jobs:
           echo "version=${version}" >> "$GITHUB_OUTPUT"
       - name: Restore Playwright browsers
         id: playwright-browsers-cache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-${{ runner.arch }}-playwright-${{ steps.playwright-version.outputs.version }}
@@ -60,7 +60,7 @@ jobs:
       - name: Save Playwright browsers
         if: success() && steps.playwright-browsers-cache.outputs.cache-hit != 'true'
         continue-on-error: true
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ${{ steps.playwright-browsers-cache.outputs.cache-primary-key }}
@@ -68,7 +68,7 @@ jobs:
         run: vp test
       - name: Run Playwright tests
         run: vp exec playwright test
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7.0.2
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
@@ -85,7 +85,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: ShellCheck and actionlint
         env:
           LINT_TOOL_DIR: ${{ runner.temp }}/lint-tools
@@ -94,11 +94,33 @@ jobs:
           export PATH="${LINT_TOOL_DIR}:${PATH}"
           bash scripts/lint-shell-and-workflows.sh
 
+  # .github/workflows/actions.lock がワークフローと食い違うと失敗する。
+  # ランナーは記録されたコミットを実行する。lock は gh actions-lock が書き、手では編集しない。
+  # gh-actions-lock の版は公式の verify 例（v0.4.1）に合わせた。
+  actions-lock:
+    name: Verify actions.lock
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Verify actions.lock
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh extension install github/gh-actions-lock --pin v0.4.1
+          gh actions-lock --verify
+
   # ブランチ保護は Private Repository では有料プランでしか使えない。
   # Renovate の automerge は必須チェックが無いと CI 完了前にマージし得るので、ここで待つ。
+  # Actions の更新 PR は、lock が古いとマージしない。
   # hold は vite-plus、oxc-transform-react、major に付く（renovate.json5）。
   dependency-auto-merge:
-    needs: [test, lint]
+    needs: [test, lint, actions-lock]
     if: github.actor == 'renovate[bot]' && github.event_name == 'pull_request'
     runs-on: ubuntu-slim
     timeout-minutes: 5
@@ -121,13 +143,13 @@ jobs:
           fi
           gh pr merge --squash "$PR_URL"
 
-  # main への push では、test と lint が成功してから GitHub Pages へデプロイする。
+  # main への push では、test、lint、actions.lock の検証が成功してから GitHub Pages へデプロイする。
   # レシピ追加だけの PR は recipe-auto-merge.yml が squash マージし、main を指定して CI を手動起動する。
   # GITHUB_TOKEN のマージでは push が発火しないため、手動起動（workflow_dispatch）でもデプロイする。
   # それ以外の PR ではデプロイしない。同じ内容の出し直しは gh-pages-deploy.yml の手動実行。
   pages:
     name: Deploy to GitHub Pages
-    needs: [test, lint]
+    needs: [test, lint, actions-lock]
     if: >-
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
       github.ref == 'refs/heads/main'
