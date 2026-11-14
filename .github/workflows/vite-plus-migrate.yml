@@ -1,0 +1,77 @@
+# Renovate が renovate/vite-plus を開いたあと、対象版のグローバル CLI で vp migrate する。
+# push は VP_MIGRATE_PUSH_TOKEN（contents の読み書きができる fine-grained PAT）。
+# GITHUB_TOKEN の push では pull_request が再発火せず、Tests が migrate 後のコミットを見ない。
+# 差分が無いときは Tests を手動起動する。Renovate の最初のコミットでは test がスキップされるため。
+name: Vite+ migrate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: vite-plus-migrate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  migrate:
+    name: Run vp migrate
+    if: >-
+      github.event.pull_request.user.login == 'renovate[bot]' &&
+      github.event.pull_request.head.ref == 'renovate/vite-plus' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Checkout the Renovate branch
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.VP_MIGRATE_PUSH_TOKEN }}
+          persist-credentials: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: ".node-version"
+
+      - name: Read the target version
+        id: gate
+        env:
+          NODE_NO_WARNINGS: "1"
+        run: node --experimental-strip-types scripts/vp-migrate-renovate.ts gate
+
+      - name: Install the target global CLI
+        if: success() && steps.gate.outputs.skip != 'true'
+        uses: voidzero-dev/setup-vp@v1.22.0
+        with:
+          version: ${{ steps.gate.outputs.version }}
+          node-version-file: ".node-version"
+          run-install: false
+
+      - name: vp migrate
+        if: success() && steps.gate.outputs.skip != 'true'
+        env:
+          NODE_NO_WARNINGS: "1"
+        run: node --experimental-strip-types scripts/vp-migrate-renovate.ts apply
+
+      - name: Commit and push when migrate changed files
+        id: commit
+        if: success() && steps.gate.outputs.skip != 'true'
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          NODE_NO_WARNINGS: "1"
+        run: node --experimental-strip-types scripts/vp-migrate-renovate.ts commit
+
+      - name: Start Tests when migrate made no commit
+        if: >-
+          success() &&
+          steps.gate.outputs.skip != 'true' &&
+          steps.commit.outputs.pushed != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          NODE_NO_WARNINGS: "1"
+        run: node --experimental-strip-types scripts/vp-migrate-renovate.ts dispatch-tests

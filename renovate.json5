@@ -45,17 +45,29 @@
       enabled: false,
     },
     {
-      // パッチでも型と設定 API が壊れ得る（#63）。vp migrate は走らない。
-      description: "vite-plus はパッチでも自動マージしない",
-      matchPackageNames: [
-        "vite-plus",
-        "vite",
-        "@voidzero-dev/vite-plus-core",
-        "vitest",
-        "vitest-browser-react",
-        "@vitest/**",
-      ],
+      // パッチでも型と設定 API が壊れ得る（#63）。
+      // PR はここまで。中身は vite-plus-migrate.yml が vp migrate で書く。
+      // rebaseWhen: never なので、migrate のコミットを main の進行では捨てない。
+      // 追随させたいときは Renovate の rebase ラベルを付ける。
+      description: "vite-plus は PR だけ作り、パッチでも自動マージしない",
+      matchPackageNames: ["vite-plus", "vite", "@voidzero-dev/vite-plus-core"],
       groupName: "vite-plus",
+      branchName: "renovate/vite-plus",
+      rebaseWhen: "never",
+      addLabels: ["hold"],
+    },
+    {
+      // ピンは Vite+ がバンドルする版。npm の最新へ上げると vp migrate と押し合う。
+      description: "Vitest は vp migrate がピンする。Renovate は PR を出さない",
+      matchPackageNames: ["vitest", "@vitest/**"],
+      enabled: false,
+      vulnerabilityAlerts: {
+        enabled: false,
+      },
+    },
+    {
+      description: "vitest-browser-react はバンドル対象ではない。互換を見てからマージする",
+      matchPackageNames: ["vitest-browser-react"],
       addLabels: ["hold"],
     },
     {

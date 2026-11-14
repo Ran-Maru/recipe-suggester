@@ -31,7 +31,7 @@ run: node --experimental-strip-types scripts/example.ts
 - ファイルを直接実行したときだけ `main` が走るようにする。形は `scripts/recipe-additions-only.ts` の `isDirectRun`。テストが import したときに本体が動くと、Vitest の中で `process.exit` する。
 - `GITHUB_OUTPUT` に書く値へ改行を含めない。
 
-いまの入口は `scripts/biweekly-gate.ts`、`scripts/playwright-ci.ts`、`scripts/merge-recipe-additions-pr.ts`。レシピ差分の判定そのものは `scripts/recipe-additions-only.ts`。
+いまの入口は `scripts/biweekly-gate.ts`、`scripts/playwright-ci.ts`、`scripts/merge-recipe-additions-pr.ts`、`scripts/vp-migrate-renovate.ts`。レシピ差分の判定そのものは `scripts/recipe-additions-only.ts`。Vite+ のピンの戻しは `scripts/vp-migrate-pins.ts`。
 
 ## シェルのままにする
 
