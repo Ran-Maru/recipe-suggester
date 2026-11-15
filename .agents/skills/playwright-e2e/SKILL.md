@@ -83,14 +83,20 @@ test.skip(browserName === "webkit", "WebKit lacks clipboard API support");
 
 ## テスト範囲
 
-`tests/test.spec.ts` がカバーするもの:
+`tests/recipe-get.spec.ts` と `tests/recipe-list.spec.ts` がカバーするもの:
 
 - **レシピGET ページ**: 「開く」が新しいタブを開く、「コピーする」がレシピ URL をコピーする
 - **一覧（`/recipes`）**: コピーボタンが URL をクリップボードへ書く。スマホ幅（Mobile Chrome / Mobile Safari）ではコピー列を出さないので、このテストは `isMobile` のとき skip する
 
+画面のロケータと操作は Page Object に置く。spec は `tests/fixtures.ts` の `test` からページオブジェクトを受け取る。
+
+- `tests/pages/recipe-get.page.ts`
+- `tests/pages/recipe-list.page.ts`
+- `tests/support/clipboard.ts` — クリップボード権限と、コピーした URL の確認
+
 その他の UI と検索は `src/**/*.test.ts`（Node）と `src/**/*.browser.test.tsx`（Vitest Browser Mode）にある。
 
-セレクタはアクセシブルなロールを優先する（`getByRole`、`getByTestId`）。
+セレクタはアクセシブルなロールを優先する（`getByRole`、`getByTestId`）。ページクラスの外にロケータを書かない。
 
 ## CI の挙動
 

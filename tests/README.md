@@ -11,6 +11,14 @@
 
 `tests/` の `@playwright/test`。コマンドは `package.json` の `test:e2e*`。
 
+画面の操作は Page Object に置く。spec はページを開いて結果を確認する。
+
+- `tests/pages/recipe-get.page.ts` — レシピGET（`/`）
+- `tests/pages/recipe-list.page.ts` — 一覧（`/recipes`）
+- `tests/support/clipboard.ts` — クリップボードの権限と、コピーした URL の確認
+- `tests/fixtures.ts` — spec にページオブジェクトを渡す
+- `tests/recipe-get.spec.ts` と `tests/recipe-list.spec.ts`
+
 残しているケース:
 
 - レシピGET の「開く」で別タブが開くこと
