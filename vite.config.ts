@@ -1,20 +1,27 @@
 import { defineConfig, lazyPlugins } from "vite-plus";
 import react from "@vitejs/plugin-react";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
+import { VitePWA } from "vite-plugin-pwa";
 import { playwright } from "vite-plus/test/browser-playwright";
+import {
+  PWA_BACKGROUND_COLOR,
+  PWA_DESCRIPTION,
+  PWA_DISPLAY,
+  PWA_INCLUDE_ASSETS,
+  PWA_LANG,
+  PWA_NAME,
+  PWA_SHORT_NAME,
+  PWA_THEME_COLOR,
+  manifestIcons,
+} from "./scripts/pwa-manifest.ts";
+import { viteBase } from "./scripts/vite-base.ts";
 import {
   worktreeDevPort,
   worktreePreviewPort,
   worktreeVitestBrowserApiPort,
 } from "./scripts/worktree-ports.ts";
 
-function viteBase(): string {
-  const raw = process.env.VITE_BASE ?? "/";
-  if (raw === "/" || raw === "") {
-    return "/";
-  }
-  return raw.endsWith("/") ? raw : `${raw}/`;
-}
+const base = viteBase();
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -233,7 +240,7 @@ export default defineConfig({
       },
     ],
   },
-  base: viteBase(),
+  base,
   server: {
     port: worktreeDevPort(),
     strictPort: true,
@@ -249,5 +256,23 @@ export default defineConfig({
       routeFileIgnorePattern: "\\.(?:browser\\.)?test\\.[jt]sx?$",
     }),
     react({ compiler: true }),
+    VitePWA({
+      registerType: "autoUpdate",
+      injectRegister: "auto",
+      includeAssets: [...PWA_INCLUDE_ASSETS],
+      manifest: {
+        name: PWA_NAME,
+        short_name: PWA_SHORT_NAME,
+        description: PWA_DESCRIPTION,
+        lang: PWA_LANG,
+        theme_color: PWA_THEME_COLOR,
+        background_color: PWA_BACKGROUND_COLOR,
+        display: PWA_DISPLAY,
+        id: base,
+        start_url: base,
+        scope: base,
+        icons: manifestIcons(base),
+      },
+    }),
   ]),
 });

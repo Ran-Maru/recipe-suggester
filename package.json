@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vp dev",
-    "build": "cmk -p tsconfig.app.json && tsc -b && vp build",
+    "build": "cmk -p tsconfig.app.json && tsc -b && vp build && NODE_NO_WARNINGS=1 node --experimental-strip-types scripts/check-pwa-dist.ts",
     "check": "cmk -p tsconfig.app.json && vp check && stylelint \"src/**/*.css\" && node scripts/check-mapping.json.js && node scripts/check-original-recipes.json.js",
     "format": "vp fmt .",
     "generate:css-types": "cmk -p tsconfig.app.json",
@@ -52,9 +52,10 @@
     "typescript": "npm:@typescript/typescript6@~6.0.2",
     "typescript-7": "npm:typescript@~7.0.2",
     "vite": "catalog:",
+    "vite-plugin-pwa": "^2.0.0",
     "vite-plus": "catalog:",
-    "vitest-browser-react": "2.3.0",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "vitest-browser-react": "2.3.0"
   },
   "devEngines": {
     "packageManager": {
