@@ -49,6 +49,7 @@ release. Add a tool name to select part of the graph. For example, run
 | `scripts/lint-shell-and-workflows.sh`                                        | ShellCheck と actionlint（CI の同名ジョブ）。Linux と他 OS の入れ方はスクリプト先頭のコメント            |
 | `natural-japanese`                                                           | 日本語を自然に書く・直す                                                                                 |
 | `upgrade-toolchain`                                                          | Vite Plus、Node.js、pnpm、Vitest ピンのバージョンアップ                                                  |
+| `.coderabbit.yaml`                                                           | CodeRabbit のレビュー設定を変えるとき。`automerge` ラベルの PR は見ない                                  |
 
 スキルの実体は `.agents/skills/` にある。Claude Code は `.claude/skills`（`.agents/skills` へのシンボリックリンク）から同じディレクトリを読む。
 
