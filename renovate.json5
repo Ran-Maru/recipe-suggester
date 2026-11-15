@@ -23,8 +23,17 @@
   // PR は依存ごと、または下のグループごとに分ける。
   packageRules: [
     {
+      // hold が付くパッケージは外す。addLabels は足すだけで、後のルールでは automerge を外せない。
+      // CodeRabbit は automerge の PR をレビューしない。新しく hold を付けるパッケージはここにも書く。
       description: "minor/patch は CI が squash する",
       matchUpdateTypes: ["minor", "patch"],
+      excludePackageNames: [
+        "vite-plus",
+        "vite",
+        "@voidzero-dev/vite-plus-core",
+        "vitest-browser-react",
+        "oxc-transform-react",
+      ],
       addLabels: ["automerge"],
     },
     {

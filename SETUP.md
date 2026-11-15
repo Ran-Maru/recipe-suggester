@@ -57,6 +57,7 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
 
 - Renovate が作る PR のうち、`hold` が無いものは CI が squash マージする。
 - `hold` が付いた PR（vite-plus、`vitest-browser-react`、`oxc-transform-react`、major）は内容を見てからマージする。vite-plus は `chore: vp migrate` のコミットが載ってから見る。
+- `hold` が付くパッケージの minor と patch には `automerge` を付けない。
 - Node の 26 系は `.node-version`、pnpm は `devEngines.packageManager.version` を Renovate が更新する。
 
 ## Zed Editorについて

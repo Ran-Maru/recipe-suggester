@@ -1,0 +1,48 @@
+language: ja-JP
+tone_instructions: 指摘は短く、日本語で書く。規約に無い好みや、CI がすでに見ている整形と lint の繰り返しは書かない。
+reviews:
+  profile: chill
+  high_level_summary: true
+  high_level_summary_in_walkthrough: true
+  sequence_diagrams: false
+  auto_apply_labels: false
+  merge_risk_instructions: フロントエンドだけで、レシピ JSON の追加は低リスク。ワークフロー、自動マージ、依存の major は高リスク。
+  auto_review:
+    enabled: true
+    drafts: false
+    labels:
+      - "!automerge"
+  path_filters:
+    - "!pnpm-lock.yaml"
+    - "!src/routeTree.gen.ts"
+    - "!.github/workflows/actions.lock"
+  finishing_touches:
+    unit_tests:
+      enabled: false
+    autofix:
+      enabled: false
+    fix_ci:
+      enabled: false
+    resolve_merge_conflict:
+      enabled: false
+  tools:
+    eslint:
+      enabled: false
+      e18e:
+        enabled: false
+    biome:
+      enabled: false
+    ruff:
+      enabled: false
+    markdownlint:
+      enabled: false
+    languagetool:
+      enabled: false
+    shellcheck:
+      enabled: true
+    actionlint:
+      enabled: true
+    gitleaks:
+      enabled: true
+    github-checks:
+      enabled: true
