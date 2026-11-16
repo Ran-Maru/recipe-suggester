@@ -4,7 +4,8 @@ description: >-
   Adds or updates recipe entries in src/mapping.json or
   src/original-recipes.json for recipe-suggester. Use when adding recipes,
   editing mapping.json, validating recipe data, or when the user mentions
-  レシピ追加, mapping, original recipes, or recipe URLs.
+  レシピ追加, mapping, original recipes, or recipe URLs. When the dish name
+  is read from the recipe page, use add-recipe-from-url.
 ---
 
 # レシピの mapping
@@ -15,12 +16,13 @@ description: >-
 
 `src/mapping.json` は JSON 配列。各要素は次のフィールドを持つオブジェクトにする。
 
-| フィールド | 型     | ルール                                                        |
-| ---------- | ------ | ------------------------------------------------------------- |
-| `title`    | string | trim 後に空でない（UI に出す料理名）                          |
-| `kana`     | string | trim 後に空でない（検索用のひらがな読み）                     |
-| `url`      | string | trim 後に空でない（レシピページの URL）                       |
-| `memo`     | string | 空文字可。trim 後に中身があるときだけ一覧にメモアイコンを出す |
+| フィールド  | 型     | ルール                                                       |
+| ----------- | ------ | ------------------------------------------------------------ |
+| `title`     | string | trim 後に空でない（UI に出す料理名）                         |
+| `kana`      | string | trim 後に空でない（検索用のひらがな読み）                    |
+| `url`       | string | trim 後に空でない（レシピページの URL）                      |
+| `addedDate` | string | 省略可。`YYYY-MM-DD`。URL から足す行には追加日（Asia/Tokyo） |
+| `memo`      | string | 空文字可。trim 後に中身があるときだけ一覧にメモアイコンを出す |
 
 例:
 
@@ -95,7 +97,9 @@ URL は外部の `https://` リンクにする。アプリ内のオリジナル�
 
 外部サイトのレシピ:
 
-1. `src/mapping.json` を編集する。エントリを足すか、既存を更新する。JSON として正しい形を保つ（末尾カンマは不正）。
+URL を渡されてページから料理名を取るときは `add-recipe-from-url` に従う。料理名が分かっているときは次のとおり。
+
+1. `src/mapping.json` を編集する。エントリを足すか、既存を更新する。JSON として正しい形を保つ（末尾カンマは不正）。新しい行には `addedDate` を入れる。
 2. `vp run check` で lint、型チェック、両方の JSON 検証をまとめて走らせる。
 3. UI の挙動を変えたときは `vp test` と Playwright E2E を実行する（`playwright-e2e` スキルを参照）。
 
