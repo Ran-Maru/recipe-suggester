@@ -1,143 +1,99 @@
 {
-  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
-  extends: [
-    'config:recommended',
-  ],
-  minimumReleaseAge: '3 days',
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:recommended"],
+  minimumReleaseAge: "3 days",
   minimumReleaseAgeBuffer: null,
   prHourlyLimit: 0,
   prConcurrentLimit: 0,
-  rangeStrategy: 'bump',
+  rangeStrategy: "bump",
   automerge: false,
-  labels: [
-    'dependencies',
-  ],
+  labels: ["dependencies"],
   vulnerabilityAlerts: {
     enabled: true,
     minimumReleaseAge: null,
   },
   packageRules: [
     {
-      description: 'minor/patch は CI が squash する',
-      matchUpdateTypes: [
-        'minor',
-        'patch',
-      ],
-      addLabels: [
-        'automerge',
-      ],
+      description: "minor/patch は CI が squash する",
+      matchUpdateTypes: ["minor", "patch"],
+      addLabels: ["automerge"],
       matchPackageNames: [
-        '!vite-plus',
-        '!vite',
-        '!@voidzero-dev/vite-plus-core',
-        '!vitest-browser-react',
-        '!oxc-transform-react',
+        "!vite-plus",
+        "!vite",
+        "!@voidzero-dev/vite-plus-core",
+        "!vitest-browser-react",
+        "!oxc-transform-react",
       ],
     },
     {
-      description: 'major は人が見る',
-      matchUpdateTypes: [
-        'major',
-      ],
-      addLabels: [
-        'hold',
-      ],
+      description: "major は人が見る",
+      matchUpdateTypes: ["major"],
+      addLabels: ["hold"],
     },
     {
-      description: 'Node は 26 系だけ。次のメジャーは allowedVersions を付け替えてから',
-      matchManagers: [
-        'nodenv',
-      ],
-      matchPackageNames: [
-        'node',
-      ],
-      allowedVersions: '^26',
+      description: "Node は 26 系だけ。次のメジャーは allowedVersions を付け替えてから",
+      matchManagers: ["nodenv"],
+      matchPackageNames: ["node"],
+      allowedVersions: "^26",
     },
     {
-      description: '@types/node の major は Node の major と人が一緒に上げる',
-      matchPackageNames: [
-        '@types/node',
-      ],
-      matchUpdateTypes: [
-        'major',
-      ],
+      description: "@types/node の major は Node の major と人が一緒に上げる",
+      matchPackageNames: ["@types/node"],
+      matchUpdateTypes: ["major"],
       enabled: false,
     },
     {
-      description: 'vite-plus は PR だけ作り、パッチでも自動マージしない',
-      matchPackageNames: [
-        'vite-plus',
-        'vite',
-        '@voidzero-dev/vite-plus-core',
-      ],
-      groupName: 'vite-plus',
-      branchName: 'renovate/vite-plus',
-      rebaseWhen: 'never',
-      addLabels: [
-        'hold',
-      ],
+      description: "vite-plus は PR だけ作り、パッチでも自動マージしない",
+      matchPackageNames: ["vite-plus", "vite", "@voidzero-dev/vite-plus-core"],
+      groupName: "vite-plus",
+      branchName: "renovate/vite-plus",
+      rebaseWhen: "never",
+      addLabels: ["hold"],
     },
     {
-      description: 'Vitest は vp migrate がピンする。Renovate は PR を出さない',
-      matchPackageNames: [
-        'vitest',
-        '@vitest/**',
-      ],
+      description: "Vitest は vp migrate がピンする。Renovate は PR を出さない",
+      matchPackageNames: ["vitest", "@vitest/**"],
       enabled: false,
       vulnerabilityAlerts: {
         enabled: false,
       },
     },
     {
-      description: 'vitest-browser-react はバンドル対象ではない。互換を見てからマージする',
-      matchPackageNames: [
-        'vitest-browser-react',
-      ],
-      addLabels: [
-        'hold',
-      ],
+      description: "vitest-browser-react はバンドル対象ではない。互換を見てからマージする",
+      matchPackageNames: ["vitest-browser-react"],
+      addLabels: ["hold"],
     },
     {
-      description: '0.x の oxc は minor でも壊れ得る',
-      matchPackageNames: [
-        'oxc-transform-react',
-      ],
-      addLabels: [
-        'hold',
-      ],
+      description: "0.x の oxc は minor でも壊れ得る",
+      matchPackageNames: ["oxc-transform-react"],
+      addLabels: ["hold"],
     },
     {
       matchPackageNames: [
-        'react',
-        'react-dom',
-        '@types/react',
-        '@types/react-dom',
-        '@vitejs/plugin-react',
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "@vitejs/plugin-react",
       ],
-      groupName: 'react',
+      groupName: "react",
+    },
+    {
+      matchPackageNames: ["playwright", "@playwright/test"],
+      groupName: "playwright",
     },
     {
       matchPackageNames: [
-        'playwright',
-        '@playwright/test',
+        "typescript",
+        "typescript-7",
+        "@typescript/typescript6",
       ],
-      groupName: 'playwright',
+      groupName: "typescript",
     },
     {
-      matchPackageNames: [
-        'typescript',
-        'typescript-7',
-        '@typescript/typescript6',
-      ],
-      groupName: 'typescript',
-    },
-    {
-      description: 'stylelint 本体と standard config は同時に上げる',
-      matchPackageNames: [
-        'stylelint',
-        'stylelint-config-standard',
-      ],
-      groupName: 'stylelint',
+      description: "stylelint 本体と standard config は同時に上げる",
+      matchPackageNames: ["stylelint", "stylelint-config-standard"],
+      groupName: "stylelint",
     },
   ],
 }
