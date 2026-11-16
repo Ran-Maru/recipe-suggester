@@ -1,40 +1,29 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: ["config:recommended"],
-  // 公開から 72 時間を過ぎた更新は、ホスト版が次に来た回で PR にする。時刻では区切らない。
   minimumReleaseAge: "3 days",
-  // 既定はさらに 30 分待つ。72 時間を過ぎたら足さない。
   minimumReleaseAgeBuffer: null,
-  // 既定は 1 時間に 2 件、同時に 10 件。1 回の実行で、待ちを終えたものを全部出す。
   prHourlyLimit: 0,
   prConcurrentLimit: 0,
-  // Dependabot は範囲に収まる更新でも下限を書き換えていた。ピンはそのままピンで上がる。
   rangeStrategy: "bump",
-  // ブランチ保護が無い。Renovate の automerge は CI 完了前にマージし得るので使わない。
-  // ci.yml が renovate[bot] の PR を、hold ラベルが無いときだけ squash する。
   automerge: false,
   labels: ["dependencies"],
-  // 待ち時間の既定は null。脆弱性 PR に 3 日は掛けない。
   vulnerabilityAlerts: {
     enabled: true,
     minimumReleaseAge: null,
   },
-  // #100: 受け皿グループに破壊的更新が混ざると、ひとまとまりの PR が落ちる。
-  // PR は依存ごと、または下のグループごとに分ける。
   packageRules: [
     {
-      // hold が付くパッケージは外す。addLabels は足すだけで、後のルールでは automerge を外せない。
-      // CodeRabbit は automerge の PR をレビューしない。新しく hold を付けるパッケージはここにも書く。
       description: "minor/patch は CI が squash する",
       matchUpdateTypes: ["minor", "patch"],
-      excludePackageNames: [
-        "vite-plus",
-        "vite",
-        "@voidzero-dev/vite-plus-core",
-        "vitest-browser-react",
-        "oxc-transform-react",
-      ],
       addLabels: ["automerge"],
+      matchPackageNames: [
+        "!vite-plus",
+        "!vite",
+        "!@voidzero-dev/vite-plus-core",
+        "!vitest-browser-react",
+        "!oxc-transform-react",
+      ],
     },
     {
       description: "major は人が見る",
@@ -54,10 +43,6 @@
       enabled: false,
     },
     {
-      // パッチでも型と設定 API が壊れ得る（#63）。
-      // PR はここまで。中身は vite-plus-migrate.yml が vp migrate で書く。
-      // rebaseWhen: never なので、migrate のコミットを main の進行では捨てない。
-      // 追随させたいときは Renovate の rebase ラベルを付ける。
       description: "vite-plus は PR だけ作り、パッチでも自動マージしない",
       matchPackageNames: ["vite-plus", "vite", "@voidzero-dev/vite-plus-core"],
       groupName: "vite-plus",
@@ -66,7 +51,6 @@
       addLabels: ["hold"],
     },
     {
-      // ピンは Vite+ がバンドルする版。npm の最新へ上げると vp migrate と押し合う。
       description: "Vitest は vp migrate がピンする。Renovate は PR を出さない",
       matchPackageNames: ["vitest", "@vitest/**"],
       enabled: false,
@@ -107,7 +91,6 @@
       groupName: "typescript",
     },
     {
-      // 本体のメジャーはルールを増減し、standard config の peer は対応するメジャーだけを指す。
       description: "stylelint 本体と standard config は同時に上げる",
       matchPackageNames: ["stylelint", "stylelint-config-standard"],
       groupName: "stylelint",
