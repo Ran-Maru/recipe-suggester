@@ -25,7 +25,7 @@ rc の間はピンの書き先が変わり得る。公式とこのリポジト�
 
 - Node.js は `.node-version` のみ。`.nvmrc` と `devEngines.runtime` は追加しない。`v` プレフィックスは付けない。
 - pnpm は `package.json` の `devEngines.packageManager`（`name`、`version`、`onFail: "download"`）。トップレベルの `packageManager` は追加しない。
-- `pnpm-workspace.yaml` の default catalog で `vite` は `npm:@voidzero-dev/vite-plus-core@<vp toolchain vite-plus-core のバージョン>`。Vite+ 1.7 以降、core の版は `vite-plus` の版と違う。
+- `pnpm-workspace.yaml` の default catalog で `vite` は `npm:@voidzero-dev/vite-plus-core@<vp toolchain vite-plus-core --global のバージョン>`。Vite+ 1.7 以降、core の版は `vite-plus` の版と違う。
 - `package.json` の `vite` と `vite-plus` は `catalog:` のまま。
 - overrides のキーは `vite@*` と `vitest@*`。bare key（`vite`、`vitest`）に戻さない。bare key は `catalog:` まで上書きし、更新コマンドが具体バージョンへ書き換える。
 - `vite@*` の値は `"catalog:"`。
@@ -73,11 +73,11 @@ vp migrate --no-interactive
 
 `vp migrate` を使わない場合:
 
-1. catalog の `vite-plus` を目的の版にし、`vite` は `npm:@voidzero-dev/vite-plus-core@<vp toolchain vite-plus-core の版>` にする。core の版を `vite-plus` の版と揃えない。
-2. そのバージョンの CLI でバンドルされている Vitest を確認する。
+1. catalog の `vite-plus` を目的の版にし、`vite` は `npm:@voidzero-dev/vite-plus-core@<vp toolchain vite-plus-core --global の版>` にする。core の版を `vite-plus` の版と揃えない。
+2. そのバージョンのグローバル CLI でバンドルされている Vitest を確認する。
 
    ```bash
-   vp toolchain vitest
+   vp toolchain vitest --global
    ```
 
 3. `overrides` の `vitest@*` をその正確なバージョンにする。古いままだと `vp test` と依存の Vitest が分裂する。
