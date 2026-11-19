@@ -392,7 +392,7 @@ EOF
   exit 0
 fi
 if [[ "\${1:-}" == "toolchain" ]]; then
-  printf '%s\\n' '{"source":{"scope":"global","vitePlusVersion":"1.6.0"},"nodes":[{"name":"vite-plus","version":"1.6.0"},{"name":"vitest","version":"5.2.0"}]}'
+  printf '%s\\n' '{"source":{"scope":"global","vitePlusVersion":"1.6.0"},"nodes":[{"name":"vite-plus","version":"1.6.0"},{"name":"@voidzero-dev/vite-plus-core","version":"1.6.0"},{"name":"vitest","version":"5.2.0"}]}'
   exit 0
 fi
 if [[ "\${1:-}" == "install" ]]; then
@@ -409,7 +409,7 @@ exit 1
       });
       expect(result.status).toBe(0);
       expect(readLog(vpLog)).toBe(
-        "migrate --no-interactive\ntoolchain vitest --global --json\ninstall\n",
+        "migrate --no-interactive\ntoolchain vitest vite-plus-core --global --json\ninstall\n",
       );
       expect(readFileSync(path.join(root, "AGENTS.md"), "utf8")).toBe("keep\n");
       expect(existsSync(path.join(root, ".vscode/settings.json"))).toBe(false);
