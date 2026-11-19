@@ -7,8 +7,8 @@ const CATALOG_SPECS = [
   {
     key: "vite",
     yamlKey: "vite",
-    value: (versions: { vitePlus: string }) =>
-      `npm:@voidzero-dev/vite-plus-core@${versions.vitePlus}`,
+    value: (versions: { viteCore: string }) =>
+      `npm:@voidzero-dev/vite-plus-core@${versions.viteCore}`,
   },
   {
     key: "vite-plus",
@@ -88,10 +88,10 @@ export function parseToolchainJson(raw: string): unknown {
   return parsed;
 }
 
-export function readBundledVitestVersion(
+function globalToolchainNodes(
   toolchainJson: unknown,
   expectedVitePlus: string,
-): string {
+): ToolchainNode[] {
   if (!isSemver(expectedVitePlus)) {
     throw new Error(`vite-plus の版が不正です: ${expectedVitePlus}`);
   }
@@ -125,27 +125,57 @@ export function readBundledVitestVersion(
       `グローバル CLI は ${String(vitePlus.version)} です。対象は ${expectedVitePlus} です。`,
     );
   }
-  const vitest = nodes.find(
-    (node) => node.name === "vitest" || node.id === "vitest",
-  );
-  if (
-    !vitest ||
-    typeof vitest.version !== "string" ||
-    !isSemver(vitest.version)
-  ) {
-    throw new Error("バンドルされている Vitest の版を読めません。");
+  return nodes;
+}
+
+function readNodeVersion(
+  nodes: readonly ToolchainNode[],
+  matches: (node: ToolchainNode) => boolean,
+  missing: string,
+): string {
+  const node = nodes.find(matches);
+  if (!node || typeof node.version !== "string" || !isSemver(node.version)) {
+    throw new Error(missing);
   }
-  return vitest.version;
+  return node.version;
+}
+
+export function readBundledVitestVersion(
+  toolchainJson: unknown,
+  expectedVitePlus: string,
+): string {
+  return readNodeVersion(
+    globalToolchainNodes(toolchainJson, expectedVitePlus),
+    (node) => node.name === "vitest" || node.id === "vitest",
+    "バンドルされている Vitest の版を読めません。",
+  );
+}
+
+export function readBundledVitePlusCoreVersion(
+  toolchainJson: unknown,
+  expectedVitePlus: string,
+): string {
+  return readNodeVersion(
+    globalToolchainNodes(toolchainJson, expectedVitePlus),
+    (node) =>
+      node.name === "@voidzero-dev/vite-plus-core" ||
+      node.id === "vite-plus-core",
+    "バンドルされている vite-plus-core の版を読めません。",
+  );
 }
 
 export function restoreWorkspaceText(
   original: string,
   migrated: string,
   vitePlus: string,
+  viteCore: string,
   vitest: string,
 ): string {
   if (!isSemver(vitePlus)) {
     throw new Error(`vite-plus の版が不正です: ${vitePlus}`);
+  }
+  if (!isSemver(viteCore)) {
+    throw new Error(`vite-plus-core の版が不正です: ${viteCore}`);
   }
   if (!isSemver(vitest)) {
     throw new Error(`Vitest の版が不正です: ${vitest}`);
@@ -166,7 +196,7 @@ export function restoreWorkspaceText(
   if (!catalog) {
     throw new Error("pnpm-workspace.yaml に catalog がありません。");
   }
-  catalog.lines = upsertCatalog(catalog.lines, vitePlus, vitest);
+  catalog.lines = upsertCatalog(catalog.lines, vitePlus, viteCore, vitest);
   const overrides = migratedDoc.sections.find(
     (section) => section.name === "overrides",
   );
@@ -262,6 +292,7 @@ function renderSections(doc: {
 function upsertCatalog(
   lines: string[],
   vitePlus: string,
+  viteCore: string,
   vitest: string,
 ): string[] {
   let next = [...lines];
@@ -270,7 +301,7 @@ function upsertCatalog(
       next,
       spec.key,
       spec.yamlKey,
-      spec.value({ vitePlus, vitest }),
+      spec.value({ vitePlus, viteCore, vitest }),
     );
   }
   return next;

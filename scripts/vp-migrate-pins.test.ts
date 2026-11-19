@@ -4,6 +4,7 @@ import { describe, expect, it } from "vite-plus/test";
 import { readCatalogVersion } from "./vp-migrate-renovate.ts";
 import {
   parseToolchainJson,
+  readBundledVitePlusCoreVersion,
   readBundledVitestVersion,
   restorePackageJsonText,
   restoreWorkspaceText,
@@ -52,14 +53,19 @@ describe("restoreWorkspaceText", () => {
       "utf8",
     );
     const vitePlus = readCatalogVersion(text, "vite-plus");
+    const viteCore =
+      /npm:@voidzero-dev\/vite-plus-core@(\S+)/.exec(text)?.[1] ?? "";
     const vitest = readCatalogVersion(text, "vitest");
-    expect(restoreWorkspaceText(text, text, vitePlus, vitest)).toBe(text);
+    expect(restoreWorkspaceText(text, text, vitePlus, viteCore, vitest)).toBe(
+      text,
+    );
   });
 
   it("catalog と override を戻し、peerDependencyRules は元のまま残す", () => {
     const restored = restoreWorkspaceText(
       originalWorkspace,
       migratedWorkspace,
+      "1.6.0",
       "1.6.0",
       "5.2.0",
     );
@@ -81,6 +87,33 @@ peerDependencyRules:
     # stylelint 18 に、peer が 17 までの CSS Modules 関連を載せる。
     stylelint: "18"
 `);
+  });
+
+  it("vite-plus と core の版が違っても core の版を使う", () => {
+    const migrated = `catalog:
+  vite: npm:@voidzero-dev/vite-plus-core@8.3.8000
+  vite-plus: 1.7.0
+  vitest: 5.1.0
+  "@vitest/browser-playwright": 5.1.0
+overrides:
+  vite: npm:@voidzero-dev/vite-plus-core@8.3.8000
+  vitest: 5.1.0
+peerDependencyRules:
+  allowAny:
+    - vitest
+`;
+    const restored = restoreWorkspaceText(
+      originalWorkspace,
+      migrated,
+      "1.7.0",
+      "8.3.8000",
+      "5.1.0",
+    );
+    expect(restored).toContain(
+      "vite: npm:@voidzero-dev/vite-plus-core@8.3.8000",
+    );
+    expect(restored).toContain("vite-plus: 1.7.0");
+    expect(restored).not.toContain("vite-plus-core@1.7.0");
   });
 });
 
@@ -148,9 +181,10 @@ describe("restorePackageJsonText", () => {
 describe("readBundledVitestVersion", () => {
   it("グローバル CLI の vitest を読む", () => {
     const parsed = parseToolchainJson(`log line
-{"schemaVersion":1,"source":{"scope":"global","vitePlusVersion":"1.6.0"},"nodes":[{"id":"vite-plus","name":"vite-plus","version":"1.6.0"},{"id":"vitest","name":"vitest","version":"5.2.0"}]}
+{"schemaVersion":1,"source":{"scope":"global","vitePlusVersion":"1.6.0"},"nodes":[{"id":"vite-plus","name":"vite-plus","version":"1.6.0"},{"id":"vite-plus-core","name":"@voidzero-dev/vite-plus-core","version":"8.3.8000"},{"id":"vitest","name":"vitest","version":"5.2.0"}]}
 `);
     expect(readBundledVitestVersion(parsed, "1.6.0")).toBe("5.2.0");
+    expect(readBundledVitePlusCoreVersion(parsed, "1.6.0")).toBe("8.3.8000");
   });
 
   it("ローカルの vite-plus を見ていたら止める", () => {

@@ -17,6 +17,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   parseToolchainJson,
+  readBundledVitePlusCoreVersion,
   readBundledVitestVersion,
   restorePackageJsonText,
   restoreWorkspaceText,
@@ -211,23 +212,29 @@ function apply(): number {
       return migrated;
     }
     restoreGeneratedPaths();
-    const toolchain = run(vp, ["toolchain", "vitest", "--global", "--json"]);
+    const toolchain = run(vp, [
+      "toolchain",
+      "vitest",
+      "vite-plus-core",
+      "--global",
+      "--json",
+    ]);
     if (toolchain.stderr.length > 0) {
       process.stderr.write(toolchain.stderr);
     }
     if (toolchain.status !== 0) {
       return toolchain.status;
     }
-    const vitest = readBundledVitestVersion(
-      parseToolchainJson(toolchain.stdout),
-      version,
-    );
+    const toolchainJson = parseToolchainJson(toolchain.stdout);
+    const vitest = readBundledVitestVersion(toolchainJson, version);
+    const viteCore = readBundledVitePlusCoreVersion(toolchainJson, version);
     writeFileSync(
       WORKSPACE_FILE,
       restoreWorkspaceText(
         originalWorkspace,
         readFileSync(WORKSPACE_FILE, "utf8"),
         version,
+        viteCore,
         vitest,
       ),
     );

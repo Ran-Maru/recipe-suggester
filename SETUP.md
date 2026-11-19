@@ -34,7 +34,7 @@ Node.js, pnpm のバージョンは Vite Plus で管理する。（[`.node-versi
 ## Vite Plusのアップデート手順
 
 - 手元で上げるときは `vp upgrade` でグローバル CLI を上げ、ワークスペースルートで `vp migrate --no-interactive` を実行する。`--full` は付けない。
-- catalog の `vite-plus` と `vite`（`@voidzero-dev/vite-plus-core`）が同じバージョンか、`pnpm-workspace.yaml` の `vitest` が `vp toolchain vitest` のバージョンかを確認する。override の値は `catalog:` のまま。
+- catalog の `vite`（`@voidzero-dev/vite-plus-core`）が `vp toolchain vite-plus-core` の版か、`pnpm-workspace.yaml` の `vitest` が `vp toolchain vitest` の版かを確認する。core の版は `vite-plus` の版と別に合わせる。override の値は `catalog:` のまま。
 - 依存の入れ直しは `vp install`。`vp update` は依存全体が上がる。
 - Renovate は `renovate/vite-plus` を開き、`hold` を付ける。ワークフローが対象版のグローバル CLI で同じ migrate を実行し、差分があれば `chore: vp migrate <版>` を同じブランチへ載せる。このコミットが載ってから見る。差分が無いときは Tests を手動起動する。
 - その push にはリポジトリシークレット `VP_MIGRATE_PUSH_TOKEN` が要る。中身は、このリポジトリの contents を読み書きできる fine-grained PAT にする。
