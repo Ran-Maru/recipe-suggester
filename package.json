@@ -33,7 +33,7 @@
     "@css-modules-kit/stylelint-plugin": "^1.4.2",
     "@css-modules-kit/ts-plugin": "^1.4.2",
     "@playwright/test": "1.65.1",
-    "@tanstack/react-router-devtools": "^1.167.3",
+    "@tanstack/react-router-devtools": "^1.167.4",
     "@tanstack/router-plugin": "^1.169.0",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
